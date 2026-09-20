@@ -1,0 +1,52 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/versions
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# production
+/build
+
+# misc
+.DS_Store
+Thumbs.db
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files
+.env
+.env*.local
+.env.development
+.env.production
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+
+# ---------------------------------------------------------------------------
+# Source briefing material. Deliberately NOT committed.
+#
+# This repository is public. The introduction deck names clients that the site
+# itself anonymises under confidentiality agreements, and the walkthrough video
+# is an internal recording. Keep both out of version control and share them
+# through a private channel instead.
+# ---------------------------------------------------------------------------
+*.pdf
+*.mp4

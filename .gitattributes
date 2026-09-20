@@ -1,0 +1,11 @@
+# Normalise line endings so the repo stays consistent across Windows and CI.
+* text=auto eol=lf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.mp4 binary

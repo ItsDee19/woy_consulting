@@ -1,0 +1,360 @@
+@import "tailwindcss";
+
+/* dark mode is driven by a data attribute set on <html> */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------------------------------------------------------------- tokens --- */
+:root {
+  --c-bg:      #FBF9F7;   /* warm white */
+  --c-raised:  #FFFFFF;
+  --c-sunken:  #F3EEE9;
+  --c-ink:     #14171D;   /* charcoal */
+  --c-ink2:    #4B525C;
+  --c-ink3:    #7C838D;
+  --c-line:    #E4DDD5;
+  --c-line2:   #D2C8BE;
+  --c-red:     #CD1421;   /* WOY logo red */
+  --c-redb:    #E83928;   /* WOY accent red */
+  --c-reddeep: #A50F1A;
+  --c-block:   #10141B;   /* the single dark colour block */
+  --c-onblock: #F6F2EE;
+  --c-onblock2:#A3ABB6;
+  --c-blockline:#262D37;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --c-bg:      #0E1013;
+  --c-raised:  #15181D;
+  --c-sunken:  #090B0D;
+  --c-ink:     #F2EEE9;
+  --c-ink2:    #A9B0B9;
+  --c-ink3:    #79808A;
+  --c-line:    #242A31;
+  --c-line2:   #333B44;
+  --c-red:     #E8412F;
+  --c-redb:    #FF5A44;
+  --c-reddeep: #C41F16;
+  --c-block:   #090B0D;
+  --c-onblock: #F2EEE9;
+  --c-onblock2:#A9B0B9;
+  --c-blockline:#242A31;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg:        var(--c-bg);
+  --color-raised:    var(--c-raised);
+  --color-sunken:    var(--c-sunken);
+  --color-ink:       var(--c-ink);
+  --color-ink2:      var(--c-ink2);
+  --color-ink3:      var(--c-ink3);
+  --color-line:      var(--c-line);
+  --color-line2:     var(--c-line2);
+  --color-red:       var(--c-red);
+  --color-redb:      var(--c-redb);
+  --color-reddeep:   var(--c-reddeep);
+  --color-block:     var(--c-block);
+  --color-onblock:   var(--c-onblock);
+  --color-onblock2:  var(--c-onblock2);
+  --color-blockline: var(--c-blockline);
+
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-brand: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ------------------------------------------------------------------ base --- */
+@layer base {
+  * { border-color: var(--c-line); }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 { letter-spacing: -0.028em; line-height: 1.08; font-weight: 500; }
+
+  ::selection { background: var(--c-red); color: #fff; }
+
+  :focus-visible { outline: 2px solid var(--c-red); outline-offset: 3px; border-radius: 1px; }
+}
+
+/* ------------------------------------------------------------ utilities --- */
+@utility shell {
+  width: 100%;
+  max-width: 1320px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 5vw, 4.5rem);
+}
+
+/* fluid display scale */
+@utility t-display {
+  font-size: clamp(2.15rem, 1.55rem + 2.5vw, 3.55rem);
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  font-weight: 400;
+}
+@utility t-h2 {
+  font-size: clamp(1.95rem, 1.6rem + 1.75vw, 3.25rem);
+  letter-spacing: -0.032em;
+  line-height: 1.06;
+  font-weight: 400;
+}
+@utility t-h3 {
+  font-size: clamp(1.5rem, 1.33rem + 0.84vw, 2rem);
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  font-weight: 400;
+}
+
+/* =============================================================================
+   LOGO FORMATION LOOP
+   One 11s timeline shared by every part of the mark so it can never drift.
+   Geometry measured from WOY's own artwork: ring, five spokes at
+   0/90/180/230/310 degrees, compass north marker.
+   ============================================================================= */
+.mk-ring, .mk-star, .mk-compass, .mk-compass-ring,
+.mk-letters path, .mk-consulting, .mk-bezel {
+  transform-box: view-box;
+  transform-origin: 180px 94px;
+}
+
+.mk-ring {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: mkRingDraw 11s linear infinite, mkFromLeft 11s cubic-bezier(.16,1,.3,1) infinite;
+}
+@keyframes mkRingDraw {
+  0%, 2%   { stroke-dashoffset: 1; opacity: 0; }
+  3%       { opacity: 1; }
+  13%      { stroke-dashoffset: 0; }
+  93%      { stroke-dashoffset: 0; opacity: 1; }
+  99%,100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes mkFromLeft {
+  0%, 26%  { transform: translateX(-72px) scale(.5); }
+  38%, 83% { transform: translateX(0) scale(1); }
+  94%,100% { transform: translateX(-72px) scale(.5); }
+}
+
+.mk-star path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: mkSpokeDraw 11s linear infinite;
+}
+.mk-star path:nth-child(1) { animation-delay: 0s; }
+.mk-star path:nth-child(2) { animation-delay: .08s; }
+.mk-star path:nth-child(3) { animation-delay: .16s; }
+.mk-star path:nth-child(4) { animation-delay: .24s; }
+.mk-star path:nth-child(5) { animation-delay: .32s; }
+@keyframes mkSpokeDraw {
+  0%, 6%   { stroke-dashoffset: 1; opacity: 0; }
+  7%       { opacity: 1; }
+  17%      { stroke-dashoffset: 0; }
+  93%      { stroke-dashoffset: 0; opacity: 1; }
+  99%,100% { stroke-dashoffset: 0; opacity: 0; }
+}
+.mk-star { animation: mkStarScale 11s cubic-bezier(.16,1,.3,1) infinite; }
+@keyframes mkStarScale {
+  0%, 26%  { transform: scale(.5); }
+  38%, 83% { transform: scale(1); }
+  94%,100% { transform: scale(.5); }
+}
+
+.mk-compass { animation: mkFromRight 11s cubic-bezier(.16,1,.3,1) infinite; }
+@keyframes mkFromRight {
+  0%, 26%  { transform: translateX(72px) scale(.5); }
+  38%, 83% { transform: translateX(0) scale(1); }
+  94%,100% { transform: translateX(72px) scale(.5); }
+}
+.mk-compass-ring {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: mkCompassRing 11s linear infinite;
+}
+@keyframes mkCompassRing {
+  0%, 10%  { stroke-dashoffset: 1; opacity: 0; }
+  11%      { opacity: .85; }
+  20%      { stroke-dashoffset: 0; opacity: .85; }
+  30%      { opacity: .85; }
+  37%, 86% { opacity: 0; }
+  92%,100% { opacity: .85; }
+}
+.mk-needle { animation: mkNeedle 11s cubic-bezier(.16,1,.3,1) infinite; }
+@keyframes mkNeedle {
+  0%, 12%  { opacity: 0; transform: translateY(-6px); }
+  21%      { opacity: 1; transform: translateY(0); }
+  93%      { opacity: 1; transform: translateY(0); }
+  99%,100% { opacity: 0; transform: translateY(0); }
+}
+
+.mk-letters path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: mkLetter 11s cubic-bezier(.16,1,.3,1) infinite;
+}
+.mk-letters path:nth-child(2) { animation-delay: .1s; }
+.mk-letters path:nth-child(3) { animation-delay: .18s; }
+@keyframes mkLetter {
+  0%, 38%  { stroke-dashoffset: 1; opacity: 0; }
+  40%      { opacity: 1; }
+  50%      { stroke-dashoffset: 0; }
+  76%      { stroke-dashoffset: 0; opacity: 1; }
+  84%,100% { stroke-dashoffset: 1; opacity: 0; }
+}
+
+.mk-consulting {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 6px;
+  animation: mkWord 11s cubic-bezier(.16,1,.3,1) infinite;
+}
+@keyframes mkWord {
+  0%, 46%  { opacity: 0; letter-spacing: 13px; }
+  54%, 76% { opacity: 1; letter-spacing: 6px; }
+  82%,100% { opacity: 0; letter-spacing: 13px; }
+}
+
+.mk-bezel {
+  opacity: .16;
+  animation: mkBezel 44s linear infinite, mkBezelFade 11s cubic-bezier(.16,1,.3,1) infinite;
+}
+@keyframes mkBezel { to { transform: rotate(360deg); } }
+@keyframes mkBezelFade {
+  0%, 24%  { opacity: 0; }
+  40%, 80% { opacity: .16; }
+  92%,100% { opacity: 0; }
+}
+
+/* costs nothing once it has scrolled away */
+.is-paused .mk-ring, .is-paused .mk-star, .is-paused .mk-star path,
+.is-paused .mk-compass, .is-paused .mk-compass-ring, .is-paused .mk-needle,
+.is-paused .mk-letters path, .is-paused .mk-consulting, .is-paused .mk-bezel {
+  animation-play-state: paused;
+}
+
+/* complete static lockup when motion is not wanted */
+@media (prefers-reduced-motion: reduce) {
+  .mk-ring, .mk-star, .mk-star path, .mk-compass, .mk-needle,
+  .mk-letters path, .mk-consulting, .mk-bezel { animation: none !important; }
+  .mk-ring, .mk-star path, .mk-letters path { stroke-dashoffset: 0; opacity: 1; }
+  .mk-ring, .mk-star, .mk-compass { transform: none; }
+  .mk-compass-ring { opacity: 0; animation: none !important; }
+  .mk-consulting { opacity: 1; letter-spacing: 6px; }
+  .mk-bezel { opacity: .14; }
+}
+
+/* ---------------------------------------------------------- page enter --- */
+.page-enter { animation: pageEnter .42s cubic-bezier(.16,1,.3,1) both; }
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ------------------------------------------------------ scroll progress --- */
+.scroll-progress { transform: scaleX(0); transform-origin: left; }
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    animation: progressGrow linear both;
+    animation-timeline: scroll(root block);
+  }
+}
+@keyframes progressGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* ------------------------------------------------------- scroll reveal --- */
+/* Scoped to [data-js] so the content is visible if scripting never runs. */
+[data-js] .reveal { opacity: 0; transform: translateY(var(--ry, 22px)); }
+[data-js] .reveal.is-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity .65s cubic-bezier(.16,1,.3,1), transform .65s cubic-bezier(.16,1,.3,1);
+  transition-delay: var(--rd, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter { animation: none; }
+  .scroll-progress { animation: none; }
+  [data-js] .reveal,
+  [data-js] .reveal.is-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* --------------------------------------------------------------- marquee --- */
+@keyframes marqueeL { to { transform: translateX(-50%); } }
+@keyframes marqueeR { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+.marquee-l { animation: marqueeL 70s linear infinite; }
+.marquee-r { animation: marqueeR 86s linear infinite; }
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+.marquee-wrap:hover .marquee-l,
+.marquee-wrap:hover .marquee-r { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .marquee-l, .marquee-r { animation: none; }
+  .marquee-mask { -webkit-mask-image: none; mask-image: none; }
+}
+
+/* ------------------------------------------------------ accordion panel --- */
+.acc-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s cubic-bezier(.16,1,.3,1); }
+.acc-panel[data-open="true"] { grid-template-rows: 1fr; }
+.acc-panel > div { overflow: hidden; min-height: 0; }
+@media (prefers-reduced-motion: reduce) { .acc-panel { transition: none; } }
+
+/* -------------------------------------------------------- photo reveal --- */
+.reveal-photo img,
+.reveal-photo .tile {
+  filter: grayscale(1) contrast(1.04);
+  transform: scale(1.03);
+  transition: filter .7s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1);
+}
+.reveal-photo:hover img,
+.reveal-photo:hover .tile { filter: grayscale(0) contrast(1); transform: scale(1); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal-photo img, .reveal-photo .tile { filter: none; transform: none; }
+}
+
+/* ------------------------------------------------------------ logo band ---
+   Client marks are shown in full colour, with no plate and no border around
+   them. The extracted artwork carries a white background, and several brands
+   (EY, Airtel, Horiba, Union Bank) have a dark or coloured lockup of their own,
+   so the band itself is a white surface in both themes. That is what lets the
+   logos sit directly on the page with nothing drawn around them, and keeps
+   every mark legible without recolouring anyone's brand.
+   Locally re-pointing the ink tokens keeps the captions readable in dark mode. */
+.logo-band {
+  background: #FFFFFF;
+  --c-ink:   #14171D;
+  --c-ink2:  #4B525C;
+  --c-ink3:  #7C838D;
+  --c-line:  #E4DDD5;
+  --c-line2: #D2C8BE;
+  --c-red:   #CD1421;
+}
+
+.logo-plate img {
+  transition: transform .45s cubic-bezier(.16,1,.3,1);
+}
+.logo-plate:hover img { transform: scale(1.05); }
+@media (prefers-reduced-motion: reduce) {
+  .logo-plate img { transition: none; }
+  .logo-plate:hover img { transform: none; }
+}
+
+/* ------------------------------------------------------------ scrollbar --- */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar { width: 11px; height: 11px; }
+  ::-webkit-scrollbar-track { background: var(--c-sunken); }
+  ::-webkit-scrollbar-thumb { background: var(--c-line2); border: 3px solid var(--c-sunken); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--c-ink3); }
+}
