@@ -1,28 +1,38 @@
-import type { Metadata } from "next";
+import { StructuredData } from "@/components/StructuredData";
+import { contentPageGraph, schemaId, serviceGraph } from "@/lib/structured-data";
+import { pageMetadata } from "@/lib/metadata";
 import Image from "next/image";
 import { PageHero } from "@/components/PageHero";
 import { CTASection } from "@/components/CTASection";
 import { Reveal } from "@/components/Reveal";
 import { capabilities, pillars, type Pillar } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "Expertise",
-  description:
-    "Six capabilities across three outcomes: coaching and leadership development, inclusive leadership and culture, people and culture consulting, HR capability and transformation, strategy and sales management, organisation diagnostics and restructuring.",
-};
+export const metadata = pageMetadata(
+  "Leadership & Business Consulting Services",
+  "Explore WOY expertise in leadership coaching, culture, people consulting, HR transformation, strategy, sales and organisation diagnostics.",
+  "/expertise"
+);
 
 const PILLAR_ORDER: Pillar[] = ["empowering", "transforming", "accelerating"];
 
 /* one supporting image per pillar, placed so the page is not a wall of text */
 const PILLAR_IMAGE: Record<Pillar, string> = {
-  empowering: "https://picsum.photos/seed/woy-coaching-session/1100/620",
-  transforming: "https://picsum.photos/seed/woy-hr-workshop/1100/620",
-  accelerating: "https://picsum.photos/seed/woy-strategy-review/1100/620",
+  empowering: "/images/coaching-session.webp",
+  transforming: "/images/hr-workshop.webp",
+  accelerating: "/images/strategy-review.webp",
 };
 
 export default function ExpertisePage() {
   return (
     <>
+      <StructuredData id="expertise-structured-data" nodes={[
+          ...contentPageGraph({
+            path: "/expertise", name: "Leadership and Business Consulting Services", description: metadata.description ?? "",
+            type: "CollectionPage",
+            mainEntity: capabilities.map((capability) => ({ "@id": schemaId("/expertise", capability.slug) })),
+          }),
+          ...serviceGraph(),
+        ]} />
       <PageHero
         kicker="Expertise"
         title="Six capabilities. Three outcomes. One operating reality: yours."
@@ -64,7 +74,8 @@ export default function ExpertisePage() {
                       width={1100}
                       height={620}
                       className="h-full w-full object-cover"
-                      unoptimized
+                      sizes="(max-width: 1023px) 90vw, 570px"
+                      loading={pi === 0 ? "eager" : "lazy"}
                     />
                   </figure>
                 </Reveal>

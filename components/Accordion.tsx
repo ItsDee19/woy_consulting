@@ -50,6 +50,8 @@ export function ApproachAccordion({ tone = "dark" }: { tone?: "dark" | "light" }
               data-open={isOpen}
               id={`panel-${step.key}`}
               role="region"
+              aria-hidden={!isOpen}
+              inert={!isOpen}
               aria-labelledby={`btn-${step.key}`}
             >
               <div>

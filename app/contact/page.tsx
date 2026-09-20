@@ -1,18 +1,24 @@
-import type { Metadata } from "next";
+import { StructuredData } from "@/components/StructuredData";
+import { contentPageGraph, schemaId } from "@/lib/structured-data";
+import { pageMetadata } from "@/lib/metadata";
 import { PageHero } from "@/components/PageHero";
 import { ContactForm } from "@/components/ContactForm";
 import { Reveal } from "@/components/Reveal";
 import { approach } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Leave your name, mobile number and email, and a WOY partner will reach out for a short conversation.",
-};
+export const metadata = pageMetadata(
+  "Request a Conversation",
+  "Tell us about your leadership, people or business challenge. Share your details to request a short conversation with a WOY Consulting partner.",
+  "/contact"
+);
 
 export default function ContactPage() {
   return (
     <>
+      <StructuredData id="contact-structured-data" nodes={contentPageGraph({
+          path: "/contact", name: "Contact WOY Consulting", description: metadata.description ?? "",
+          type: "ContactPage", mainEntity: { "@id": schemaId("/", "organization") },
+        })} />
       <PageHero
         kicker="Contact"
         title="Leave your details and a partner will reach out."

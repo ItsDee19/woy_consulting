@@ -28,10 +28,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files
-.env
-.env*.local
-.env.development
-.env.production
+.env*
 !.env.example
 
 # vercel
@@ -50,3 +47,6 @@ yarn-error.log*
 # ---------------------------------------------------------------------------
 *.pdf
 *.mp4
+
+# Local audit outputs
+/reports/

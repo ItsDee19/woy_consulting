@@ -1,4 +1,7 @@
+import { StructuredData } from "@/components/StructuredData";
+import { caseStudySchema, contentPageGraph, schemaId } from "@/lib/structured-data";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/dist/ssr";
@@ -18,11 +21,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const c = caseStudyBySlug(slug);
-  if (!c) return { title: "Case study" };
-  return {
-    title: `${c.title} | ${c.industry}`,
-    description: c.context,
-  };
+  if (!c) notFound();
+  return pageMetadata(
+    c.title,
+    `${c.industry} case study: ${c.headline}`,
+    `/case-studies/${c.slug}`
+  );
 }
 
 const BLOCKS = [
@@ -45,6 +49,13 @@ export default async function CaseStudyPage({
 
   return (
     <>
+      <StructuredData id="case-study-structured-data" nodes={[
+        ...contentPageGraph({
+          path: `/case-studies/${study.slug}`, name: study.title, description: `${study.industry} case study: ${study.headline}`,
+          mainEntity: { "@id": schemaId(`/case-studies/${study.slug}`, "case-study") },
+        }, [{ name: "Case Studies", path: "/case-studies" }]),
+        caseStudySchema(study),
+      ]} />
       <section className="relative overflow-hidden border-b border-line bg-sunken">
         <MarkGlyph className="pointer-events-none absolute -right-16 -top-20 h-[420px] w-[420px] text-red opacity-[0.045] md:right-[4%]" />
 

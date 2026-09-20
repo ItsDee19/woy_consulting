@@ -1,4 +1,6 @@
-import type { Metadata } from "next";
+import { StructuredData } from "@/components/StructuredData";
+import { contentPageGraph, schemaId } from "@/lib/structured-data";
+import { pageMetadata } from "@/lib/metadata";
 import Image from "next/image";
 import { PageHero } from "@/components/PageHero";
 import { PhilosophyMark } from "@/components/PhilosophyMark";
@@ -8,15 +10,19 @@ import { Stats } from "@/components/Stats";
 import { ClientGrid } from "@/components/ClientLogos";
 import { differentiators, logoDisclaimer, site } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "About",
-  description:
-    "WOY is a boutique, practitioner-led consulting firm established in 2015. A consortium of former CEOs and CXOs working across multinationals, conglomerates, public sector, SMEs and founder-led businesses.",
-};
+export const metadata = pageMetadata(
+  "About Our Practitioner-led Firm",
+  "Meet WOY Consulting, a boutique advisory founded in 2015. Former CEOs and CXOs help organisations strengthen leadership, people, culture and execution.",
+  "/about"
+);
 
 export default function AboutPage() {
   return (
     <>
+      <StructuredData id="about-structured-data" nodes={contentPageGraph({
+          path: "/about", name: "About WOY Consulting", description: metadata.description ?? "",
+          type: "AboutPage", mainEntity: { "@id": schemaId("/", "organization") },
+        })} />
       <PageHero
         kicker={`Practitioner-led since ${site.established}`}
         title="We have sat in the chair before advising the person in it."
@@ -29,13 +35,13 @@ export default function AboutPage() {
           <Reveal>
             <figure className="reveal-photo m-0 h-[220px] overflow-hidden md:h-[400px]">
               <Image
-                src="https://picsum.photos/seed/woy-leadership-room/1800/760"
-                alt="Senior leaders in a working session"
+                src="/images/leadership-room.webp"
+                alt=""
                 width={1800}
                 height={760}
                 className="h-full w-full object-cover"
-                unoptimized
-                priority
+                sizes="(max-width: 1320px) 90vw, 1176px"
+                loading="eager"
               />
             </figure>
           </Reveal>

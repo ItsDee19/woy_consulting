@@ -20,7 +20,7 @@ import { useEffect, useRef, type ElementType, type ReactNode } from "react";
 export function Reveal({
   children,
   delay = 0,
-  y = 22,
+  y = 16,
   className = "",
   as: Tag = "div",
 }: {
@@ -36,25 +36,24 @@ export function Reveal({
     const el = ref.current;
     if (!el) return;
 
-    const show = () => el.classList.add("is-in");
+    const show = () => { el.classList.remove("is-ready"); el.classList.add("is-in"); };
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       show();
       return;
     }
 
-    /* already on screen: show it now, do not wait for an observer tick */
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight * 0.95 && rect.bottom > 0) {
-      show();
-      return;
-    }
-
+    // Content starts visible. The observer supplies layout measurements in a
+    // batch, avoiding a synchronous layout read for every revealed section.
     const io = new IntersectionObserver(
       ([entry], obs) => {
-        if (!entry.isIntersecting) return;
-        show();
-        obs.disconnect();
+        const rect = entry.boundingClientRect;
+        if (entry.isIntersecting || (rect.top < window.innerHeight && rect.bottom > 0)) {
+          show();
+          obs.disconnect();
+        } else {
+          el.classList.add("is-ready");
+        }
       },
       { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }
     );
@@ -62,7 +61,8 @@ export function Reveal({
 
     /* backstop, in case the callback never arrives */
     const failsafe = window.setTimeout(() => {
-      if (el.getBoundingClientRect().top < window.innerHeight) show();
+      show();
+      io.disconnect();
     }, 2500);
 
     return () => {

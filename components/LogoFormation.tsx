@@ -41,10 +41,10 @@ export function LogoFormation({ className = "" }: { className?: string }) {
     >
       {/* soft brand halo so the mark is not floating on a flat field */}
       <div
-        className="pointer-events-none absolute -inset-x-[6%] -inset-y-[12%]"
+        className="pointer-events-none absolute inset-x-0 -inset-y-[12%]"
         style={{
           background:
-            "radial-gradient(60% 55% at 50% 47%, color-mix(in srgb, var(--c-red) 12%, transparent), transparent 72%)",
+            "radial-gradient(60% 55% at 50% 47%, color-mix(in srgb, var(--c-logo-red) 12%, transparent), transparent 72%)",
         }}
       />
 
@@ -68,9 +68,9 @@ export function LogoFormation({ className = "" }: { className?: string }) {
             x2="272"
             y2="160"
           >
-            <stop offset="0%" stopColor="var(--c-red)" />
-            <stop offset="55%" stopColor="var(--c-redb)" />
-            <stop offset="100%" stopColor="var(--c-red)" />
+            <stop offset="0%" stopColor="var(--c-logo-red)" />
+            <stop offset="55%" stopColor="var(--c-logo-accent)" />
+            <stop offset="100%" stopColor="var(--c-logo-red)" />
           </linearGradient>
         </defs>
 
@@ -81,7 +81,7 @@ export function LogoFormation({ className = "" }: { className?: string }) {
             cy={MARK.cy}
             r={47}
             fill="none"
-            stroke="var(--c-red)"
+            stroke="var(--c-logo-red)"
             strokeWidth={1}
             strokeDasharray="0.6 5.2"
             strokeLinecap="round"
@@ -91,7 +91,7 @@ export function LogoFormation({ className = "" }: { className?: string }) {
             cy={MARK.cy}
             r={53.5}
             fill="none"
-            stroke="var(--c-red)"
+            stroke="var(--c-logo-red)"
             strokeWidth={0.6}
             strokeDasharray="1.4 12"
           />
@@ -131,10 +131,10 @@ export function LogoFormation({ className = "" }: { className?: string }) {
             r={MARK.r}
             pathLength={1}
             fill="none"
-            stroke="var(--c-red)"
+            stroke="var(--c-logo-red)"
             strokeWidth={2.4}
           />
-          <path className="mk-needle" d={MARK.needle} fill="var(--c-red)" />
+          <path className="mk-needle" d={MARK.needle} fill="var(--c-logo-red)" />
         </g>
 
         {/* the wordmark completes the lockup */}
@@ -156,7 +156,7 @@ export function LogoFormation({ className = "" }: { className?: string }) {
           x={MARK.wordX}
           y={MARK.wordY}
           textAnchor="middle"
-          fill="var(--c-red)"
+          fill="var(--c-logo-red)"
         >
           CONSULTING
         </text>

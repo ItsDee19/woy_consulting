@@ -10,7 +10,7 @@ export const site = {
   established: 2015,
   cta: "Request a conversation",
   description:
-    "Practitioner-led advisory working with leaders on strategy, leadership capability, culture and execution. A consortium of former CEOs and CXOs.",
+    "WOY Consulting helps organisations develop leaders, strengthen people and culture, and turn strategy into execution through former CEO and CXO expertise.",
 };
 
 export const nav = [

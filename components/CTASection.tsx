@@ -21,7 +21,7 @@ export function CTASection({
         </p>
         <Link
           href="/contact"
-          className="group mt-9 inline-flex items-center gap-2.5 rounded-[2px] bg-red px-7 py-4 font-medium text-white transition-all duration-300 hover:bg-redb active:translate-y-px"
+          className="group mt-9 inline-flex items-center gap-2.5 rounded-[2px] bg-action px-7 py-4 font-medium text-white transition-all duration-300 hover:bg-action-hover active:translate-y-px"
         >
           {site.cta}
           <ArrowRight

@@ -1,8 +1,6 @@
 # WOY Consulting - website
 
-A multi-page Next.js site (App Router, TypeScript, Tailwind v4). Every page
-renders from a single content file, so copy changes never require touching a
-component.
+A multi-page Next.js site (App Router, TypeScript, Tailwind v4). Core marketing copy is maintained in `lib/content.ts`; policy text lives in the two legal page files.
 
 ```
 app/
@@ -22,6 +20,8 @@ _legacy/                the earlier single-page static build, kept for reference
 
 ## Run it
 
+Use Node.js 22.19 or newer (Node 24 recommended for the development tools).
+
 ```bash
 npm install
 ```
@@ -30,29 +30,28 @@ npm install
 npm run dev
 ```
 
-Opens on `http://localhost:5173`. `npm run build` produces 17 prerendered routes,
-including `sitemap.xml` and `robots.txt`.
+Opens on `http://localhost:5173`. `npm run build` produces public pages, legal pages, social/icon assets, sitemap and robots. The contact API runs on the server.
+
+See [the launch checklist](docs/launch-checklist.md) for the 20-point audit and deployment requirements, and [SEO/GEO readiness](docs/seo-geo.md) for search improvements and public-domain setup.
+
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npm start -- -p 5173
+```
+
+With that production server running, use `npm run test:browser` for the route, accessibility and interaction checks, and `npm run test:performance` for mobile/desktop Lighthouse reports. These use Chrome on Windows or Playwright Chromium elsewhere; set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use another installed Chromium browser. Results are written to ignored `reports/`.
 
 ## Deploy to Vercel
 
 Vercel auto-detects Next.js, so there is nothing to configure in the build
 settings. Import `ItsDee19/woy_consulting`, accept the defaults, and deploy.
 
-Then set these under **Settings > Environment Variables**:
+Set server-only variables from `.env.example`: `SITE_URL`, `CONTACT_ENDPOINT`, `CONTACT_FORM_SECRET` and optional `CONTACT_ENDPOINT_TOKEN`. Rebuild after changing the public origin. Without delivery configuration the form reports unavailable and retains entered details.
 
-| Variable | Value | Scope |
-|---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | `https://woyconsulting.com` | Production |
-| `NEXT_PUBLIC_CONTACT_ENDPOINT` | your form handler URL | Production, Preview |
-
-Neither is required for a first deploy. Without `NEXT_PUBLIC_SITE_URL` the app
-falls back to the Vercel production domain, then the preview domain, then
-localhost. Without `NEXT_PUBLIC_CONTACT_ENDPOINT` the contact form validates and
-reports success without sending anything.
-
-`vercel.json` sets security headers on every route and a one year immutable
-cache on `/logos/*`. Preview deployments return `Disallow: /` in `robots.txt`,
-so only the production domain is indexed.
+HTTPS redirects, HSTS, CSP and other headers are in `next.config.mjs`. Hosting must supply TLS and trustworthy proxy headers. Preview/local builds block indexing. See [the checklist](docs/launch-checklist.md) for shared spam-limit requirements.
 
 **Note on the repository:** `.gitignore` excludes `*.pdf` and `*.mp4`. The
 introduction deck names clients that the site itself anonymises under
@@ -71,6 +70,9 @@ through a private channel rather than committing them.
 | `/case-studies/[slug]` | Six detail pages, generated from `lib/content.ts` |
 | `/practitioners` | Profiles with hover reveals and LinkedIn slots |
 | `/contact` | Name, mobile and email form |
+| `/faq` | Answers about WOY, its services, approach and enquiries |
+| `/privacy-policy` | Information handling and cookie choices |
+| `/terms-and-conditions` | Website terms and enquiries |
 
 Adding a seventh case study means adding one object to `caseStudies` in
 `lib/content.ts`. The index card, the detail page, the route and its metadata
@@ -111,7 +113,7 @@ Spokes reach `0.745` of the ring's centreline radius.
 ## The hero animation
 
 One 11 second CSS timeline in `globals.css`, shared by every part of the mark so
-it cannot drift. Auto-loops, no replay control.
+it cannot drift. Auto-loops; respects system reduced-motion preferences.
 
 | Time | What happens |
 |---|---|
@@ -174,17 +176,9 @@ file was cropped to remove a baked-in award badge.
 
 ## Before this goes live
 
-Each is marked `TODO` in the source.
+The following details require WOY’s production information.
 
-1. **Contact form endpoint.** The form validates and shows loading, error and
-   success states, but posts nowhere. Create `.env.local`:
-
-   ```
-   NEXT_PUBLIC_CONTACT_ENDPOINT=https://formspree.io/f/YOUR_ID
-   ```
-
-   Any handler that accepts a `POST` of `FormData` and returns 2xx will work.
-   Without it the form runs in demo mode and logs a console warning.
+1. **Contact delivery.** Configure the server-only handler and signing secret from `.env.example`. Add the privacy email when provided.
 
 2. **LinkedIn URLs.** `linkedin` is `null` for all three practitioners in
    `lib/content.ts`, and the card shows a placeholder line. These were not
@@ -194,13 +188,9 @@ Each is marked `TODO` in the source.
    initials tile is replaced automatically. Stock faces were not substituted
    under real people's names.
 
-4. **Section photography.** `/about` and `/expertise` use `picsum.photos`
-   placeholders. Replace with WOY's own photography at roughly 1800x760 and
-   1100x620.
+4. **Section photography.** Existing decorative stock photos are optimized locally in `public/images/`. Replace them with WOY-owned photography when available and update meaningful alternatives.
 
-5. **Domain.** `metadataBase` in `app/layout.tsx` is set to
-   `https://woyconsulting.com`. Point it at the real domain so Open Graph URLs
-   resolve.
+5. **Domain.** Set `SITE_URL` to the verified public origin for metadata, sitemap and HTTPS redirects.
 
 ## Content decisions
 
@@ -218,5 +208,5 @@ Each is marked `TODO` in the source.
   and an `aria-live` status.
 - Every animation honours `prefers-reduced-motion`.
 - Dark mode follows the system and can be overridden from the nav; the choice
-  persists in `localStorage` and is applied before first paint.
+  is applied before first paint and persists only with optional theme-memory consent.
 - No scroll listeners anywhere.

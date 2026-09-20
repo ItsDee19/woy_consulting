@@ -1,3 +1,6 @@
+import { pageMetadata } from "@/lib/metadata";
+import { StructuredData } from "@/components/StructuredData";
+import { webPageSchema } from "@/lib/structured-data";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { LogoFormation } from "@/components/LogoFormation";
@@ -14,11 +17,18 @@ import {
   type Pillar,
 } from "@/lib/content";
 
+export const metadata = pageMetadata(
+  "Leadership & Business Advisory",
+  site.description,
+  "/"
+);
+
 const PILLAR_ORDER: Pillar[] = ["empowering", "transforming", "accelerating"];
 
 export default function Home() {
   return (
     <>
+      <StructuredData id="home-structured-data" nodes={[webPageSchema({ path: "/", name: "WOY Consulting | Leadership & Business Advisory", description: site.description })]} />
       {/* ------------------------------------------------------------ hero */}
       <section className="shell flex min-h-[calc(100dvh-72px)] items-center pb-14 pt-8 md:pb-20">
         <div className="grid w-full items-center gap-8 lg:grid-cols-[1.12fr_1fr] lg:gap-14">
@@ -35,7 +45,7 @@ export default function Home() {
             <div className="mt-9">
               <Link
                 href="/contact"
-                className="group inline-flex items-center gap-2.5 rounded-[2px] bg-red px-7 py-4 font-medium text-white transition-all duration-300 hover:bg-reddeep hover:shadow-[0_10px_26px_-12px_rgba(205,20,33,.7)] active:translate-y-px"
+                className="group inline-flex items-center gap-2.5 rounded-[2px] bg-action px-7 py-4 font-medium text-white transition-all duration-300 hover:bg-action-hover hover:shadow-[0_10px_26px_-12px_rgba(205,20,33,.7)] active:translate-y-px"
               >
                 {site.cta}
                 <ArrowRight
@@ -67,8 +77,9 @@ export default function Home() {
           <Reveal delay={0.08}>
             <div className="grid max-w-[62ch] gap-5 font-light leading-relaxed text-ink2">
               <p>
-                We help leaders and organisations move from intent to execution,
-                through practitioner insight, bespoke design and disciplined
+                WOY Consulting is a practitioner-led leadership and business advisory
+                established in 2015. We help leaders and organisations move from intent
+                to execution through practitioner insight, bespoke design and disciplined
                 implementation. Our partners are former senior leaders who have
                 led through scale, complexity and change, so the work is grounded
                 in real operating realities rather than theory.

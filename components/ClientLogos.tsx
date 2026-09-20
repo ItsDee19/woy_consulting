@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { getImageProps } from "next/image";
 import { clientLogos, logoDisclaimer, type ClientLogo } from "@/lib/content";
 
 /* Full colour, no plate, no border. The band behind these is a white surface
@@ -6,17 +6,25 @@ import { clientLogos, logoDisclaimer, type ClientLogo } from "@/lib/content";
    on the page with nothing drawn around it. */
 function Plate({ logo, size = "md" }: { logo: ClientLogo; size?: "md" | "sm" }) {
   const box = size === "md" ? "h-16" : "h-12";
+  // Static logo plates keep Next's responsive image optimisation without
+  // hydrating an Image component for every copy in the two marquee rows.
+  const { props } = getImageProps({
+    src: logo.file,
+    alt: `${logo.name} logo`,
+    sizes: "168px",
+    width: logo.w,
+    height: logo.h,
+    loading: "lazy",
+    decoding: "async",
+    className: "max-h-full w-auto object-contain",
+    style: { maxWidth: "100%" },
+  });
   return (
     <figure className="logo-plate group flex w-[176px] shrink-0 flex-col items-center gap-3 sm:w-[200px]">
       <div className={`flex w-full ${box} items-center justify-center px-4`}>
-        <Image
-          src={logo.file}
-          alt={`${logo.name} logo`}
-          width={logo.w}
-          height={logo.h}
-          className="max-h-full w-auto object-contain"
-          style={{ maxWidth: "100%" }}
-        />
+        {/* Optimised src/srcSet are generated on the server by getImageProps. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img {...props} alt={props.alt} />
       </div>
       <figcaption className="text-center text-xs leading-tight text-ink3 transition-colors duration-300 group-hover:text-ink2">
         {logo.name}
@@ -53,7 +61,9 @@ export function ClientMarquee() {
   return (
     <section className="logo-band border-y border-line py-14 md:py-20">
       <div className="shell">
-        <p className="mb-9 text-sm text-ink3">Brands supported by WOY</p>
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-ink3">Brands supported by WOY</p>
+        </div>
       </div>
 
       <div className="marquee-wrap flex flex-col gap-8">

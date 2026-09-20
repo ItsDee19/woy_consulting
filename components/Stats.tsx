@@ -26,7 +26,6 @@ function Value({ stat }: { stat: Stat }) {
     if (stat.count == null || prefersReducedMotion()) return;
     const el = ref.current;
     if (!el) return;
-    setShown(0);
 
     let raf = 0;
     const io = new IntersectionObserver(

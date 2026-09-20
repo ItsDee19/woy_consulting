@@ -88,8 +88,8 @@ export function PhilosophyMark() {
             onMouseEnter={() => setFocus(s.key)}
             onFocus={() => setFocus(s.key)}
             tabIndex={0}
-            className={`border-t border-line py-7 transition-opacity duration-500 last:border-b md:py-9 ${
-              focus === s.key ? "opacity-100" : "opacity-50 lg:opacity-40"
+            className={`border-t border-line py-7 transition-colors duration-300 last:border-b md:py-9 ${
+              focus === s.key ? "border-t-red" : "border-t-line"
             }`}
           >
             <h3 className="t-h3">{s.name}</h3>

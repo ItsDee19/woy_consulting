@@ -2,16 +2,25 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { List, X, Sun, Moon, ArrowRight } from "@phosphor-icons/react";
 import { Mark } from "./Mark";
 import { nav, site } from "@/lib/content";
+import { hasPreferenceConsent } from "@/lib/cookie-consent";
+
+function subscribeTheme(callback: () => void) {
+  window.addEventListener("woy-theme-changed", callback);
+  return () => window.removeEventListener("woy-theme-changed", callback);
+}
+
 
 export function Nav() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  const [menuPath, setMenuPath] = useState<string | null>(null);
+  const open = menuPath === pathname;
+  const menuButton = useRef<HTMLButtonElement>(null);
   const [stuck, setStuck] = useState(false);
-  const [dark, setDark] = useState(false);
+  const dark = useSyncExternalStore(subscribeTheme, () => document.documentElement.getAttribute("data-theme") === "dark", () => false);
   const sentinel = useRef<HTMLDivElement>(null);
 
   /* border appears only once the page has moved. no scroll listener. */
@@ -23,26 +32,24 @@ export function Nav() {
     return () => io.disconnect();
   }, []);
 
-  useEffect(() => {
-    setDark(document.documentElement.getAttribute("data-theme") === "dark");
-  }, []);
 
   useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && open) {
+        setMenuPath(null);
+        menuButton.current?.focus();
+      }
+    };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, []);
+  }, [open]);
 
   function toggleTheme() {
     const next = dark ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
-    setDark(!dark);
+    window.dispatchEvent(new Event("woy-theme-changed"));
     try {
-      localStorage.setItem("woy-theme", next);
+      if (hasPreferenceConsent()) localStorage.setItem("woy-theme", next);
     } catch {
       /* private mode */
     }
@@ -96,25 +103,26 @@ export function Nav() {
               type="button"
               onClick={toggleTheme}
               aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
-              className="grid h-9 w-9 place-items-center rounded-[2px] border border-line text-ink2 transition-colors hover:border-line2 hover:text-ink"
+              className="grid h-11 w-11 place-items-center rounded-[2px] border border-control text-ink2 transition-colors hover:border-line2 hover:text-ink"
             >
               {dark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
             <Link
               href="/contact"
-              className="hidden whitespace-nowrap rounded-[2px] bg-red px-5 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-reddeep hover:shadow-[0_8px_22px_-10px_rgba(205,20,33,.65)] active:translate-y-px lg:inline-flex"
+              className="hidden whitespace-nowrap rounded-[2px] bg-action px-5 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-action-hover hover:shadow-[0_8px_22px_-10px_rgba(205,20,33,.65)] active:translate-y-px lg:inline-flex"
             >
               {site.cta}
             </Link>
 
             <button
               type="button"
-              onClick={() => setOpen((v) => !v)}
+              ref={menuButton}
+              onClick={() => setMenuPath(open ? null : pathname)}
               aria-expanded={open}
               aria-controls="mobile-nav"
               aria-label={open ? "Close menu" : "Open menu"}
-              className="grid h-10 w-10 place-items-center text-ink lg:hidden"
+              className="grid h-11 w-11 place-items-center text-ink lg:hidden"
             >
               {open ? <X size={24} /> : <List size={24} />}
             </button>
@@ -122,12 +130,14 @@ export function Nav() {
         </div>
 
         {open && (
-          <div id="mobile-nav" className="border-t border-line lg:hidden">
+          <nav id="mobile-nav" aria-label="Mobile" className="max-h-[calc(100dvh-72px)] overflow-y-auto border-t border-line lg:hidden">
             <div className="shell flex flex-col pb-7 pt-2">
               {nav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => setMenuPath(null)}
+                  aria-current={pathname === item.href ? "page" : undefined}
                   className="border-b border-line py-3.5 text-lg text-ink"
                 >
                   {item.label}
@@ -135,13 +145,13 @@ export function Nav() {
               ))}
               <Link
                 href="/contact"
-                className="mt-5 inline-flex items-center justify-center gap-2 rounded-[2px] bg-red px-5 py-3.5 font-medium text-white"
+                className="mt-5 inline-flex items-center justify-center gap-2 rounded-[2px] bg-action px-5 py-3.5 font-medium text-white"
               >
                 {site.cta}
                 <ArrowRight size={17} weight="bold" />
               </Link>
             </div>
-          </div>
+          </nav>
         )}
       </header>
     </>

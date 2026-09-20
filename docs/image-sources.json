@@ -1,0 +1,30 @@
+[
+  {
+    "name": "leadership-room",
+    "source": "https://picsum.photos/seed/woy-leadership-room/1800/760",
+    "resolved": "https://fastly.picsum.photos/id/820/1800/760.jpg?hmac=QyKUfcpjtWpjcARSnO89VQe92uarIL77hZFMopGOsz4",
+    "originalBytes": 98503,
+    "webpBytes": 47554
+  },
+  {
+    "name": "coaching-session",
+    "source": "https://picsum.photos/seed/woy-coaching-session/1100/620",
+    "resolved": "https://fastly.picsum.photos/id/992/1100/620.jpg?hmac=LSWrrpK52sKCgR7SgVi_XWWobjtRvgqazsYfUpwTLQM",
+    "originalBytes": 15445,
+    "webpBytes": 6036
+  },
+  {
+    "name": "hr-workshop",
+    "source": "https://picsum.photos/seed/woy-hr-workshop/1100/620",
+    "resolved": "https://fastly.picsum.photos/id/181/1100/620.jpg?hmac=czxXPE-8QjJPatNAJi4huT5MqtQ4uw10KSRdch63FM8",
+    "originalBytes": 40977,
+    "webpBytes": 20496
+  },
+  {
+    "name": "strategy-review",
+    "source": "https://picsum.photos/seed/woy-strategy-review/1100/620",
+    "resolved": "https://fastly.picsum.photos/id/622/1100/620.jpg?hmac=xysz8M_mY4WsTLTjZiijsRhQvroXQRtzpHxSgCsZU2I",
+    "originalBytes": 68971,
+    "webpBytes": 46300
+  }
+]

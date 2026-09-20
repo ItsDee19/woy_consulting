@@ -1,4 +1,6 @@
-import type { Metadata } from "next";
+import { StructuredData } from "@/components/StructuredData";
+import { contentPageGraph, practitionerGraph, schemaId } from "@/lib/structured-data";
+import { pageMetadata } from "@/lib/metadata";
 import Image from "next/image";
 import { LinkedinLogo } from "@phosphor-icons/react/dist/ssr";
 import { PageHero } from "@/components/PageHero";
@@ -6,15 +8,23 @@ import { CTASection } from "@/components/CTASection";
 import { Reveal } from "@/components/Reveal";
 import { practitioners } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "Practitioners",
-  description:
-    "A consortium of over ten consultants and more than twenty-five coaches, all former business leaders. The partners you meet stay accountable through delivery.",
-};
+export const metadata = pageMetadata(
+  "Leadership Advisors & Practitioners",
+  "Meet Vipin Tuteja, Sandeep Bidani and Kannan Swaminathan, WOY practitioners in leadership, culture, strategy and executive coaching.",
+  "/practitioners"
+);
 
 export default function PractitionersPage() {
   return (
     <>
+      <StructuredData id="practitioners-structured-data" nodes={[
+          ...contentPageGraph({
+            path: "/practitioners", name: "Leadership Advisors & Practitioners", description: metadata.description ?? "",
+            type: "CollectionPage",
+            mainEntity: practitioners.map((practitioner) => ({ "@id": schemaId("/practitioners", practitioner.slug) })),
+          }),
+          ...practitionerGraph(),
+        ]} />
       <PageHero
         kicker="The practitioners"
         title="The leaders you meet are the ones who stay through delivery."
@@ -25,7 +35,7 @@ export default function PractitionersPage() {
         <div className="shell grid gap-4 lg:grid-cols-3">
           {practitioners.map((p, i) => (
             <Reveal key={p.slug} delay={i * 0.07}>
-              <article className="reveal-photo group flex h-full flex-col overflow-hidden rounded-[2px] border border-line bg-raised transition-all duration-400 hover:-translate-y-1 hover:border-red/40 hover:shadow-[0_1px_2px_rgba(20,23,29,.04),0_16px_38px_-16px_rgba(20,23,29,.16)]">
+              <article id={p.slug} className="reveal-photo group flex h-full flex-col overflow-hidden rounded-[2px] border border-line bg-raised transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-red/40 hover:shadow-[0_1px_2px_rgba(20,23,29,.04),0_16px_38px_-16px_rgba(20,23,29,.16)]">
                 {/* TODO: set `photo` in lib/content.ts and a real headshot
                     replaces the initials tile. The greyscale to colour reveal
                     already applies to whichever one renders. */}
@@ -34,6 +44,7 @@ export default function PractitionersPage() {
                     <Image
                       src={p.photo}
                       alt={p.name}
+                      sizes="(max-width: 1023px) 90vw, 360px"
                       width={800}
                       height={620}
                       className="h-full w-full object-cover"

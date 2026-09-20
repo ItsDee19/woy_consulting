@@ -3,9 +3,13 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
+import { CookieConsent } from "@/components/CookieConsent";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { site } from "@/lib/content";
-import { siteUrl } from "@/lib/site-url";
+import { isIndexable, siteUrl } from "@/lib/site-url";
+import { pageMetadata } from "@/lib/metadata";
+import { StructuredData } from "@/components/StructuredData";
+import { siteEntityGraph } from "@/lib/structured-data";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -15,29 +19,25 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
+  ...pageMetadata("Practitioner-led Leadership Advisory", site.description, "/"),
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${site.name} | Practitioner-led leadership advisory`,
+    default: `${site.name} | Practitioner-led Leadership Advisory`,
     template: `%s | ${site.name}`,
   },
-  description: site.description,
-  openGraph: {
-    type: "website",
-    siteName: site.name,
-    title: `${site.name} | Practitioner-led leadership advisory`,
-    description: site.description,
-  },
-  icons: {
-    icon: [
-      {
-        url:
-          "data:image/svg+xml," +
-          encodeURIComponent(
-            `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g fill="none" stroke="#CD1421" stroke-width="7"><circle cx="50" cy="54" r="34"/><path d="M50 54v-25M50 54h25M50 54H25M50 54l-16 19M50 54l16 19"/></g><path d="M45 12h10l-5-8z" fill="#CD1421"/></svg>`
-          ),
-      },
-    ],
-  },
+  // Do not inherit a homepage canonical for missing or unmatched routes.
+  alternates: undefined,
+  robots: isIndexable ? {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
+    },
+  } : { index: false, follow: false },
 };
 
 /* Runs before first paint. Sets the saved theme so there is no flash, and
@@ -48,10 +48,14 @@ const bootScript = `
   var d=document.documentElement;
   d.setAttribute('data-js','');
   try{
-    var t=localStorage.getItem('woy-theme');
+    var c=JSON.parse(localStorage.getItem('woy-cookie-preferences')||'null');
+    var valid=c&&c.version===1&&typeof c.updatedAt==='string'&&typeof c.preferences==='boolean';
+    if(valid){d.setAttribute('data-cookie-choice','saved');}
+    var t=valid&&c.preferences===true?localStorage.getItem('woy-theme'):null;
+    if(t!=='light'&&t!=='dark'){t=null;}
     if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
     d.setAttribute('data-theme',t);
-  }catch(e){d.setAttribute('data-theme','light');}
+  }catch(e){d.setAttribute('data-theme',matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}
 })();
 `;
 
@@ -66,7 +70,7 @@ export default function RootLayout({
       <body>
         <a
           href="#main"
-          className="fixed left-6 top-[-100px] z-[100] rounded-[2px] bg-red px-4 py-3 text-sm font-medium text-white transition-all focus:top-4"
+          className="fixed left-6 top-[-100px] z-[100] rounded-[2px] bg-action px-4 py-3 text-sm font-medium text-white transition-all focus:top-4"
         >
           Skip to content
         </a>
@@ -75,21 +79,10 @@ export default function RootLayout({
         <Nav />
         <main id="main">{children}</main>
         <Footer />
+        <CookieConsent />
 
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "ProfessionalService",
-              name: site.name,
-              slogan: site.principle,
-              description: site.description,
-              foundingDate: String(site.established),
-              areaServed: "IN",
-            }),
-          }}
-        />
+        <StructuredData id="site-structured-data" nodes={siteEntityGraph()} />
+
       </body>
     </html>
   );

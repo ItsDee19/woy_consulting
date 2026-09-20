@@ -1,18 +1,23 @@
-import type { Metadata } from "next";
+import { StructuredData } from "@/components/StructuredData";
+import { contentPageGraph } from "@/lib/structured-data";
+import { pageMetadata } from "@/lib/metadata";
 import { PageHero } from "@/components/PageHero";
 import { ApproachAccordion } from "@/components/Accordion";
 import { CTASection } from "@/components/CTASection";
 import { Reveal } from "@/components/Reveal";
 
-export const metadata: Metadata = {
-  title: "Approach",
-  description:
-    "The 4D approach: Discover, Define, Design, Deliver. A structured path from diagnosis to sustained adoption, with ownership transferred to the internal team.",
-};
+export const metadata = pageMetadata(
+  "The 4D Consulting Approach",
+  "Discover, Define, Design, Deliver: a structured path from diagnosis to lasting adoption, with ownership transferred to your internal team.",
+  "/approach"
+);
 
 export default function ApproachPage() {
   return (
     <>
+      <StructuredData id="approach-structured-data" nodes={contentPageGraph({
+          path: "/approach", name: "The 4D Consulting Approach", description: metadata.description ?? "",
+        })} />
       <PageHero
         kicker="How we work"
         title="A structured path from diagnosis to sustained adoption."

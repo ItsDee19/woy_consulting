@@ -1,4 +1,6 @@
-import type { Metadata } from "next";
+import { StructuredData } from "@/components/StructuredData";
+import { caseStudyListSchema, contentPageGraph, schemaId } from "@/lib/structured-data";
+import { pageMetadata } from "@/lib/metadata";
 import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { PageHero } from "@/components/PageHero";
@@ -6,15 +8,22 @@ import { CTASection } from "@/components/CTASection";
 import { Reveal } from "@/components/Reveal";
 import { caseStudies } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "Case Studies",
-  description:
-    "Proven impact across insurance, education, IT and ITES, financial services, automotive and medical technology. Client names withheld under confidentiality agreements.",
-};
+export const metadata = pageMetadata(
+  "Leadership & Transformation Case Studies",
+  "Explore WOY case studies in insurance, education, IT, financial services, automotive and medical technology, with client confidentiality protected.",
+  "/case-studies"
+);
 
 export default function CaseStudiesPage() {
   return (
     <>
+      <StructuredData id="case-studies-structured-data" nodes={[
+          ...contentPageGraph({
+            path: "/case-studies", name: "Case Studies", description: metadata.description ?? "",
+            type: "CollectionPage", mainEntity: { "@id": schemaId("/case-studies", "case-studies") },
+          }),
+          caseStudyListSchema(),
+        ]} />
       <PageHero
         kicker="Case studies"
         title="Proven impact across industries, contexts and leadership challenges."
