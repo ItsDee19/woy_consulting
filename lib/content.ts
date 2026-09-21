@@ -14,7 +14,7 @@ export const site = {
   principle: "Win Over Yourself",
   tagline: "Empowering leaders. Transforming organizations. Accelerating impact.",
   established: 2015,
-  cta: "Request a conversation",
+  cta: "Start a conversation",
   description:
     "WOY Consulting helps organisations develop leaders, strengthen people and culture, and turn strategy into execution through former CEO and CXO expertise.",
 };

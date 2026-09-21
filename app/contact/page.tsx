@@ -7,7 +7,7 @@ import { Reveal } from "@/components/Reveal";
 import { approach, site } from "@/lib/content";
 
 export const metadata = pageMetadata(
-  "Request a Conversation",
+  "Start a Conversation",
   `Email WOY Consulting at ${site.email} or share your details to discuss your leadership, people or business challenge with a partner.`,
   "/contact"
 );

@@ -83,7 +83,7 @@ try {
       }
     }
     assert.equal(await page.getByRole("navigation", { name: "Primary", exact: true }).getByRole("link", { name: "Expertise", exact: true }).count(), 0, "Expertise is absent from the main navigation");
-    const conversationLinks = page.getByRole("link", { name: "Request a conversation", exact: true });
+    const conversationLinks = page.getByRole("link", { name: "Start a conversation", exact: true });
     assert.ok(await conversationLinks.count() >= 2, `Header and footer email actions: ${route}`);
     for (const link of await conversationLinks.all()) assert.equal(await link.getAttribute("href"), "mailto:hello@woyconsulting.com");
     const footer = page.getByRole("contentinfo");

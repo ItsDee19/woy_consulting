@@ -112,16 +112,19 @@ Spokes reach `0.745` of the ring's centreline radius.
 
 ## The hero animation
 
-One 11 second CSS timeline in `globals.css`, shared by every part of the mark so
-it cannot drift. Auto-loops; respects system reduced-motion preferences.
+One 12-second CSS timeline in `globals.css`, shared by every part through
+`--mk-duration`. The reference circle, outlined five-point star and detailed
+compass rose are introduced separately before converging into the exact WOY mark.
+Auto-loops; respects system reduced-motion preferences.
 
 | Time | What happens |
 |---|---|
-| 0.0 - 2.2s | Three symbols draw themselves in, staggered |
-| 2.2 - 4.2s | The three converge and merge into the single mark |
-| 4.2 - 5.7s | W and Y draw in, then CONSULTING settles from wide letterspacing |
-| 5.7 - 8.4s | The complete lockup holds |
-| 8.4 - 11s | The wordmark releases and the mark separates again |
+| 0.0–1.7s | The three reference symbols reveal; the compass rose aligns north |
+| 1.7–3.1s | Circle, star and compass hold separately |
+| 3.1–5.5s | Symbols converge; the star resolves into the original spokes and the compass leaves its north marker |
+| 5.5–7.0s | W, Y and CONSULTING complete the lockup; a fine alignment ring fades away |
+| 7.0–10.1s | The original logo holds, clear of construction details |
+| 10.1–12.0s | A gentle fade hides the reset before the sequence repeats |
 
 **If you edit it, two things matter:**
 
@@ -132,7 +135,7 @@ it cannot drift. Auto-loops; respects system reduced-motion preferences.
 2. `prefers-reduced-motion: reduce` collapses the sequence to the finished static
    lockup. Keep that block in sync with the timeline.
 
-The loop pauses once it scrolls out of view.
+The full loop pauses outside the viewport and when the document is hidden. All tracks share a start time and use no animation delays. `npm run test:logo` samples the separate, merging and completed states and verifies reduced motion and off-screen pausing.
 
 ## Why there is no animation library
 

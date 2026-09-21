@@ -22,7 +22,7 @@ Reviewed and implemented on 21 September 2026. The requested application feature
 | 16 | Spam protection | Signed HttpOnly cookie, time guard, honeypot, origin/schema/body limits, rate and duplicate-delivery checks. |
 | 17 | Sitemap/robots | All public/legal pages; production indexing and preview/local noindex. |
 | 18 | Image alt text | Meaningful logo/headshot alternatives; empty alternatives for decorative stock images. |
-| 19 | Clear CTA | Request a conversation opens `mailto:hello@woyconsulting.com`; the Contact page and its separate form remain accessible in the footer. |
+| 19 | Clear CTA | Start a conversation opens `mailto:hello@woyconsulting.com`; the Contact page and its separate form remain accessible in the footer. |
 | 20 | Transitions | Short transform/opacity motion, no hydration content flash, system reduced-motion support. Visible animation controls removed at the site owner’s request; the logo retains its red artwork colors. |
 
 ## Verification
@@ -63,6 +63,8 @@ SEO/GEO additions and final-domain steps are documented in [seo-geo.md](seo-geo.
 The Approach page now uses an interactive 4D explorer. Keyboard, touch, stable panels, reduced motion, all selected states and the no-JavaScript fallback passed. Local Approach-page performance measured 98 mobile / 100 desktop with zero layout shift. These measurements are separate from the homepage results above; see [approach-review.md](approach-review.md) for details.
 
 The owner-provided email now powers conversation CTAs. The footer has a unified invitation, company details and navigation; keyboard, touch, reduced motion, link destinations and responsive layouts passed. See [footer-review.md](footer-review.md) for this revision.
+
+The logo now forms from the reference circle, outlined star and detailed compass rose. Sampled-state, reduced-motion and pause/resume checks pass; conversation buttons read **Start a conversation**. See [logo-formation-review.md](logo-formation-review.md).
 
 ## Production setup
 
