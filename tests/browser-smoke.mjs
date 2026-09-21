@@ -64,7 +64,17 @@ try {
     assert.equal(await page.getByRole("button", { name: /(?:Pause|Resume) animations/ }).count(), 0);
     const schemaOrigin = new URL(meta.canonical).origin;
     for (const node of meta.schema) if (node["@id"]) assert.equal(new URL(node["@id"]).origin, schemaOrigin);
+    let heroImageSource;
     if (route === "/") {
+      const heroBackground = page.locator("[data-home-hero] [data-hero-background]");
+      assert.equal(await heroBackground.count(), 1, "The hero uses one shared background image");
+      assert.equal(await heroBackground.getAttribute("alt"), "", "The background is decorative");
+      assert.equal(await heroBackground.getAttribute("aria-hidden"), "true");
+      await heroBackground.evaluate(image => image.decode());
+      heroImageSource = await heroBackground.evaluate(image => {
+        if (!image.complete || image.naturalWidth === 0) throw new Error("Hero background failed to load");
+        return image.currentSrc;
+      });
       const services = meta.schema.filter(node => node["@type"] === "Service");
       assert.equal(services.length, 6, "All expertise entities are now on the homepage");
       for (const service of services) {
@@ -97,6 +107,12 @@ try {
     pages.push({ route, title: meta.title, description: meta.description, status: response.status() });
     for (const theme of ["light", "dark"]) {
       await page.evaluate(theme => document.documentElement.setAttribute("data-theme", theme), theme);
+      if (route === "/") {
+        const heroBackground = page.locator("[data-hero-background]");
+        assert.equal(await heroBackground.isVisible(), true, `Hero background is visible in ${theme} mode`);
+        assert.equal(await heroBackground.evaluate(image => image.currentSrc), heroImageSource, "Theme changes reuse the same image asset");
+        assert.ok(await heroBackground.evaluate(image => Number(getComputedStyle(image).opacity) > 0), `Hero image has visible opacity in ${theme} mode`);
+      }
       const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
       if (result.violations.length) accessibility.push({ route, theme, violations: result.violations.map(v => ({ id: v.id, impact: v.impact, description: v.description, nodes: v.nodes.map(n => ({ target: n.target, summary: n.failureSummary })) })) });
     }
@@ -104,6 +120,20 @@ try {
       await page.setViewportSize({ width, height: 900 });
       const size = await page.evaluate(() => ({ content: document.documentElement.scrollWidth, viewport: document.documentElement.clientWidth }));
       if (size.content > size.viewport + 1) overflow.push({ route, width, ...size });
+      if (route === "/") {
+        for (const theme of ["light", "dark"]) {
+          await page.evaluate(theme => document.documentElement.setAttribute("data-theme", theme), theme);
+          const background = page.locator("[data-hero-background]");
+          assert.equal(await background.isVisible(), true, `Hero background remains visible at ${width}px in ${theme} mode`);
+          const heroBounds = await page.locator("[data-home-hero]").boundingBox();
+          const imageBounds = await background.boundingBox();
+          assert.ok(heroBounds && imageBounds, "Hero and background have rendered bounds");
+          for (const dimension of ["x", "y", "width", "height"]) {
+            assert.ok(Math.abs(heroBounds[dimension] - imageBounds[dimension]) <= 1, `Background fills hero ${dimension} at ${width}px in ${theme} mode`);
+          }
+          assert.equal(await background.evaluate(image => getComputedStyle(image).objectFit), "cover", "Image keeps its proportions while covering the hero");
+        }
+      }
     }
     await page.setViewportSize({ width: 1440, height: 1000 });
     fs.writeFileSync(path.join(reportDir, "browser-progress.json"), JSON.stringify({ pages, jsErrors: errors, accessibility, overflow }, null, 2));
@@ -324,7 +354,7 @@ try {
   const saveBounds = await page.getByRole("button", { name: "Save preferences", exact: true }).boundingBox();
   assert.ok(saveBounds && saveBounds.y >= 0 && saveBounds.y + saveBounds.height <= 569, "Cookie action reachable on a small screen");
   await page.screenshot({ path: path.join(reportDir, "cookie-mobile.png") });
-  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "footer email CTAs, Contact and back-to-top navigation, cookie choices, theme memory, Home/footer Expertise navigation; Expertise absent from both navbars, expertise redirect/deep links/disclosures, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/hover/focus/touch/reduced motion/biography disclosure, client disclosure, Approach explorer keyboard/click/next/previous/wrapping/stable panels/reduced motion/no-JS fallback, validation, unavailable delivery, mocked success/duplicate prevention passed" };
+  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "hero background loading/decorative semantics/shared theme asset/responsive coverage, footer email CTAs, Contact and back-to-top navigation, cookie choices, theme memory, Home/footer Expertise navigation; Expertise absent from both navbars, expertise redirect/deep links/disclosures, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/hover/focus/touch/reduced motion/biography disclosure, client disclosure, Approach explorer keyboard/click/next/previous/wrapping/stable panels/reduced motion/no-JS fallback, validation, unavailable delivery, mocked success/duplicate prevention passed" };
   fs.writeFileSync(path.join(reportDir, "browser-check.json"), JSON.stringify(report, null, 2));
   console.log(JSON.stringify({ pages: pages.length, jsErrors: errors.length, accessibility: accessibility.length, overflow: overflow.length, brokenLinks: brokenLinks.length }));
   assert.equal(errors.length, 0, "Browser JS errors");

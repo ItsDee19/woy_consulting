@@ -26,5 +26,16 @@
     "resolved": "https://fastly.picsum.photos/id/622/1100/620.jpg?hmac=xysz8M_mY4WsTLTjZiijsRhQvroXQRtzpHxSgCsZU2I",
     "originalBytes": 68971,
     "webpBytes": 46300
+  },
+  {
+    "name": "woy-direction-hero",
+    "source": "Generated with the built-in image_gen tool on 2026-09-21",
+    "purpose": "Decorative conceptual architecture; not a real WOY office or engagement",
+    "promptFile": "docs/hero-image-prompt.md",
+    "asset": "public/images/woy-direction-hero.webp",
+    "width": 1918,
+    "height": 820,
+    "originalBytes": 1807782,
+    "webpBytes": 83736
   }
 ]

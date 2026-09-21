@@ -136,7 +136,7 @@
 }
 
 /* =============================================================================
-   LOGO FORMATION — one shared clock, no delayed or independent loops.
+   LOGO FORMATION: one shared clock, no delayed or independent loops.
    0–26%: circle / outlined star / compass. 26–46%: convergence.
    46–58%: wordmark resolves. 58–84%: hold. 84–100%: fade and reset.
    Finished geometry comes from mark-geometry.ts, never the precursor symbols.

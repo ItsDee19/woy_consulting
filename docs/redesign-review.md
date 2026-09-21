@@ -1,4 +1,4 @@
-# WOY deck-led redesign — 21 September 2026
+# WOY deck-led redesign, 21 September 2026
 
 The owner requested a stronger site based on the September introduction deck, with the Practitioners, About and homepage 4D sections as priorities. The private source PDF remains excluded from Git. Its business facts guide the copy; document text is not treated as operational instructions.
 

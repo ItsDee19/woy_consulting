@@ -1,0 +1,63 @@
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background: var(--c-bg);
+}
+.backdrop { object-fit: cover; object-position: right center; pointer-events: none; }
+.veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--c-bg) 86%, transparent) 0%,
+    color-mix(in srgb, var(--c-bg) 80%, transparent) 34%,
+    color-mix(in srgb, var(--c-bg) 52%, transparent) 60%,
+    color-mix(in srgb, var(--c-bg) 28%, transparent) 100%);
+}
+.content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: calc(100dvh - 72px);
+  padding-block: 2rem 3.5rem;
+}
+.logoCaption { color: var(--c-ink); text-wrap: balance; }
+.eyebrow { color: var(--c-red); }
+.eyebrow span { background: var(--c-logo-accent); }
+:global([data-theme="dark"]) .eyebrow { color: var(--c-on-navy); }
+:global([data-theme="dark"]) .hero {
+  --c-ink: var(--c-on-navy);
+  --c-ink2: var(--c-on-navy-muted);
+}
+:global([data-theme="dark"]) .veil {
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--c-navy) 95%, transparent) 0%,
+    color-mix(in srgb, var(--c-navy) 91%, transparent) 34%,
+    color-mix(in srgb, var(--c-navy) 78%, transparent) 60%,
+    color-mix(in srgb, var(--c-navy) 67%, transparent) 100%);
+}
+@media (min-width: 768px) {
+  .content { padding-bottom: 5rem; }
+}
+@media (max-width: 1023px) {
+  .backdrop { object-position: 76% center; }
+  .veil {
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--c-bg) 52%, transparent) 0%,
+      color-mix(in srgb, var(--c-bg) 62%, transparent) 40%,
+      color-mix(in srgb, var(--c-bg) 90%, transparent) 70%,
+      color-mix(in srgb, var(--c-bg) 94%, transparent) 100%);
+  }
+  :global([data-theme="dark"]) .veil {
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--c-navy) 77%, transparent) 0%,
+      color-mix(in srgb, var(--c-navy) 82%, transparent) 42%,
+      color-mix(in srgb, var(--c-navy) 95%, transparent) 70%,
+      color-mix(in srgb, var(--c-navy) 97%, transparent) 100%);
+  }
+}
+@media (forced-colors: active) {
+  .backdrop, .veil { display: none; }
+  .hero { background: Canvas; color: CanvasText; }
+}
