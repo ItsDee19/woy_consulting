@@ -37,5 +37,14 @@
     "height": 820,
     "originalBytes": 1807782,
     "webpBytes": 83736
+  },
+  {
+    "name": "vipin-tuteja-homepage",
+    "source": "Owner-supplied portrait: codex-clipboard-19646607-a294-4c53-b1e0-fca59f461838.png",
+    "asset": "/practitioners/vipin-tuteja-homepage.webp",
+    "width": 575,
+    "height": 710,
+    "webpBytes": 41552,
+    "processing": "WebP encoding only, without retouching. CSS displays the 557 x 557 photograph at x=10, y=14; the supplied name panel is replaced with accessible HTML text."
   }
 ]

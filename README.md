@@ -62,7 +62,7 @@ through a private channel rather than committing them.
 
 | Route | What it holds |
 |---|---|
-| `/` | Generated architectural hero background with light/dark treatments, animated brand mark, positioning, compact expertise and delivery section, clients, interactive 4D approach and selected work |
+| `/` | Generated architectural hero background with light/dark treatments, animated brand mark, positioning, compact expertise and delivery section, clients, interactive 4D approach and a founder-led leadership section |
 | `/about` | Concise firm introduction, logo philosophy, partnership principles and expandable client roster |
 | `/expertise` | Permanent redirect to the homepage’s `#expertise` section |
 | `/approach` | Interactive 4D journey, connected architectural planes and the ownership built into delivery |

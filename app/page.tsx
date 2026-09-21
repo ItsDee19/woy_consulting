@@ -11,7 +11,7 @@ import { Reveal } from "@/components/Reveal";
 import { Stats } from "@/components/Stats";
 import FourDApproach from "@/components/FourDApproach";
 import { ExpertiseSection } from "@/components/ExpertiseSection";
-import { SelectedCaseStudies } from "@/components/SelectedCaseStudies";
+import { LeadershipSection } from "@/components/LeadershipSection";
 import { site } from "@/lib/content";
 
 export const metadata = pageMetadata(
@@ -110,7 +110,7 @@ export default function Home() {
 
       <FourDApproach />
 
-      <SelectedCaseStudies />
+      <LeadershipSection />
     </>
   );
 }

@@ -1,0 +1,85 @@
+.section {
+  padding-block: clamp(3.5rem, 7vw, 6.5rem);
+  background: var(--c-bg);
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+  grid-template-areas: "portrait heading" "portrait copy" "portrait experience";
+  column-gap: clamp(2.5rem, 6vw, 6rem);
+  align-items: start;
+}
+.heading { grid-area: heading; }
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  color: var(--c-red);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.eyebrow::before { content: ""; width: 2rem; height: 1px; background: currentColor; flex-shrink: 0; }
+.heading h2 {
+  margin-top: 1.5rem;
+  font-size: clamp(2.3rem, 3.55vw, 3.4rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -.045em;
+  text-wrap: balance;
+}
+.heading em { display: block; color: var(--c-red); font-weight: 400; margin-top: .15em; }
+.profile { grid-area: portrait; max-width: 430px; width: 100%; margin: 0; align-self: center; }
+.portraitFrame { position: relative; aspect-ratio: 1; overflow: hidden; background: var(--c-sunken); }
+/* Frame the supplied photograph while keeping its original pixels and excluding its baked-in caption. */
+.portrait { position: absolute; top: calc(-14 / 557 * 100%); left: calc(-10 / 557 * 100%); width: calc(575 / 557 * 100%); max-width: none; height: auto; }
+.identity { display: flex; flex-direction: column; gap: .45rem; padding: 1.3rem 1.5rem 1.4rem; color: var(--c-on-navy); background: var(--c-navy); border-left: 3px solid var(--c-logo-red); }
+.name { font-size: clamp(1.5rem, 2vw, 1.9rem); line-height: 1.15; letter-spacing: -.035em; font-weight: 500; }
+.role { color: var(--c-on-navy-muted); font-size: .78rem; line-height: 1.5; }
+.copy { grid-area: copy; margin-top: 1.65rem; max-width: 58ch; }
+.copy > p { color: var(--c-ink2); font-size: .98rem; line-height: 1.75; }
+.copy > p + p { margin-top: 1rem; }
+.link { display: inline-flex; align-items: center; justify-content: space-between; gap: 1.6rem; padding-block: .9rem; margin-top: 1.35rem; min-height: 48px; border-bottom: 1px solid var(--c-ink); color: var(--c-ink); font-size: .88rem; font-weight: 500; transition: color .2s, border-color .2s; }
+.link svg { flex-shrink: 0; transition: transform .2s ease; }
+.link:hover { color: var(--c-red); border-color: var(--c-red); }
+.link:hover svg, .link:focus-visible svg { transform: translate(3px, -3px); }
+.experience { grid-area: experience; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 1.7rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--c-line2); }
+.tenure { display: flex; align-items: center; gap: .85rem; }
+.tenure strong { font-size: clamp(2.75rem, 4vw, 3.4rem); font-weight: 400; line-height: 1; letter-spacing: -.06em; }
+.tenure strong span { font-size: .55em; vertical-align: top; line-height: 1.3; color: var(--c-red); }
+.tenure > span { color: var(--c-ink2); font-size: .75rem; line-height: 1.5; }
+.career { border-left: 1px solid var(--c-line2); padding-left: 1.7rem; }
+.career > p { margin-bottom: .5rem; color: var(--c-ink3); font-size: .7rem; }
+.career ul { display: flex; flex-wrap: wrap; column-gap: .8rem; row-gap: .35rem; color: var(--c-ink2); font-size: .75rem; line-height: 1.5; }
+.career li { white-space: nowrap; }
+@media (max-width: 1023px) {
+  .layout { column-gap: 2rem; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
+  .heading h2 { font-size: clamp(2rem, 4vw, 2.7rem); }
+  .experience { gap: 1rem; }
+  .career { padding-left: 1rem; }
+  .tenure { gap: .65rem; }
+  .tenure strong { font-size: 2.75rem; }
+}
+@media (max-width: 700px) {
+  .layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "heading" "portrait" "copy" "experience"; }
+  .heading h2 { font-size: clamp(2.15rem, 7vw, 2.9rem); max-width: 20ch; margin-top: 1.2rem; }
+  .profile { max-width: 360px; margin-top: 2rem; }
+  .identity { padding: 1.15rem 1.25rem; }
+  .copy { margin-top: 1.65rem; }
+  .copy > p { font-size: .95rem; }
+  .link { gap: 1.15rem; font-size: .85rem; }
+  .experience { margin-top: 1.75rem; padding-top: 1.35rem; }
+}
+@media (max-width: 359px) {
+  .experience { grid-template-columns: 1fr; gap: 1rem; }
+  .career { padding: 0; border: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .link, .link svg { transition: none; }
+  .link:hover svg, .link:focus-visible svg { transform: none; }
+}
+@media (forced-colors: active) {
+  .identity { border: 1px solid CanvasText; }
+  .link { border-color: LinkText; }
+}
