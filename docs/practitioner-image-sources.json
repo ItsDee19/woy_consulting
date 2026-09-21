@@ -1,0 +1,61 @@
+{
+  "sourceDocument": "WOY Introduction_September 2026_AVLYS.pdf",
+  "sourceSha256": "d4d44ef764635d6f86e216e9b00406cf12620f3402d335ec244495ac04eb9814",
+  "identityBasis": "Portraits appear beside the explicitly named practitioner profiles on source pages 12\u201314; identification is based on document labels.",
+  "portraits": [
+    {
+      "person": "Vipin Tuteja",
+      "sourcePage": 12,
+      "sourceImage": "Im10.jpg",
+      "sourceDimensions": [
+        951,
+        1287
+      ],
+      "sourceHasSoftMask": false,
+      "output": "/practitioners/vipin-tuteja.webp",
+      "outputDimensions": [
+        951,
+        1287
+      ],
+      "bytes": 103510,
+      "processing": "Extracted embedded image; any PDF transparency preserved by pypdf; encoded as WebP at quality 90 without enlargement or retouching.",
+      "sha256": "d0f9569a000f80f493c183542dbadb7873211f1e91e8007d37bdd8c067e60b7d"
+    },
+    {
+      "person": "Sandeep Bidani",
+      "sourcePage": 13,
+      "sourceImage": "Im11.jpg",
+      "sourceDimensions": [
+        800,
+        800
+      ],
+      "sourceHasSoftMask": false,
+      "output": "/practitioners/sandeep-bidani.webp",
+      "outputDimensions": [
+        800,
+        800
+      ],
+      "bytes": 74836,
+      "processing": "Extracted embedded image; any PDF transparency preserved by pypdf; encoded as WebP at quality 90 without enlargement or retouching.",
+      "sha256": "2285e135ef09366fdbc80fc25dcbac8ccf0c1445249f297a9c6ad8329deddae8"
+    },
+    {
+      "person": "Kannan Swaminathan",
+      "sourcePage": 14,
+      "sourceImage": "Im12.jpg",
+      "sourceDimensions": [
+        284,
+        284
+      ],
+      "sourceHasSoftMask": false,
+      "output": "/practitioners/kannan-swaminathan.webp",
+      "outputDimensions": [
+        284,
+        284
+      ],
+      "bytes": 17358,
+      "processing": "Extracted embedded image; any PDF transparency preserved by pypdf; encoded as WebP at quality 90 without enlargement or retouching.",
+      "sha256": "5df739e85756bd72ce78d179ff7b49eb3d6b56dc924604d808877952c163b49b"
+    }
+  ]
+}

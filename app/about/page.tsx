@@ -1,14 +1,15 @@
+import Link from "next/link";
+import { getImageProps } from "next/image";
+import { ArrowRight, Plus } from "@phosphor-icons/react/dist/ssr";
 import { StructuredData } from "@/components/StructuredData";
 import { contentPageGraph, schemaId } from "@/lib/structured-data";
 import { pageMetadata } from "@/lib/metadata";
-import Image from "next/image";
-import { PageHero } from "@/components/PageHero";
-import { PhilosophyMark } from "@/components/PhilosophyMark";
 import { CTASection } from "@/components/CTASection";
 import { Reveal } from "@/components/Reveal";
-import { Stats } from "@/components/Stats";
 import { ClientGrid } from "@/components/ClientLogos";
-import { differentiators, logoDisclaimer, site } from "@/lib/content";
+import { MARK } from "@/components/mark-geometry";
+import { clientLogos, logoDisclaimer, site } from "@/lib/content";
+import styles from "./about.module.css";
 
 export const metadata = pageMetadata(
   "About Our Practitioner-led Firm",
@@ -16,116 +17,147 @@ export const metadata = pageMetadata(
   "/about"
 );
 
+const principles = [
+  {
+    key: "circle",
+    name: "The circle",
+    title: "Grow with a shared vision.",
+    body: "Connect self-aware leadership with a unified direction for the organisation.",
+  },
+  {
+    key: "star",
+    name: "The five-point star",
+    title: "Make excellence a habit.",
+    body: "Build the capability to set benchmarks, deliver value and sustain your advantage.",
+  },
+  {
+    key: "compass",
+    name: "The compass",
+    title: "Stay clear. Stay adaptable.",
+    body: "Navigate uncertainty with the judgement, agility and resilience to keep moving.",
+  },
+] as const;
+
+const differences = [
+  {
+    title: "Experience in the room",
+    body: "Former CEOs, CXOs and business leaders bring first-hand understanding of targets, talent, trade-offs and execution.",
+  },
+  {
+    title: "Built around your reality",
+    body: "We adapt proven frameworks to your context, ambition and constraints. The work is designed to be used.",
+  },
+  {
+    title: "Senior partners, throughout",
+    body: "The leaders you meet stay involved through delivery, combining enterprise rigour with boutique agility.",
+  },
+  {
+    title: "Change your teams can sustain",
+    body: "We leave behind stronger capability, clear ownership and practical rhythms that support lasting progress.",
+  },
+];
+
+const featuredBrands = [
+  "Reliance Industries", "Samsung", "Siemens Financial Services", "EY",
+  "Maruti Suzuki", "Capgemini", "Dr. Reddy's", "GE HealthCare",
+];
+
+function PhilosophySymbol({ part }: { part?: "circle" | "star" | "compass" }) {
+  return (
+    <svg viewBox="136 39 88 100" fill="none" aria-hidden="true">
+      {(!part || part === "circle" || part === "compass") && (
+        <circle cx={MARK.cx} cy={MARK.cy} r={MARK.r} stroke="currentColor" strokeWidth={MARK.ringStroke} />
+      )}
+      {(!part || part === "star") && (
+        <g stroke="currentColor" strokeWidth={MARK.spokeStroke}>
+          {MARK.spokes.map((path) => <path key={path} d={path} />)}
+        </g>
+      )}
+      {(!part || part === "compass") && <path d={MARK.needle} fill="currentColor" />}
+    </svg>
+  );
+}
+
 export default function AboutPage() {
   return (
     <>
       <StructuredData id="about-structured-data" nodes={contentPageGraph({
-          path: "/about", name: "About WOY Consulting", description: metadata.description ?? "",
-          type: "AboutPage", mainEntity: { "@id": schemaId("/", "organization") },
-        })} />
-      <PageHero
-        kicker={`Practitioner-led since ${site.established}`}
-        title="We have sat in the chair before advising the person in it."
-        lede="WOY is a boutique consulting firm that partners with organisations to strengthen leadership, elevate people and culture systems, and improve execution where it matters most."
-      />
+        path: "/about", name: "About WOY Consulting", description: metadata.description ?? "",
+        type: "AboutPage", mainEntity: { "@id": schemaId("/", "organization") },
+      })} />
 
-      {/* ------------------------------------------------------- who we are */}
-      <section className="py-16 md:py-24">
+      <section className={styles.intro} aria-labelledby="about-title">
         <div className="shell">
-          <Reveal>
-            <figure className="reveal-photo m-0 h-[220px] overflow-hidden md:h-[400px]">
-              <Image
-                src="/images/leadership-room.webp"
-                alt=""
-                width={1800}
-                height={760}
-                className="h-full w-full object-cover"
-                sizes="(max-width: 1320px) 90vw, 1176px"
-                loading="eager"
-              />
-            </figure>
-          </Reveal>
-
-          <div className="mt-14 grid gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
-            <Reveal>
-              <h2 className="t-h2 max-w-[14ch]">Who we are</h2>
-            </Reveal>
-            <Reveal delay={0.08}>
-              <div className="grid max-w-[62ch] gap-5 font-light leading-relaxed text-ink2">
-                <p>
-                  Established in {site.established}, we work across
-                  multinationals, Indian conglomerates, public sector
-                  institutions, SMEs, startups and founder-led businesses, across
-                  industries.
-                </p>
-                <p>
-                  WOY is a consortium of more than ten former CEOs, CXOs and
-                  senior business leaders who have led large teams, run P&amp;Ls,
-                  handled governance and driven change in real operating
-                  environments. That is the difference between advice that
-                  survives contact with a Monday morning and advice that does not.
-                </p>
-                <p>
-                  The work is partner-led end to end. The leaders you meet stay
-                  involved through delivery, which keeps judgement senior and
-                  adoption practical. We adapt proven frameworks to your reality
-                  rather than force-fitting templates.
-                </p>
-              </div>
-            </Reveal>
-
-            <div className="lg:col-span-2">
-              <Stats />
+          <p className={styles.eyebrow}>About WOY Consulting</p>
+          <div className={styles.introGrid}>
+            <h1 id="about-title" className={styles.title}>
+              Experience,<br /><span>on your side.</span>
+            </h1>
+            <div className={styles.introCopy}>
+              <p className={styles.lede}>
+                We have led businesses, built teams and navigated change.
+                Today, we bring that experience to your next chapter.
+              </p>
+              <p className={styles.description}>
+                A boutique, practitioner-led firm helping organisations strengthen
+                leadership, people, culture and execution since {site.established}.
+              </p>
+              <Link href="/practitioners" className={styles.textLink}>
+                Meet our practitioners <ArrowRight size={18} aria-hidden="true" />
+              </Link>
             </div>
           </div>
+          <dl className={styles.facts}>
+            <div><dt>Established</dt><dd>{site.established}</dd></div>
+            <div><dt>Former CEOs, CXOs<br />&amp; business leaders</dt><dd>10<span>+</span></dd></div>
+            <div><dt>Coaches in our<br />wider consortium</dt><dd>25<span>+</span></dd></div>
+            <div><dt>From the first conversation<br />through delivery</dt><dd className={styles.wordFact}>Partner-led</dd></div>
+          </dl>
         </div>
       </section>
 
-      {/* ------------------------------------------------ logo philosophy */}
-      <section className="border-y border-line bg-sunken py-20 md:py-28">
-        <div className="shell">
-          <Reveal>
-            <h2 className="t-h2 max-w-[20ch]">
-              The philosophy behind the mark
-            </h2>
+      <section className={styles.philosophy} aria-labelledby="philosophy-title">
+        <div className={`shell ${styles.philosophyGrid}`}>
+          <Reveal className={styles.philosophyIdentity}>
+            <p className={styles.eyebrow}>The idea behind our name</p>
+            <h2 id="philosophy-title">Win Over<br /><span>Yourself.</span></h2>
+            <div className={styles.philosophySignature}>
+              <div className={styles.brandSymbol}><PhilosophySymbol /></div>
+              <p>Meaningful transformation starts with the capacity to grow, excel and adapt.</p>
+            </div>
           </Reveal>
-          <Reveal delay={0.06}>
-            <p className="mb-14 mt-5 max-w-[58ch] font-light text-ink2">
-              Our guiding principle inspires individuals and organisations toward
-              exceptional leadership, sustained growth and meaningful
-              transformation. It is embodied in a logo built from three symbols.
+          <Reveal delay={0.08}>
+            <ul className={styles.principles}>
+              {principles.map((principle) => (
+                <li key={principle.key}>
+                  <div className={styles.partSymbol}><PhilosophySymbol part={principle.key} /></div>
+                  <div>
+                    <p className={styles.symbolLabel}>{principle.name}</p>
+                    <h3>{principle.title}</h3>
+                    <p className={styles.principleBody}>{principle.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className={styles.partnership} aria-labelledby="partnership-title">
+        <div className={`shell ${styles.partnershipGrid}`}>
+          <Reveal>
+            <p className={styles.eyebrow}>The WOY difference</p>
+            <h2 id="partnership-title" className={styles.sectionTitle}>A partner<br />in the work.</h2>
+            <p className={styles.partnershipLede}>
+              Clear choices. Stronger leadership.<br />Progress that carries forward.
             </p>
           </Reveal>
-
-          <PhilosophyMark />
-        </div>
-      </section>
-
-      {/* -------------------------------------------------- differentiators */}
-      <section className="py-20 md:py-28">
-        <div className="shell">
-          <Reveal>
-            <h2 className="t-h2 max-w-[16ch]">Why partner with WOY</h2>
-          </Reveal>
-
-          <div className="mt-14 grid gap-px bg-line md:grid-cols-2">
-            {differentiators.map((d, i) => (
-              <Reveal key={d.title} delay={i * 0.05}>
-                <div className="h-full bg-bg p-8 transition-colors duration-300 hover:bg-sunken md:p-10">
-                  <h3 className="text-xl font-medium tracking-[-0.022em]">
-                    {d.title}
-                  </h3>
-                  <ul role="list" className="mt-5 grid gap-3">
-                    {d.points.map((p) => (
-                      <li
-                        key={p}
-                        className="relative pl-6 font-light leading-relaxed text-ink2"
-                      >
-                        <span className="absolute left-0 top-[0.7em] h-px w-3 bg-red" />
-                        {p}
-                      </li>
-                    ))}
-                  </ul>
+          <div className={styles.differences}>
+            {differences.map((difference, i) => (
+              <Reveal key={difference.title} delay={i * 0.04}>
+                <div className={styles.difference}>
+                  <h3>{difference.title}</h3>
+                  <p>{difference.body}</p>
                 </div>
               </Reveal>
             ))}
@@ -133,30 +165,44 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* -------------------------------------------------------- client wall */}
-      <section className="logo-band border-t border-line py-20 md:py-28">
+      <section className={`logo-band ${styles.clients}`} aria-labelledby="brands-title">
         <div className="shell">
-          <Reveal>
-            <h2 className="t-h2 max-w-[18ch]">Brands supported by WOY</h2>
-          </Reveal>
-          <Reveal delay={0.06}>
-            <p className="mb-14 mt-5 max-w-[56ch] font-light text-ink2">
-              Across financial services, technology, manufacturing, healthcare,
-              energy, education, public sector and consumer businesses.
-            </p>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <ClientGrid />
-          </Reveal>
-          <Reveal delay={0.14}>
-            <p className="mt-12 max-w-[62ch] text-sm text-ink3">
-              {logoDisclaimer}
-            </p>
-          </Reveal>
+          <div className={styles.clientsHeading}>
+            <h2 id="brands-title">Experience across industries.</h2>
+            <p>Selected brands supported by WOY</p>
+          </div>
+          <ul className={styles.featuredBrands}>
+            {featuredBrands.map((name) => {
+              const logo = clientLogos.find((item) => item.name === name)!;
+              const { props } = getImageProps({
+                src: logo.file, alt: `${logo.name} logo`, width: logo.w, height: logo.h,
+                sizes: "(max-width: 639px) 120px, 170px", loading: "lazy",
+              });
+              return (
+                <li key={logo.name}>
+                  {/* Responsive optimisation without a client component for each logo. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img {...props} alt={props.alt} />
+                </li>
+              );
+            })}
+          </ul>
+          <p className={styles.disclaimer}>{logoDisclaimer}</p>
+          <details className={styles.allClients}>
+            <summary>
+              <span className={styles.whenClosed}>View full brand list</span>
+              <span className={styles.whenOpen}>Close full brand list</span>
+              <Plus size={18} aria-hidden="true" />
+            </summary>
+            <div className={styles.clientGrid}><ClientGrid /></div>
+          </details>
         </div>
       </section>
 
-      <CTASection />
+      <CTASection
+        title="Let's work on what comes next."
+        body="Share the leadership or business challenge on your mind. Start a conversation with WOY."
+      />
     </>
   );
 }

@@ -1,0 +1,79 @@
+.hero { padding: clamp(3.5rem, 7vw, 6rem) 0 0; }
+.eyebrow { display: flex; align-items: center; gap: .75rem; color: var(--c-red); font-size: .72rem; font-weight: 600; letter-spacing: .13em; text-transform: uppercase; }
+.eyebrow::before { content: ""; width: 1.75rem; height: 2px; background: currentColor; }
+.heroGrid { display: grid; grid-template-columns: 1.45fr 1fr; gap: 3rem; align-items: end; margin-top: 1.7rem; }
+.hero h1 { max-width: 16ch; font-size: clamp(2.65rem, 5.1vw, 4.6rem); line-height: 1.04; letter-spacing: -.045em; font-weight: 500; }
+.heroAside { max-width: 35ch; padding-bottom: .3rem; }
+.heroAside > p { font-size: 1.125rem; line-height: 1.65; color: var(--c-ink2); }
+.textLink { display: inline-flex; gap: .65rem; align-items: center; min-height: 44px; font-size: .9rem; font-weight: 500; color: var(--c-red); }
+.heroAside .textLink { margin-top: 1.1rem; }
+.textLink svg { flex-shrink: 0; transition: transform .25s ease; }
+.textLink:hover svg { transform: translate(2px, -2px); }
+.heroFoot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .75rem; margin-top: 3.5rem; padding: 1.1rem 0; border-top: 1px solid var(--c-line); color: var(--c-ink3); font-size: .75rem; }
+.profiles { padding: 2.1rem 0 5rem; scroll-margin-top: 6rem; }
+.profileGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2.5rem; align-items: start; }
+.profile { min-width: 0; scroll-margin-top: 6rem; }
+.portraitField { position: relative; display: flex; justify-content: center; align-items: end; overflow: hidden; padding: 1.5rem 1rem 0; background: var(--c-sunken); }
+.portraitLine { position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--c-logo-red); }
+.portrait { display: block; width: 100%; max-width: 284px; height: auto; aspect-ratio: 1; object-fit: cover; object-position: center; }
+.founderPortrait { object-position: 50% 0; }
+.identity { padding: 1.6rem 0 1.4rem; }
+.role { min-height: 2.8em; max-width: 29ch; font-size: .76rem; line-height: 1.4; font-weight: 500; color: var(--c-red); }
+.identity h2 { margin: .55rem 0 .9rem; font-size: clamp(1.5rem, 2.1vw, 1.95rem); line-height: 1.12; letter-spacing: -.035em; }
+.lede { color: var(--c-ink2); font-size: .95rem; line-height: 1.65; min-height: 5em; }
+.experience { padding: 1.35rem 0; border-top: 1px solid var(--c-line); }
+.experience strong { display: block; font-size: 1.6rem; font-weight: 500; line-height: 1.2; letter-spacing: -.035em; }
+.experience span { display: block; color: var(--c-ink3); font-size: .76rem; line-height: 1.5; margin-top: .25rem; }
+.background { min-height: 3.1em; margin-top: 1rem; font-size: .78rem; line-height: 1.55; color: var(--c-ink2); }
+.biography { border-top: 1px solid var(--c-line); border-bottom: 1px solid var(--c-line); }
+.biography summary { min-height: 56px; padding: .9rem 0; display: flex; align-items: center; justify-content: space-between; gap: .6rem; list-style: none; font-size: .85rem; font-weight: 500; }
+.biography summary::-webkit-details-marker { display: none; }
+.biography summary svg { flex-shrink: 0; color: var(--c-red); transition: transform .2s ease; }
+.biography[open] summary svg { transform: rotate(45deg); }
+.biography summary:hover { color: var(--c-red); }
+.bioBody { padding: .25rem 0 1.5rem; color: var(--c-ink2); font-size: .875rem; line-height: 1.7; }
+.bioBody p + p { margin-top: 1rem; }
+.bioBody h3 { margin: 1.5rem 0 .75rem; color: var(--c-ink); font-size: .9rem; }
+.bioBody ul { display: grid; gap: .65rem; padding-left: 1rem; list-style: disc; }
+.bioBody li::marker { color: var(--c-red); }
+.consortium { padding: 4rem 0; background: var(--c-sunken); border-top: 1px solid var(--c-line); }
+.consortiumGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; }
+.consortium h2 { margin-top: 1.4rem; font-size: clamp(2rem, 3vw, 2.8rem); line-height: 1.12; font-weight: 400; letter-spacing: -.035em; }
+.networkFacts { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.networkFacts dt { font-size: 3rem; font-weight: 400; line-height: 1; letter-spacing: -.05em; }
+.networkFacts dd { margin-top: .65rem; max-width: 20ch; font-size: .85rem; line-height: 1.5; color: var(--c-ink2); }
+.networkCopy { margin: 1.8rem 0 .6rem; max-width: 48ch; color: var(--c-ink2); font-size: .95rem; line-height: 1.7; }
+@media (max-width: 1023px) {
+  .heroGrid { grid-template-columns: 1.3fr 1fr; gap: 2rem; }
+  .profileGrid { gap: 1.4rem; }
+  .portraitField { padding: 1rem .5rem 0; }
+  .role { min-height: 4.2em; }
+  .identity h2 { min-height: 2.25em; }
+  .lede { min-height: 8.25em; }
+  .consortiumGrid { gap: 3rem; }
+}
+@media (max-width: 700px) {
+  .hero { padding-top: 3rem; }
+  .heroGrid, .consortiumGrid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .hero h1 { font-size: clamp(2.55rem, 8vw, 3.5rem); }
+  .heroAside { max-width: 42ch; }
+  .heroAside > p { font-size: 1rem; }
+  .heroFoot { margin-top: 2rem; }
+  .heroFoot span:last-child { display: none; }
+  .profiles { padding: 1.3rem 0 3rem; }
+  .profileGrid { grid-template-columns: 1fr; gap: 3rem; }
+  .portraitField { padding-top: 1.4rem; }
+  .identity { padding: 1.3rem 0 1rem; }
+  .identity h2 { min-height: 0; font-size: 1.9rem; }
+  .role, .lede, .background { min-height: 0; }
+  .role { max-width: none; }
+  .experience { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; }
+  .background { margin-top: 0; }
+  .experience strong { font-size: 1.45rem; }
+  .consortium { padding: 3rem 0; }
+  .consortiumGrid { gap: 2.2rem; }
+  .networkFacts { gap: 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .textLink svg, .biography summary svg { transition: none; }
+}

@@ -485,7 +485,7 @@ export type Practitioner = {
   expertise: string[];
   /* TODO: replace with the real LinkedIn profile URL before launch */
   linkedin: string | null;
-  /* TODO: drop a headshot at this path and the initials tile is replaced */
+  /* Authentic portraits extracted from the firm introduction deck. */
   photo: string | null;
 };
 
@@ -508,7 +508,7 @@ export const practitioners: Practitioner[] = [
       "HR transformation, talent strategy and performance management",
     ],
     linkedin: null,
-    photo: null,
+    photo: "/practitioners/vipin-tuteja.webp",
   },
   {
     slug: "sandeep-bidani",
@@ -528,7 +528,7 @@ export const practitioners: Practitioner[] = [
       "Executive and team coaching, inclusion advisory",
     ],
     linkedin: null,
-    photo: null,
+    photo: "/practitioners/sandeep-bidani.webp",
   },
   {
     slug: "kannan-swaminathan",
@@ -548,7 +548,7 @@ export const practitioners: Practitioner[] = [
       "Human potential assessment and applied neuroscience",
     ],
     linkedin: null,
-    photo: null,
+    photo: "/practitioners/kannan-swaminathan.webp",
   },
 ];
 

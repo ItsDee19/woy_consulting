@@ -1,12 +1,12 @@
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowUpRight, Plus, LinkedinLogo } from "@phosphor-icons/react/dist/ssr";
 import { StructuredData } from "@/components/StructuredData";
 import { contentPageGraph, practitionerGraph, schemaId } from "@/lib/structured-data";
 import { pageMetadata } from "@/lib/metadata";
-import Image from "next/image";
-import { LinkedinLogo } from "@phosphor-icons/react/dist/ssr";
-import { PageHero } from "@/components/PageHero";
 import { CTASection } from "@/components/CTASection";
-import { Reveal } from "@/components/Reveal";
 import { practitioners } from "@/lib/content";
+import styles from "./practitioners.module.css";
 
 export const metadata = pageMetadata(
   "Leadership Advisors & Practitioners",
@@ -14,134 +14,112 @@ export const metadata = pageMetadata(
   "/practitioners"
 );
 
+const experience: Record<string, { label: string; detail: string; background: string }> = {
+  "vipin-tuteja": {
+    label: "35+ years",
+    detail: "of business leadership",
+    background: "Xerox · American Express · Ricoh · Samsung",
+  },
+  "sandeep-bidani": {
+    label: "38,000+ people",
+    detail: "within his past HR leadership remit",
+    background: "KPMG · American Express · IBM",
+  },
+  "kannan-swaminathan": {
+    label: "2,000+ hours",
+    detail: "of coaching in India and globally",
+    background: "ICF Professional Certified Coach · EMCC Senior Practitioner",
+  },
+};
+
 export default function PractitionersPage() {
   return (
     <>
       <StructuredData id="practitioners-structured-data" nodes={[
-          ...contentPageGraph({
-            path: "/practitioners", name: "Leadership Advisors & Practitioners", description: metadata.description ?? "",
-            type: "CollectionPage",
-            mainEntity: practitioners.map((practitioner) => ({ "@id": schemaId("/practitioners", practitioner.slug) })),
-          }),
-          ...practitionerGraph(),
-        ]} />
-      <PageHero
-        kicker="The practitioners"
-        title="The leaders you meet are the ones who stay through delivery."
-        lede="A consortium of over ten consultants and more than twenty-five coaches, all former business leaders across a range of industries and disciplines."
-      />
+        ...contentPageGraph({
+          path: "/practitioners", name: "Leadership Advisors & Practitioners", description: metadata.description ?? "",
+          type: "CollectionPage",
+          mainEntity: practitioners.map((practitioner) => ({ "@id": schemaId("/practitioners", practitioner.slug) })),
+        }),
+        ...practitionerGraph(),
+      ]} />
 
-      <section className="py-16 md:py-24">
-        <div className="shell grid gap-4 lg:grid-cols-3">
-          {practitioners.map((p, i) => (
-            <Reveal key={p.slug} delay={i * 0.07}>
-              <article id={p.slug} className="reveal-photo group flex h-full flex-col overflow-hidden rounded-[2px] border border-line bg-raised transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-red/40 hover:shadow-[0_1px_2px_rgba(20,23,29,.04),0_16px_38px_-16px_rgba(20,23,29,.16)]">
-                {/* TODO: set `photo` in lib/content.ts and a real headshot
-                    replaces the initials tile. The greyscale to colour reveal
-                    already applies to whichever one renders. */}
-                {p.photo ? (
-                  <div className="aspect-[4/3.1] overflow-hidden">
-                    <Image
-                      src={p.photo}
-                      alt={p.name}
-                      sizes="(max-width: 1023px) 90vw, 360px"
-                      width={800}
-                      height={620}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div
-                    className="tile grid aspect-[4/3.1] place-items-center"
-                    style={{
-                      background:
-                        "radial-gradient(70% 90% at 50% 15%, color-mix(in srgb, var(--c-red) 17%, transparent), transparent 70%), var(--c-sunken)",
-                    }}
-                    aria-hidden
-                  >
-                    <span className="text-[clamp(2.6rem,5vw,3.6rem)] font-light tracking-[-0.04em] text-red">
-                      {p.initials}
-                    </span>
-                  </div>
-                )}
+      <section className={styles.hero}>
+        <div className="shell">
+          <p className={styles.eyebrow}>Our practitioners</p>
+          <div className={styles.heroGrid}>
+            <h1>The experience<br />behind the advice.</h1>
+            <div className={styles.heroAside}>
+              <p>Business leaders. Trusted thinking partners. The people you meet stay involved through delivery.</p>
+              <a href="#meet-the-practitioners" className={styles.textLink}>Meet the practitioners <ArrowUpRight size={19} aria-hidden /></a>
+            </div>
+          </div>
+          <div className={styles.heroFoot}>
+            <span>Senior judgement. Personal commitment.</span>
+            <span>Practitioner-led since 2015</span>
+          </div>
+        </div>
+      </section>
 
-                <div className="flex flex-1 flex-col gap-2.5 p-7 md:p-8">
-                  <h2 className="text-xl font-medium tracking-[-0.022em]">
-                    {p.name}
-                  </h2>
-                  <p className="text-sm font-medium text-red">{p.role}</p>
-                  <p className="text-sm font-light italic leading-relaxed text-ink3">
-                    {p.lede}
-                  </p>
-
-                  <div className="mt-2 grid gap-3">
-                    {p.bio.map((para) => (
-                      <p
-                        key={para.slice(0, 32)}
-                        className="text-sm font-light leading-relaxed text-ink2"
-                      >
-                        {para}
-                      </p>
-                    ))}
-                  </div>
-
-                  <ul role="list" className="mt-4 flex flex-wrap gap-1.5">
-                    {p.expertise.map((e) => (
-                      <li
-                        key={e}
-                        className="rounded-[2px] border border-line px-2.5 py-1 text-xs text-ink2"
-                      >
-                        {e}
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* TODO: add the real LinkedIn URL in lib/content.ts */}
-                  {p.linkedin ? (
-                    <a
-                      href={p.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-auto inline-flex items-center gap-2 pt-6 text-sm font-medium text-ink2 transition-colors hover:text-red"
-                      aria-label={`${p.name} on LinkedIn`}
-                    >
-                      <LinkedinLogo size={19} />
-                      LinkedIn
-                    </a>
-                  ) : (
-                    <span className="mt-auto inline-flex items-center gap-2 pt-6 text-sm text-ink3">
-                      <LinkedinLogo size={19} aria-hidden />
-                      LinkedIn profile to be added
-                    </span>
-                  )}
+      <section id="meet-the-practitioners" className={styles.profiles} aria-label="Practitioner profiles">
+        <div className={`shell ${styles.profileGrid}`}>
+          {practitioners.map((p, i) => {
+            const proof = experience[p.slug];
+            return (
+              <article id={p.slug} key={p.slug} className={styles.profile}>
+                <div className={styles.portraitField}>
+                  <span className={styles.portraitLine} aria-hidden />
+                  {p.photo && <Image
+                    src={p.photo}
+                    alt={`${p.name}, ${p.role.toLowerCase()} at WOY Consulting`}
+                    width={284}
+                    height={284}
+                    sizes="(max-width: 359px) 84vw, 284px"
+                    loading={i === 0 ? "eager" : "lazy"}
+                    className={`${styles.portrait} ${i === 0 ? styles.founderPortrait : ""}`}
+                  />}
                 </div>
+                <div className={styles.identity}>
+                  <p className={styles.role}>{p.role}</p>
+                  <h2>{p.name}</h2>
+                  <p className={styles.lede}>{p.lede}</p>
+                </div>
+                <div className={styles.experience}>
+                  <p><strong>{proof.label}</strong><span>{proof.detail}</span></p>
+                  <p className={styles.background}>{proof.background}</p>
+                </div>
+                <details className={styles.biography}>
+                  <summary>Explore {p.name.split(" ")[0]}’s experience <Plus size={19} aria-hidden /></summary>
+                  <div className={styles.bioBody}>
+                    {p.bio.map(para => <p key={para.slice(0, 32)}>{para}</p>)}
+                    <h3>Areas of focus</h3>
+                    <ul>{p.expertise.map(item => <li key={item}>{item}</li>)}</ul>
+                    {p.linkedin && <a href={p.linkedin} target="_blank" rel="noopener noreferrer" className={styles.textLink} aria-label={`${p.name} on LinkedIn`}><LinkedinLogo size={19} aria-hidden /> LinkedIn</a>}
+                  </div>
+                </details>
               </article>
-            </Reveal>
-          ))}
+            );
+          })}
         </div>
       </section>
 
-      <section className="border-t border-line bg-sunken py-16 md:py-20">
-        <div className="shell grid gap-8 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
-          <Reveal>
-            <h2 className="t-h2 max-w-[16ch]">Beyond the named partners</h2>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <p className="max-w-[62ch] font-light leading-relaxed text-ink2">
-              The consortium extends well past the profiles above. Engagements
-              draw on more than twenty-five credentialled coaches and a wider
-              bench of former CXOs, selected for the specific context rather than
-              assigned by availability. Where an engagement needs a specialist we
-              do not have, we say so.
-            </p>
-          </Reveal>
+      <section className={styles.consortium}>
+        <div className={`shell ${styles.consortiumGrid}`}>
+          <div>
+            <p className={styles.eyebrow}>A wider circle of expertise</p>
+            <h2>The right experience<br />for your context.</h2>
+          </div>
+          <div>
+            <dl className={styles.networkFacts}>
+              <div><dt>10+</dt><dd>consultants and former business leaders</dd></div>
+              <div><dt>25+</dt><dd>coaches across industries and disciplines</dd></div>
+            </dl>
+            <p className={styles.networkCopy}>Our consortium brings together senior practitioners around your specific leadership, culture and business challenges.</p>
+            <Link href="/expertise" className={styles.textLink}>Explore our expertise <ArrowUpRight size={19} aria-hidden /></Link>
+          </div>
         </div>
       </section>
-
-      <CTASection
-        title="Talk to a partner, not a pitch team."
-        body="The person who scopes the work is the person who delivers it."
-      />
+      <CTASection title="A real conversation. With a practitioner." body="Tell us what your organisation is working through. A partner will help you explore the way forward." />
     </>
   );
 }

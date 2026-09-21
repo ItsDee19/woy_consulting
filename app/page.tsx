@@ -8,8 +8,8 @@ import { ClientMarquee } from "@/components/ClientLogos";
 import { CTASection } from "@/components/CTASection";
 import { Reveal } from "@/components/Reveal";
 import { Stats } from "@/components/Stats";
+import FourDApproach from "@/components/FourDApproach";
 import {
-  approach,
   caseStudies,
   capabilitiesByPillar,
   pillars,
@@ -33,6 +33,7 @@ export default function Home() {
       <section className="shell flex min-h-[calc(100dvh-72px)] items-center pb-14 pt-8 md:pb-20">
         <div className="grid w-full items-center gap-8 lg:grid-cols-[1.12fr_1fr] lg:gap-14">
           <div className="order-2 lg:order-1">
+            <p className="mb-5 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.13em] text-red"><span className="h-px w-8 bg-current" aria-hidden />Leadership &amp; business advisory</p>
             <h1 className="t-display">
               Real-world acumen.
               <br />
@@ -60,7 +61,7 @@ export default function Home() {
           <div className="order-1 flex flex-col items-center gap-5 lg:order-2">
             <LogoFormation className="w-full max-w-[520px]" />
             <p className="max-w-[32ch] text-center text-sm text-ink3">
-              Circle, five-point star and compass. Three symbols, one mark.
+              Win Over Yourself. The philosophy behind WOY.
             </p>
           </div>
         </div>
@@ -77,16 +78,13 @@ export default function Home() {
           <Reveal delay={0.08}>
             <div className="grid max-w-[62ch] gap-5 font-light leading-relaxed text-ink2">
               <p>
-                WOY Consulting is a practitioner-led leadership and business advisory
-                established in 2015. We help leaders and organisations move from intent
-                to execution through practitioner insight, bespoke design and disciplined
-                implementation. Our partners are former senior leaders who have
-                led through scale, complexity and change, so the work is grounded
-                in real operating realities rather than theory.
+                We have led businesses, built teams and navigated change. Today,
+                we bring that experience to your organisation’s most important
+                leadership, culture and execution challenges.
               </p>
               <p>
-                The result is clear choices, stronger leadership systems and
-                sustained execution. Without generic templates.
+                Our partners stay involved from the first conversation through
+                implementation, shaping solutions your teams can own and sustain.
               </p>
               <Link
                 href="/about"
@@ -162,47 +160,7 @@ export default function Home() {
       {/* -------------------------------------------------------- clients */}
       <ClientMarquee />
 
-      {/* ------------------------------------------------- approach teaser */}
-      <section className="bg-block py-20 text-onblock md:py-28">
-        <div className="shell">
-          <Reveal>
-            <h2 className="t-h2 max-w-[14ch] text-onblock">The 4D approach</h2>
-          </Reveal>
-          <Reveal delay={0.06}>
-            <p className="mt-5 max-w-[52ch] font-light text-onblock2">
-              A structured path from diagnosis to sustained adoption. Insight,
-              then alignment, then capability, then execution that holds.
-            </p>
-          </Reveal>
-
-          <ol role="list" className="mt-14 grid gap-px bg-blockline sm:grid-cols-2 lg:grid-cols-4">
-            {approach.map((step, i) => (
-              <Reveal key={step.key} delay={i * 0.06} as="li">
-                <div className="h-full bg-block p-7 transition-colors duration-300 hover:bg-[color-mix(in_srgb,var(--c-redb)_7%,var(--c-block))]">
-                  <p className="text-sm text-redb">{step.title}</p>
-                  <p className="mt-3 text-lg font-light leading-snug text-onblock">
-                    {step.tag}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
-          </ol>
-
-          <Reveal delay={0.1}>
-            <Link
-              href="/approach"
-              className="group mt-10 inline-flex items-center gap-2 font-medium text-redb"
-            >
-              How the 4D approach works
-              <ArrowRight
-                size={17}
-                weight="bold"
-                className="transition-transform duration-300 group-hover:translate-x-1"
-              />
-            </Link>
-          </Reveal>
-        </div>
-      </section>
+      <FourDApproach />
 
       {/* ----------------------------------------------- selected case work */}
       <section className="py-20 md:py-28">

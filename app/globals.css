@@ -18,6 +18,9 @@
   --c-reddeep: #A50F1A;
   --c-logo-red: #CD1421; /* fixed artwork colors in both themes */
   --c-logo-accent: #E83928;
+  --c-navy: #041D41; /* midnight navy from the WOY introduction deck */
+  --c-on-navy: #F6F2EE;
+  --c-on-navy-muted: #BAC5D6;
   --c-action: #C81926;
   --c-action-hover: #A50F1A;
   --c-danger: #A50F1A;
