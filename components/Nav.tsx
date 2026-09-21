@@ -110,7 +110,7 @@ export function Nav() {
             </button>
 
             <Link
-              href="/contact"
+              href={site.ctaHref}
               className="hidden whitespace-nowrap rounded-[2px] bg-action px-5 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-action-hover hover:shadow-[0_8px_22px_-10px_rgba(205,20,33,.65)] active:translate-y-px lg:inline-flex"
             >
               {site.cta}
@@ -145,7 +145,8 @@ export function Nav() {
                 </Link>
               ))}
               <Link
-                href="/contact"
+                href={site.ctaHref}
+                onClick={() => setMenuPath(null)}
                 className="mt-5 inline-flex items-center justify-center gap-2 rounded-[2px] bg-action px-5 py-3.5 font-medium text-white"
               >
                 {site.cta}

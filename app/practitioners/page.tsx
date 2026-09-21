@@ -4,7 +4,6 @@ import { ArrowUpRight, Plus, LinkedinLogo } from "@phosphor-icons/react/dist/ssr
 import { StructuredData } from "@/components/StructuredData";
 import { contentPageGraph, practitionerGraph, schemaId } from "@/lib/structured-data";
 import { pageMetadata } from "@/lib/metadata";
-import { CTASection } from "@/components/CTASection";
 import { practitioners } from "@/lib/content";
 import styles from "./practitioners.module.css";
 
@@ -119,7 +118,6 @@ export default function PractitionersPage() {
           </div>
         </div>
       </section>
-      <CTASection title="A real conversation. With a practitioner." body="Tell us what your organisation is working through. A partner will help you explore the way forward." />
     </>
   );
 }

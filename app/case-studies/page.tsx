@@ -3,7 +3,6 @@ import { caseStudyListSchema, contentPageGraph, schemaId } from "@/lib/structure
 import { pageMetadata } from "@/lib/metadata";
 import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
-import { CTASection } from "@/components/CTASection";
 import { caseStudies } from "@/lib/content";
 import styles from "./case-studies.module.css";
 
@@ -87,8 +86,6 @@ export default function CaseStudiesPage() {
         </ul>
         <p className={styles.confidentiality}>Client names are withheld under confidentiality agreements. The contexts, work and observed outcomes are drawn from WOY engagements.</p>
       </section>
-
-      <CTASection title="What needs to change in your organisation?" body="Start with your context. We will help you identify the choices, capabilities and ways of working that can move it forward." />
     </>
   );
 }

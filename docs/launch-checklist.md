@@ -22,7 +22,7 @@ Reviewed and implemented on 21 September 2026. The requested application feature
 | 16 | Spam protection | Signed HttpOnly cookie, time guard, honeypot, origin/schema/body limits, rate and duplicate-delivery checks. |
 | 17 | Sitemap/robots | All public/legal pages; production indexing and preview/local noindex. |
 | 18 | Image alt text | Meaningful logo/headshot alternatives; empty alternatives for decorative stock images. |
-| 19 | Clear CTA | Request a conversation consistently leads to `/contact`; other actions are secondary. |
+| 19 | Clear CTA | Request a conversation opens `mailto:hello@woyconsulting.com`; the Contact page and its separate form remain accessible in the footer. |
 | 20 | Transitions | Short transform/opacity motion, no hydration content flash, system reduced-motion support. Visible animation controls removed at the site owner’s request; the logo retains its red artwork colors. |
 
 ## Verification
@@ -61,6 +61,8 @@ These are local lab observations, not real-user field measurements or a Core Web
 SEO/GEO additions and final-domain steps are documented in [seo-geo.md](seo-geo.md). Browser checks confirm unique branded titles, canonical/social URL agreement, consistent entity origins, matching visible FAQ/schema answers, red artwork in both themes, no animation-control buttons, and JavaScript-free access to FAQ content. The deck-led redesign also verifies 4D keyboard/click navigation, practitioner images and biography disclosures, the expanded client roster, and the final mobile typography/portrait refinements. See [redesign-review.md](redesign-review.md) and [navigation-case-studies-review.md](navigation-case-studies-review.md). The latest audit also verifies Home and footer Expertise navigation, Expertise removal from both Navbars, the permanent redirect, capability deep links, exclusive disclosures, portrait hover/focus/touch/reduced-motion behavior, and case-study chapter links.
 
 The Approach page now uses an interactive 4D explorer. Keyboard, touch, stable panels, reduced motion, all selected states and the no-JavaScript fallback passed. Local Approach-page performance measured 98 mobile / 100 desktop with zero layout shift. These measurements are separate from the homepage results above; see [approach-review.md](approach-review.md) for details.
+
+The owner-provided email now powers conversation CTAs. The footer has a unified invitation, company details and navigation; keyboard, touch, reduced motion, link destinations and responsive layouts passed. See [footer-review.md](footer-review.md) for this revision.
 
 ## Production setup
 

@@ -57,7 +57,8 @@ test("schema IDs and breadcrumbs stay on the canonical origin", () => {
 test("visible services and practitioners share the site entity without invented details", () => {
   const [organization, website] = schema.siteEntityGraph();
   assert.equal(website.publisher["@id"], organization["@id"]);
-  for (const unsupported of ["address", "telephone", "email", "aggregateRating", "sameAs"]) assert.ok(!(unsupported in organization));
+  assert.equal(organization.email, "hello@woyconsulting.com");
+  for (const unsupported of ["address", "telephone", "aggregateRating", "sameAs"]) assert.ok(!(unsupported in organization));
   const services = schema.serviceGraph();
   assert.equal(services.length, content.capabilities.length);
   for (const service of services) {

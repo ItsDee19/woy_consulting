@@ -4,7 +4,6 @@ import { ArrowRight, Plus } from "@phosphor-icons/react/dist/ssr";
 import { StructuredData } from "@/components/StructuredData";
 import { contentPageGraph, schemaId } from "@/lib/structured-data";
 import { pageMetadata } from "@/lib/metadata";
-import { CTASection } from "@/components/CTASection";
 import { Reveal } from "@/components/Reveal";
 import { ClientGrid } from "@/components/ClientLogos";
 import { MARK } from "@/components/mark-geometry";
@@ -198,11 +197,6 @@ export default function AboutPage() {
           </details>
         </div>
       </section>
-
-      <CTASection
-        title="Let's work on what comes next."
-        body="Share the leadership or business challenge on your mind. Start a conversation with WOY."
-      />
     </>
   );
 }

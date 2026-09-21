@@ -3,8 +3,14 @@
    Sources: WOY Introduction deck (September 2026) and the WOY brand artwork.
    ============================================================================= */
 
+const contactEmail = "hello@woyconsulting.com";
+
 export const site = {
   name: "WOY Consulting",
+  legalName: "WOY Consulting Private Limited",
+  location: "Gurgaon 122002, Haryana, India",
+  email: contactEmail,
+  ctaHref: `mailto:${contactEmail}`,
   principle: "Win Over Yourself",
   tagline: "Empowering leaders. Transforming organizations. Accelerating impact.",
   established: 2015,

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { LogoFormation } from "@/components/LogoFormation";
 import { ClientMarquee } from "@/components/ClientLogos";
-import { CTASection } from "@/components/CTASection";
 import { Reveal } from "@/components/Reveal";
 import { Stats } from "@/components/Stats";
 import FourDApproach from "@/components/FourDApproach";
@@ -39,7 +38,7 @@ export default function Home() {
             </p>
             <div className="mt-9">
               <Link
-                href="/contact"
+                href={site.ctaHref}
                 className="group inline-flex items-center gap-2.5 rounded-[2px] bg-action px-7 py-4 font-medium text-white transition-all duration-300 hover:bg-action-hover hover:shadow-[0_10px_26px_-12px_rgba(205,20,33,.7)] active:translate-y-px"
               >
                 {site.cta}
@@ -108,8 +107,6 @@ export default function Home() {
       <FourDApproach />
 
       <SelectedCaseStudies />
-
-      <CTASection />
     </>
   );
 }

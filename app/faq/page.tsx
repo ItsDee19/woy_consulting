@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
-import { CTASection } from "@/components/CTASection";
 import { PageHero } from "@/components/PageHero";
 import { Reveal } from "@/components/Reveal";
 import { StructuredData } from "@/components/StructuredData";
@@ -88,11 +87,6 @@ export default function FAQPage() {
           </div>
         </div>
       </section>
-
-      <CTASection
-        title="Bring the question you are working through."
-        body="A conversation with a WOY partner starts with understanding your context and whether we can help."
-      />
     </>
   );
 }

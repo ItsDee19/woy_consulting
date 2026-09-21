@@ -59,7 +59,7 @@ export const faqItems: FAQItem[] = [
   {
     id: "starting-a-conversation",
     question: "How do I start a conversation with WOY?",
-    answer: "Use the contact form to share your full name, mobile number and email address. A WOY partner can then discuss what you are working on and whether the advisory team is the right fit. You do not need a fully defined brief to begin; understanding the challenge is part of Discover.",
+    answer: `Email ${site.email} or use the contact form to share your full name, mobile number and email address. A WOY partner can then discuss what you are working on and whether the advisory team is the right fit. You do not need a fully defined brief to begin; understanding the challenge is part of Discover.`,
     links: [{ label: "What happens after an enquiry", href: "/contact" }],
   },
 ];

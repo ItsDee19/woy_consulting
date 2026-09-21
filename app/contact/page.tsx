@@ -4,11 +4,11 @@ import { pageMetadata } from "@/lib/metadata";
 import { PageHero } from "@/components/PageHero";
 import { ContactForm } from "@/components/ContactForm";
 import { Reveal } from "@/components/Reveal";
-import { approach } from "@/lib/content";
+import { approach, site } from "@/lib/content";
 
 export const metadata = pageMetadata(
   "Request a Conversation",
-  "Tell us about your leadership, people or business challenge. Share your details to request a short conversation with a WOY Consulting partner.",
+  `Email WOY Consulting at ${site.email} or share your details to discuss your leadership, people or business challenge with a partner.`,
   "/contact"
 );
 
@@ -21,13 +21,22 @@ export default function ContactPage() {
         })} />
       <PageHero
         kicker="Contact"
-        title="Leave your details and a partner will reach out."
-        lede="No pitch deck, no intake questionnaire. A short conversation about what you are working on, and whether we are the right people for it."
+        title="Let’s start with your challenge."
+        lede="Email us directly or share your details below. A short conversation about what you are working on, and whether we are the right people for it."
       />
 
       <section className="py-16 md:py-24">
         <div className="shell grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:gap-20">
           <div>
+            <div className="mb-12 border-b border-line pb-8">
+              <p className="text-xs font-medium uppercase tracking-[0.13em] text-ink3">Write to WOY</p>
+              <a href={site.ctaHref} className="mt-3 inline-flex min-h-11 max-w-full items-center break-all text-xl font-medium text-red underline decoration-line2 underline-offset-8 transition-colors hover:decoration-red sm:text-2xl">
+                {site.email}
+              </a>
+              <p className="mt-3 max-w-[44ch] text-sm font-light leading-relaxed text-ink2">
+                Share a little about your organisation and the challenge you have in mind.
+              </p>
+            </div>
             <Reveal>
               <h2 className="t-h3 max-w-[18ch]">What happens next</h2>
             </Reveal>

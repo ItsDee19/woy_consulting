@@ -69,7 +69,7 @@ through a private channel rather than committing them.
 | `/case-studies` | Featured engagement and outcome-led portfolio of six cases |
 | `/case-studies/[slug]` | Six detail pages, generated from `lib/content.ts` |
 | `/practitioners` | Authentic portraits with monochrome/colour hover, experience highlights and expandable biographies |
-| `/contact` | Name, mobile and email form |
+| `/contact` | Direct email to hello@woyconsulting.com, plus the name, mobile and email form |
 | `/faq` | Answers about WOY, its services, approach and enquiries |
 | `/privacy-policy` | Information handling and cookie choices |
 | `/terms-and-conditions` | Website terms and enquiries |
@@ -198,7 +198,7 @@ The following details require WOY’s production information.
   the NDA constraint. Names in the source deck were stripped.
 - **No awards or press section.** WOY positions through work and engagement.
 - **The Approach page is an interactive 4D journey**, with keyboard-accessible stage tabs, connected planes, stable detail panels and a readable no-JavaScript fallback.
-- **The contact form asks for name, mobile and email only.** No query field.
+- **Conversation CTAs open an email to hello@woyconsulting.com.** The footer combines the closing invitation, company information, navigation and legal links. The Contact page remains available; its separate form asks for name, mobile and email only and still requires server delivery configuration.
 
 ## Accessibility and performance
 

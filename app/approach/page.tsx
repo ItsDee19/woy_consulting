@@ -4,7 +4,6 @@ import { StructuredData } from "@/components/StructuredData";
 import { contentPageGraph } from "@/lib/structured-data";
 import { pageMetadata } from "@/lib/metadata";
 import { ApproachExplorer } from "@/components/ApproachExplorer";
-import { CTASection } from "@/components/CTASection";
 import styles from "./approach.module.css";
 
 export const metadata = pageMetadata(
@@ -57,7 +56,6 @@ export default function ApproachPage() {
           <Link href="/case-studies" className={styles.proofLink}>See the approach in practice <ArrowUpRight size={18} aria-hidden /></Link>
         </div>
       </section>
-      <CTASection title="Start with the challenge you’re facing." body="A conversation with a WOY practitioner can help clarify the next step." />
     </>
   );
 }

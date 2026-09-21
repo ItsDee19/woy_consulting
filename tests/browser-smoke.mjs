@@ -83,6 +83,13 @@ try {
       }
     }
     assert.equal(await page.getByRole("navigation", { name: "Primary", exact: true }).getByRole("link", { name: "Expertise", exact: true }).count(), 0, "Expertise is absent from the main navigation");
+    const conversationLinks = page.getByRole("link", { name: "Request a conversation", exact: true });
+    assert.ok(await conversationLinks.count() >= 2, `Header and footer email actions: ${route}`);
+    for (const link of await conversationLinks.all()) assert.equal(await link.getAttribute("href"), "mailto:hello@woyconsulting.com");
+    const footer = page.getByRole("contentinfo");
+    assert.equal(await footer.getByRole("link", { name: "hello@woyconsulting.com", exact: true }).getAttribute("href"), "mailto:hello@woyconsulting.com");
+    assert.equal(await footer.getByRole("link", { name: "Contact", exact: true }).getAttribute("href"), "/contact");
+    assert.equal(await footer.getByRole("link", { name: /Made by AvlysAI/ }).getAttribute("href"), "https://avlysai.com/");
     assert.equal(meta.h1, 1, `Heading: ${route}`);
     assert.equal(meta.missingAlt, 0, `Alt: ${route}`);
     meta.hrefs.forEach(href => hrefs.add(new URL(href, base + route).href));
@@ -179,7 +186,11 @@ try {
   assert.equal(await staticExplorer.getByRole("heading", { level: 3 }).count(), 4, "Every stage remains readable without JavaScript");
   assert.equal(await staticExplorer.getByText("Capability transfer", { exact: true }).isVisible(), true);
   await staticContext.close();
-  await page.goto(base + "/contact", { waitUntil: "load" });
+  await page.getByRole("contentinfo").getByRole("link", { name: "Back to top", exact: true }).click();
+  await page.waitForFunction(() => document.getElementById("main").getBoundingClientRect().top >= 0);
+  await page.getByRole("contentinfo").getByRole("link", { name: "Contact", exact: true }).click();
+  await page.waitForURL(base + "/contact");
+  assert.equal(await page.locator("main").getByRole("link", { name: "hello@woyconsulting.com", exact: true }).getAttribute("href"), "mailto:hello@woyconsulting.com");
   await page.locator('form button[type="submit"]').click();
   assert.equal(await page.locator('input[aria-invalid="true"]').count(), 3);
   assert.equal(await page.evaluate(() => document.activeElement.id), "f-name");
@@ -313,7 +324,7 @@ try {
   const saveBounds = await page.getByRole("button", { name: "Save preferences", exact: true }).boundingBox();
   assert.ok(saveBounds && saveBounds.y >= 0 && saveBounds.y + saveBounds.height <= 569, "Cookie action reachable on a small screen");
   await page.screenshot({ path: path.join(reportDir, "cookie-mobile.png") });
-  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "cookie choices, theme memory, Home/footer Expertise navigation; Expertise absent from both navbars, expertise redirect/deep links/disclosures, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/hover/focus/touch/reduced motion/biography disclosure, client disclosure, Approach explorer keyboard/click/next/previous/wrapping/stable panels/reduced motion/no-JS fallback, validation, unavailable delivery, mocked success/duplicate prevention passed" };
+  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "footer email CTAs, Contact and back-to-top navigation, cookie choices, theme memory, Home/footer Expertise navigation; Expertise absent from both navbars, expertise redirect/deep links/disclosures, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/hover/focus/touch/reduced motion/biography disclosure, client disclosure, Approach explorer keyboard/click/next/previous/wrapping/stable panels/reduced motion/no-JS fallback, validation, unavailable delivery, mocked success/duplicate prevention passed" };
   fs.writeFileSync(path.join(reportDir, "browser-check.json"), JSON.stringify(report, null, 2));
   console.log(JSON.stringify({ pages: pages.length, jsErrors: errors.length, accessibility: accessibility.length, overflow: overflow.length, brokenLinks: brokenLinks.length }));
   assert.equal(errors.length, 0, "Browser JS errors");

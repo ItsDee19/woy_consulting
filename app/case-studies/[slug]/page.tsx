@@ -5,7 +5,6 @@ import { pageMetadata } from "@/lib/metadata";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/dist/ssr";
-import { CTASection } from "@/components/CTASection";
 import { caseStudies, caseStudyBySlug } from "@/lib/content";
 import styles from "../case-studies.module.css";
 
@@ -95,7 +94,6 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
         </Link>
         <p className={styles.confidentiality}>Client identity is withheld under confidentiality agreements.</p>
       </section>
-      <CTASection title="Let’s discuss your context." body="Bring the challenge you are working through. Our partners will help you explore a practical way forward." />
     </>
   );
 }

@@ -38,6 +38,7 @@ export function siteEntityGraph(): SchemaNode[] {
       "@type": "Organization",
       ...organization(),
       name: site.name,
+      email: site.email,
       url: schemaUrl("/"),
       logo: schemaUrl("/apple-icon.png"),
       description: site.description,
