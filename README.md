@@ -65,7 +65,7 @@ through a private channel rather than committing them.
 | `/` | Animated brand mark, positioning, compact expertise and delivery section, clients, interactive 4D approach and selected work |
 | `/about` | Concise firm introduction, logo philosophy, partnership principles and expandable client roster |
 | `/expertise` | Permanent redirect to the homepage’s `#expertise` section |
-| `/approach` | The 4D approach as drop-downs, plus what stays behind after delivery |
+| `/approach` | Interactive 4D journey, connected architectural planes and the ownership built into delivery |
 | `/case-studies` | Featured engagement and outcome-led portfolio of six cases |
 | `/case-studies/[slug]` | Six detail pages, generated from `lib/content.ts` |
 | `/practitioners` | Authentic portraits with monochrome/colour hover, experience highlights and expandable biographies |
@@ -197,7 +197,7 @@ The following details require WOY’s production information.
 - **Case studies carry no client names.** Industry and scope of work only, per
   the NDA constraint. Names in the source deck were stripped.
 - **No awards or press section.** WOY positions through work and engagement.
-- **The 4D approach is drop-downs**, one open at a time.
+- **The Approach page is an interactive 4D journey**, with keyboard-accessible stage tabs, connected planes, stable detail panels and a readable no-JavaScript fallback.
 - **The contact form asks for name, mobile and email only.** No query field.
 
 ## Accessibility and performance

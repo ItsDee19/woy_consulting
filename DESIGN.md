@@ -47,7 +47,7 @@ Shared `.shell`: width 100%, maximum 1320px, fluid horizontal padding clamp(1.25
 
 ## Elevation & Depth
 
-Use flat reading surfaces and hairline separators. Reserve subtle shadows for interactive hover and the cookie overlay. Use flat midnight navy compositions for the philosophy and 4D method. Avoid decorative gradients and repeated boxed-card layouts; establish hierarchy with type, real images, space and rules.
+Use flat reading surfaces and hairline separators. Reserve subtle shadows for interactive hover and the cookie overlay. Use flat midnight navy compositions for the philosophy and 4D method. The Approach explorer permits subtle SVG shading only within its architectural planes to explain depth and stage selection. Avoid ornamental gradients elsewhere and repeated boxed-card layouts; establish hierarchy with type, real images, space and rules.
 
 ## Shapes
 
@@ -57,7 +57,9 @@ Controls keep the existing 2px corner radius. The logo geometry in `components/m
 
 Practitioner portraits come from the supplied deck and render at a base width no greater than 284 CSS pixels to respect the smallest source. Fine-pointer devices start in monochrome; profile hover or keyboard focus restores colour and scales the image by 1.045 inside its fixed frame. Touch and reduced-motion users see colour without needing hover; reduced motion disables zoom. Full biographies use native details/summary disclosures. The compact About page shows eight brands, with the full roster in a native disclosure and the source disclaimer always visible. The homepage 4D compass uses four semantic tabs, arrow/Home/End keyboard navigation, stable panel height, no autoplay and a visible link to the full approach page.
 
-Navigation includes an explicit Home link. Expertise is a homepage section at `/#expertise`, not a standalone page; legacy `/expertise` links permanently redirect to it. Three outcome columns expose six native capability disclosures, with one open at a time. Capability anchors open their corresponding disclosure on direct/hash navigation. The initial view remains concise; detailed lists are available on demand.
+Navigation includes an explicit Home link and excludes Expertise on both desktop and mobile. The footer retains an Expertise link. Expertise is a homepage section at `/#expertise`, not a standalone page; legacy `/expertise` links permanently redirect to it. Three outcome columns expose six native capability disclosures, with one open at a time. Capability anchors open their corresponding disclosure on direct/hash navigation. The initial view remains concise; detailed lists are available on demand.
+
+The Approach page extends the 4D system into four ascending architectural planes linked by one trajectory. Tabs illuminate the matching plane and show canonical stage content, three outputs and a concise outcome. Use navy, fixed red artwork and readable on-navy text; no autoplay, parallax or heavy animation libraries. Keyboard arrows/Home/End, previous/next controls, stable panels, inert inactive content, reduced motion and a complete no-JavaScript fallback preserve usability. Keep the ownership section concise.
 
 Case studies use a featured engagement with its real planning horizons, followed by industry/outcome rows. Detail pages separate the situation, WOY’s work and observed outcomes, with native section links. The homepage teaser follows this same hierarchy. Numbers only describe evidenced work, not invented performance metrics; avoid decorative client imagery, repeated floating cards and additional animation.
 

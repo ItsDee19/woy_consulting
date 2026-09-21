@@ -82,6 +82,7 @@ try {
         assert.equal(await page.getByText(item.acceptedAnswer.text, { exact: true }).count(), 1);
       }
     }
+    assert.equal(await page.getByRole("navigation", { name: "Primary", exact: true }).getByRole("link", { name: "Expertise", exact: true }).count(), 0, "Expertise is absent from the main navigation");
     assert.equal(meta.h1, 1, `Heading: ${route}`);
     assert.equal(meta.missingAlt, 0, `Alt: ${route}`);
     meta.hrefs.forEach(href => hrefs.add(new URL(href, base + route).href));
@@ -143,11 +144,41 @@ try {
   await page.getByRole("navigation", { name: "Mobile", exact: true }).getByRole("link", { name: "Home", exact: true }).click();
   assert.equal(await page.locator("#mobile-nav").count(), 0, "Home closes the mobile menu even on the home route");
   await page.getByRole("button", { name: "Open menu" }).click();
+  assert.equal(await page.getByRole("navigation", { name: "Mobile", exact: true }).getByRole("link", { name: "Expertise", exact: true }).count(), 0, "Expertise is absent from the mobile navigation");
   await page.locator('#mobile-nav a[href="/approach"]').click();
   await page.waitForURL(base + "/approach");
-  const panels = page.locator('main button[aria-controls^="panel-"]');
-  await panels.nth(1).click();
-  assert.equal(await page.locator('main button[aria-expanded="true"]').count(), 1);
+  const explorer = page.locator("[data-approach-explorer]");
+  const explorerTabs = explorer.getByRole("tablist", { name: "The four stages of the WOY approach" }).getByRole("tab");
+  assert.equal(await explorerTabs.count(), 4);
+  await explorerTabs.first().focus();
+  const explorerHeight = (await explorer.boundingBox()).height;
+  for (const [key, name] of [["ArrowRight", "Define"], ["End", "Deliver"], ["ArrowRight", "Discover"], ["ArrowLeft", "Deliver"], ["Home", "Discover"]]) {
+    await page.keyboard.press(key);
+    const selected = explorer.getByRole("tab", { selected: true });
+    assert.match(await selected.innerText(), new RegExp(name));
+    assert.equal(await selected.evaluate(el => document.activeElement === el), true, "Explorer keyboard navigation moves focus");
+    assert.equal(await explorer.getByRole("tabpanel").count(), 1, "Only the active explorer panel is exposed");
+    assert.equal(await explorer.getByRole("tabpanel").getAttribute("aria-labelledby"), await selected.getAttribute("id"));
+    assert.equal(await explorer.locator('[role="tabpanel"][inert]').count(), 3);
+    assert.equal((await explorer.boundingBox()).height, explorerHeight, "Changing stage preserves the layout height");
+  }
+  await explorerTabs.nth(2).click();
+  assert.match(await explorer.getByRole("tabpanel").innerText(), /Tailored journey/);
+  await explorer.getByRole("button", { name: "Next stage: Deliver", exact: true }).click();
+  assert.match(await explorer.getByRole("tabpanel").innerText(), /Capability transfer/);
+  await explorer.getByRole("button", { name: "Next stage: Discover", exact: true }).click();
+  await explorer.getByRole("button", { name: "Previous stage: Deliver", exact: true }).click();
+  assert.match(await explorer.getByRole("tabpanel").innerText(), /Sustained execution/);
+  assert.equal(await explorer.getByRole("tabpanel").evaluate(el => getComputedStyle(el).transitionDuration), "0s", "Explorer respects reduced motion");
+  await page.screenshot({ path: path.join(reportDir, "approach-mobile.png"), fullPage: true });
+  const staticContext = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+  const staticPage = await staticContext.newPage();
+  await staticPage.goto(base + "/approach", { waitUntil: "load" });
+  const staticExplorer = staticPage.locator("[data-approach-explorer]");
+  assert.equal(await staticExplorer.getByRole("tab").count(), 0, "No inert controls are shown without JavaScript");
+  assert.equal(await staticExplorer.getByRole("heading", { level: 3 }).count(), 4, "Every stage remains readable without JavaScript");
+  assert.equal(await staticExplorer.getByText("Capability transfer", { exact: true }).isVisible(), true);
+  await staticContext.close();
   await page.goto(base + "/contact", { waitUntil: "load" });
   await page.locator('form button[type="submit"]').click();
   assert.equal(await page.locator('input[aria-invalid="true"]').count(), 3);
@@ -209,7 +240,7 @@ try {
   await homeLink.click();
   await page.waitForURL(base + "/");
   assert.equal(await homeLink.getAttribute("aria-current"), "page");
-  await page.getByRole("navigation", { name: "Primary", exact: true }).getByRole("link", { name: "Expertise", exact: true }).click();
+  await page.getByRole("contentinfo").getByRole("link", { name: "Expertise", exact: true }).click();
   await page.waitForURL(base + "/#expertise");
   const capabilities = page.locator("#expertise details");
   assert.equal(await capabilities.count(), 6);
@@ -282,7 +313,7 @@ try {
   const saveBounds = await page.getByRole("button", { name: "Save preferences", exact: true }).boundingBox();
   assert.ok(saveBounds && saveBounds.y >= 0 && saveBounds.y + saveBounds.height <= 569, "Cookie action reachable on a small screen");
   await page.screenshot({ path: path.join(reportDir, "cookie-mobile.png") });
-  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "cookie choices, theme memory, Home/Expertise navigation, expertise redirect/deep links/disclosures, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/hover/focus/touch/reduced motion/biography disclosure, client disclosure, accordion, validation, unavailable delivery, mocked success/duplicate prevention passed" };
+  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "cookie choices, theme memory, Home/footer Expertise navigation; Expertise absent from both navbars, expertise redirect/deep links/disclosures, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/hover/focus/touch/reduced motion/biography disclosure, client disclosure, Approach explorer keyboard/click/next/previous/wrapping/stable panels/reduced motion/no-JS fallback, validation, unavailable delivery, mocked success/duplicate prevention passed" };
   fs.writeFileSync(path.join(reportDir, "browser-check.json"), JSON.stringify(report, null, 2));
   console.log(JSON.stringify({ pages: pages.length, jsErrors: errors.length, accessibility: accessibility.length, overflow: overflow.length, brokenLinks: brokenLinks.length }));
   assert.equal(errors.length, 0, "Browser JS errors");

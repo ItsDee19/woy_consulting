@@ -16,7 +16,7 @@ export function Footer() {
         </div>
 
         <nav aria-label="Footer" className="grid grid-cols-2 gap-x-6 gap-y-3 self-start">
-          {[...nav, { label: "FAQs", href: "/faq" }, { label: site.cta, href: "/contact" }].map((item) => (
+          {[...nav, { label: "Expertise", href: "/#expertise" }, { label: "FAQs", href: "/faq" }, { label: site.cta, href: "/contact" }].map((item) => (
             <Link
               key={item.href}
               href={item.href}

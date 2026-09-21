@@ -1,10 +1,11 @@
+import Link from "next/link";
+import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { StructuredData } from "@/components/StructuredData";
 import { contentPageGraph } from "@/lib/structured-data";
 import { pageMetadata } from "@/lib/metadata";
-import { PageHero } from "@/components/PageHero";
-import { ApproachAccordion } from "@/components/Accordion";
+import { ApproachExplorer } from "@/components/ApproachExplorer";
 import { CTASection } from "@/components/CTASection";
-import { Reveal } from "@/components/Reveal";
+import styles from "./approach.module.css";
 
 export const metadata = pageMetadata(
   "The 4D Consulting Approach",
@@ -12,63 +13,51 @@ export const metadata = pageMetadata(
   "/approach"
 );
 
+const foundations = [
+  { title: "Clear ownership", body: "Agreed priorities, defined outcomes and people accountable for carrying the work forward." },
+  { title: "Capability within your team", body: "Leaders, HR and line teams equipped to apply the tools and sustain the change." },
+  { title: "A rhythm for progress", body: "Success measures, operating cadences and review routines that make execution part of everyday work." },
+];
+
 export default function ApproachPage() {
   return (
     <>
       <StructuredData id="approach-structured-data" nodes={contentPageGraph({
-          path: "/approach", name: "The 4D Consulting Approach", description: metadata.description ?? "",
-        })} />
-      <PageHero
-        kicker="How we work"
-        title="A structured path from diagnosis to sustained adoption."
-        lede="Four stages, each with a job to do. The last one is the one most engagements skip, and it is the reason change does not survive the consultant leaving."
-      />
+        path: "/approach", name: "The 4D Consulting Approach", description: metadata.description ?? "",
+      })} />
+      <header className={styles.hero}>
+        <div className={`shell ${styles.heroGrid}`}>
+          <div>
+            <p className={styles.eyebrow}>The WOY 4D approach</p>
+            <h1>A clear direction.<br /><span>Change that lasts.</span></h1>
+          </div>
+          <div className={styles.introduction}>
+            <p>Insight becomes a shared ambition. A tailored solution becomes a way of working your people can sustain.</p>
+            <a href="#explore-4d" className={styles.exploreLink}>Explore the journey <span aria-hidden>↓</span></a>
+          </div>
+        </div>
+      </header>
 
-      <section className="bg-block py-16 text-onblock md:py-24">
+      <div id="explore-4d" className={styles.explorerAnchor}>
+        <ApproachExplorer />
+      </div>
+
+      <section className={styles.ownership} aria-labelledby="ownership-title">
         <div className="shell">
-          <ApproachAccordion tone="dark" />
-
-          <Reveal delay={0.1}>
-            <p className="mt-12 max-w-[48ch] text-lg font-light text-redb md:text-xl">
-              From insight, to alignment, to capability, to sustained execution.
-            </p>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ------------------------------------------------ what stays behind */}
-      <section className="py-20 md:py-28">
-        <div className="shell grid gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
-          <Reveal>
-            <h2 className="t-h2 max-w-[16ch]">What stays behind when we leave</h2>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <div className="grid max-w-[62ch] gap-5 font-light leading-relaxed text-ink2">
-              <p>
-                An engagement that depends on us to keep working has failed,
-                whatever the feedback scores say. Delivery is built so that the
-                internal team can run, sustain and scale the change on their own.
-              </p>
-              <p>
-                That means success metrics people actually review, operating
-                cadences that survive a busy quarter, and accountability loops
-                with names attached. It also means capability transfer is a
-                deliverable rather than a hope: leaders, HR and line teams are
-                equipped to carry it before we step back.
-              </p>
-              <p>
-                We measure the work by observable behaviour shifts and system
-                reinforcement, not by the size of the deck.
-              </p>
+          <div className={styles.ownershipHeading}>
+            <div>
+              <p className={styles.eyebrow}>Built to carry forward</p>
+              <h2 id="ownership-title">The lasting part<br />belongs to you.</h2>
             </div>
-          </Reveal>
+            <p>Partner-led through delivery.<br />Designed for your team to own.</p>
+          </div>
+          <dl className={styles.foundations}>
+            {foundations.map(item => <div key={item.title}><dt>{item.title}</dt><dd>{item.body}</dd></div>)}
+          </dl>
+          <Link href="/case-studies" className={styles.proofLink}>See the approach in practice <ArrowUpRight size={18} aria-hidden /></Link>
         </div>
       </section>
-
-      <CTASection
-        title="Bring us the problem before it is fully defined."
-        body="Discover exists precisely because the brief is rarely the real issue. A first conversation costs nothing and usually sharpens it."
-      />
+      <CTASection title="Start with the challenge you’re facing." body="A conversation with a WOY practitioner can help clarify the next step." />
     </>
   );
 }
