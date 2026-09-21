@@ -115,7 +115,7 @@ export default function PractitionersPage() {
               <div><dt>25+</dt><dd>coaches across industries and disciplines</dd></div>
             </dl>
             <p className={styles.networkCopy}>Our consortium brings together senior practitioners around your specific leadership, culture and business challenges.</p>
-            <Link href="/expertise" className={styles.textLink}>Explore our expertise <ArrowUpRight size={19} aria-hidden /></Link>
+            <Link href="/#expertise" className={styles.textLink}>Explore our expertise <ArrowUpRight size={19} aria-hidden /></Link>
           </div>
         </div>
       </section>

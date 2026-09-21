@@ -31,9 +31,9 @@ Run `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, and `npm r
 
 ### Completed checks
 
-- Production build and TypeScript: passed; 24 generated routes/assets and the server contact API.
-- ESLint and design audits: passed. Security, indexing and structured-data unit tests: 29 passed.
-- Browser audit: 16 public pages, light/dark themes, and widths of 320, 375, 390, 414, 768, 1024, 1440 and 1920 pixels.
+- Production build and TypeScript: passed; 23 generated routes/assets and the server contact API.
+- ESLint and design audits: passed. Security, indexing and structured-data unit tests: 31 passed.
+- Browser audit: 15 public pages, light/dark themes, and widths of 320, 375, 390, 414, 768, 1024, 1440 and 1920 pixels.
 - No JavaScript errors, automated WCAG A/AA violations, horizontal overflow or broken internal links/assets in that run.
 - Consent, theme memory/revocation, saved-choice reloads, mobile navigation, validation, unavailable delivery and mocked successful delivery checked. Cookie actions remain reachable at 320 × 568 pixels.
 - Server-rendered consent and visible logo loading checked. All favicon, social image, robots and sitemap endpoints return 200; missing pages return 404.
@@ -48,17 +48,17 @@ Production build at `http://localhost:5173/`, Chrome 153, Lighthouse 13.5. Run `
 | Accessibility | 100 | 100 |
 | Best practices | 100 | 100 |
 | First contentful paint | 1.1 s | 0.3 s |
-| Largest contentful paint | 2.6 s | 0.6 s |
+| Largest contentful paint | 2.6 s | 0.7 s |
 | Total blocking time (simulated) | 90 ms | 0 ms |
 | Cumulative layout shift | 0 | 0 |
 
 SEO scores 69 locally because local/preview builds intentionally block indexing. This is not a production SEO result.
 
-The latest run followed the deck-led About, Practitioners and 4D redesign, using the same standard mobile and desktop presets with no competing browser audit. Historical runs on this machine scored 29/60 and 39/62 under much slower CPU conditions; those differences cannot be attributed solely to code changes. Four photos shrank from 223,896 to 120,386 bytes (46% smaller).
+The latest run followed the navigation, compact expertise, case-study and portrait-interaction refinement, using the same standard mobile and desktop presets with no competing browser audit. Historical runs on this machine scored 29/60 and 39/62 under much slower CPU conditions; those differences cannot be attributed solely to code changes. Four photos shrank from 223,896 to 120,386 bytes (46% smaller).
 
 These are local lab observations, not real-user field measurements or a Core Web Vitals guarantee. Retest on the actual public host after the domain is provided. The assembling logo remains animated in red, respects reduced motion, and pauses off screen; visible animation controls have been removed as requested.
 
-SEO/GEO additions and final-domain steps are documented in [seo-geo.md](seo-geo.md). Browser checks confirm unique branded titles, canonical/social URL agreement, consistent entity origins, matching visible FAQ/schema answers, red artwork in both themes, no animation-control buttons, and JavaScript-free access to FAQ content. The deck-led redesign also verifies 4D keyboard/click navigation, practitioner images and biography disclosures, the expanded client roster, and the final mobile typography/portrait refinements. See [redesign-review.md](redesign-review.md).
+SEO/GEO additions and final-domain steps are documented in [seo-geo.md](seo-geo.md). Browser checks confirm unique branded titles, canonical/social URL agreement, consistent entity origins, matching visible FAQ/schema answers, red artwork in both themes, no animation-control buttons, and JavaScript-free access to FAQ content. The deck-led redesign also verifies 4D keyboard/click navigation, practitioner images and biography disclosures, the expanded client roster, and the final mobile typography/portrait refinements. See [redesign-review.md](redesign-review.md) and [navigation-case-studies-review.md](navigation-case-studies-review.md). The latest audit also verifies Home and Expertise navigation, the permanent redirect, capability deep links, exclusive disclosures, portrait hover/focus/touch/reduced-motion behavior, and case-study chapter links.
 
 ## Production setup
 

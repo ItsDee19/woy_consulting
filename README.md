@@ -7,7 +7,7 @@ app/
   layout.tsx            shell: nav, footer, theme boot, scroll progress
   template.tsx          per-route enter animation
   page.tsx              home
-  about/ expertise/ approach/ practitioners/ contact/
+  about/ approach/ practitioners/ contact/
   case-studies/
     page.tsx            index
     [slug]/page.tsx     six generated detail pages
@@ -62,20 +62,20 @@ through a private channel rather than committing them.
 
 | Route | What it holds |
 |---|---|
-| `/` | Hero with the logo animation, positioning, three pillars, client wall, 4D teaser, selected work |
-| `/about` | Who we are, the logo philosophy, why partner with WOY, the full client wall |
-| `/expertise` | Three pillars, each with its capabilities broken out in full |
+| `/` | Animated brand mark, positioning, compact expertise and delivery section, clients, interactive 4D approach and selected work |
+| `/about` | Concise firm introduction, logo philosophy, partnership principles and expandable client roster |
+| `/expertise` | Permanent redirect to the homepage’s `#expertise` section |
 | `/approach` | The 4D approach as drop-downs, plus what stays behind after delivery |
-| `/case-studies` | Index of six cases |
+| `/case-studies` | Featured engagement and outcome-led portfolio of six cases |
 | `/case-studies/[slug]` | Six detail pages, generated from `lib/content.ts` |
-| `/practitioners` | Profiles with hover reveals and LinkedIn slots |
+| `/practitioners` | Authentic portraits with monochrome/colour hover, experience highlights and expandable biographies |
 | `/contact` | Name, mobile and email form |
 | `/faq` | Answers about WOY, its services, approach and enquiries |
 | `/privacy-policy` | Information handling and cookie choices |
 | `/terms-and-conditions` | Website terms and enquiries |
 
 Adding a seventh case study means adding one object to `caseStudies` in
-`lib/content.ts`. The index card, the detail page, the route and its metadata
+`lib/content.ts`. The portfolio entry, the detail page, the route and its metadata
 all follow automatically.
 
 ---

@@ -57,7 +57,7 @@ export default function FAQPage() {
               </p>
               <nav aria-label="Explore WOY" className="mt-7 flex flex-col items-start gap-2">
                 {[
-                  { label: "Our expertise", href: "/expertise" },
+                  { label: "Our expertise", href: "/#expertise" },
                   { label: "Our approach", href: "/approach" },
                   { label: "Our practitioners", href: "/practitioners" },
                 ].map((link) => (

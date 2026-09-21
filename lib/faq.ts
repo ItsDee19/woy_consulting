@@ -24,7 +24,7 @@ export const faqItems: FAQItem[] = [
     id: "consulting-services",
     question: "What does WOY Consulting help organisations with?",
     answer: "WOY Consulting works across coaching and leadership development, inclusive leadership and culture, people and culture consulting, HR capability and transformation, strategy and sales management, and organisation diagnostics and restructuring. These capabilities connect leadership, people systems and business execution.",
-    links: [{ label: "Explore our expertise", href: "/expertise" }],
+    links: [{ label: "Explore our expertise", href: "/#expertise" }],
   },
   {
     id: "who-we-work-with",

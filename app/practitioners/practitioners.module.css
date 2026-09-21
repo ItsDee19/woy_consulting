@@ -15,7 +15,14 @@
 .profile { min-width: 0; scroll-margin-top: 6rem; }
 .portraitField { position: relative; display: flex; justify-content: center; align-items: end; overflow: hidden; padding: 1.5rem 1rem 0; background: var(--c-sunken); }
 .portraitLine { position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--c-logo-red); }
-.portrait { display: block; width: 100%; max-width: 284px; height: auto; aspect-ratio: 1; object-fit: cover; object-position: center; }
+.portrait { display: block; width: 100%; max-width: 284px; height: auto; aspect-ratio: 1; object-fit: cover; object-position: center; filter: grayscale(1); transform: scale(1); transform-origin: 50% 0; transition: filter 450ms ease, transform 650ms cubic-bezier(.16, 1, .3, 1); }
+@media (hover: hover) and (pointer: fine) {
+  .profile:hover .portrait { filter: grayscale(0); transform: scale(1.045); }
+}
+.profile:focus-within .portrait { filter: grayscale(0); transform: scale(1.045); }
+@media (hover: none) {
+  .portrait { filter: none; }
+}
 .founderPortrait { object-position: 50% 0; }
 .identity { padding: 1.6rem 0 1.4rem; }
 .role { min-height: 2.8em; max-width: 29ch; font-size: .76rem; line-height: 1.4; font-weight: 500; color: var(--c-red); }
@@ -76,4 +83,5 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .textLink svg, .biography summary svg { transition: none; }
+  .portrait, .profile:hover .portrait, .profile:focus-within .portrait { filter: none; transform: none; transition: none; }
 }

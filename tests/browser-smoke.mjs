@@ -64,6 +64,16 @@ try {
     assert.equal(await page.getByRole("button", { name: /(?:Pause|Resume) animations/ }).count(), 0);
     const schemaOrigin = new URL(meta.canonical).origin;
     for (const node of meta.schema) if (node["@id"]) assert.equal(new URL(node["@id"]).origin, schemaOrigin);
+    if (route === "/") {
+      const services = meta.schema.filter(node => node["@type"] === "Service");
+      assert.equal(services.length, 6, "All expertise entities are now on the homepage");
+      for (const service of services) {
+        const serviceUrl = new URL(service.url);
+        assert.equal(serviceUrl.pathname, "/");
+        assert.equal(await page.locator(serviceUrl.hash).count(), 1, "Service schema points to a real homepage capability");
+      }
+    }
+    assert.equal(meta.hrefs.filter(href => href?.startsWith("/expertise")).length, 0, "No links target the retired page");
     if (route === "/faq") {
       const faq = meta.schema.find(node => node["@type"] === "FAQPage");
       assert.ok(faq?.mainEntity?.length >= 6, "FAQ schema has substantive answers");
@@ -95,6 +105,10 @@ try {
   assert.equal(new Set(pages.map(page => page.description)).size, pages.length, "Unique page descriptions");
   const sitemap = await (await context.request.get(base + "/sitemap.xml")).text();
   for (const page of pages) assert.ok(sitemap.includes(page.route === "/" ? "<loc>" : page.route + "</loc>"), `Sitemap route: ${page.route}`);
+  assert.ok(!sitemap.includes("/expertise</loc>"), "Retired expertise route is excluded from sitemap");
+  const expertiseRedirect = await context.request.get(base + "/expertise", { maxRedirects: 0 });
+  assert.equal(expertiseRedirect.status(), 308);
+  assert.match(expertiseRedirect.headers().location, /\/#expertise$/);
   for (const href of hrefs) {
     const url = new URL(href);
     if (url.origin !== new URL(base).origin) continue;
@@ -125,6 +139,9 @@ try {
   await page.getByRole("button", { name: "Open menu" }).click();
   await page.keyboard.press("Escape");
   assert.equal(await page.getByRole("button", { name: "Open menu" }).evaluate(e => e === document.activeElement), true);
+  await page.getByRole("button", { name: "Open menu" }).click();
+  await page.getByRole("navigation", { name: "Mobile", exact: true }).getByRole("link", { name: "Home", exact: true }).click();
+  assert.equal(await page.locator("#mobile-nav").count(), 0, "Home closes the mobile menu even on the home route");
   await page.getByRole("button", { name: "Open menu" }).click();
   await page.locator('#mobile-nav a[href="/approach"]').click();
   await page.waitForURL(base + "/approach");
@@ -186,6 +203,29 @@ try {
   await page.screenshot({ path: path.join(reportDir, "home-mobile.png"), fullPage: true });
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.screenshot({ path: path.join(reportDir, "home-desktop.png"), fullPage: true });
+  await page.goto(base + "/about", { waitUntil: "load" });
+  const homeLink = page.getByRole("navigation", { name: "Primary", exact: true }).getByRole("link", { name: "Home", exact: true });
+  assert.equal(await homeLink.getAttribute("aria-current"), null);
+  await homeLink.click();
+  await page.waitForURL(base + "/");
+  assert.equal(await homeLink.getAttribute("aria-current"), "page");
+  await page.getByRole("navigation", { name: "Primary", exact: true }).getByRole("link", { name: "Expertise", exact: true }).click();
+  await page.waitForURL(base + "/#expertise");
+  const capabilities = page.locator("#expertise details");
+  assert.equal(await capabilities.count(), 6);
+  await capabilities.first().locator("summary").focus();
+  await page.keyboard.press("Enter");
+  assert.equal(await capabilities.first().getAttribute("open"), "");
+  await capabilities.nth(2).locator("summary").click();
+  assert.equal(await page.locator("#expertise details[open]").count(), 1, "Capability details stay compact with a single open item");
+  await page.goto(base + "/#hr-capability-and-transformation", { waitUntil: "load" });
+  await page.waitForFunction(() => {
+    const target = document.getElementById("hr-capability-and-transformation");
+    const top = target?.getBoundingClientRect().top;
+    return target?.open && top >= 72 && top < 300;
+  });
+  const linkedCapability = await page.locator("#hr-capability-and-transformation").boundingBox();
+  assert.ok(linkedCapability.y >= 72 && linkedCapability.y < 300, "Saved capability link is below the sticky navigation");
   await page.goto(base + "/practitioners", { waitUntil: "load" });
   for (const [slug, name] of [["vipin-tuteja", "Vipin"], ["sandeep-bidani", "Sandeep"], ["kannan-swaminathan", "Kannan"]]) {
     const article = page.locator(`#${slug}`);
@@ -202,6 +242,31 @@ try {
     await page.keyboard.press("Enter");
     assert.equal(await article.locator("details").getAttribute("open"), null);
   }
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.mouse.move(0, 0);
+  await page.locator("h1").focus();
+  await page.evaluate(() => document.activeElement?.blur());
+  const founder = page.locator("#vipin-tuteja");
+  const founderImage = founder.locator("img");
+  await founderImage.scrollIntoViewIfNeeded();
+  await page.waitForFunction(() => getComputedStyle(document.querySelector("#vipin-tuteja img")).filter === "grayscale(1)");
+  const profileBounds = await founder.boundingBox();
+  await founderImage.hover();
+  await page.waitForFunction(() => {
+    const style = getComputedStyle(document.querySelector("#vipin-tuteja img"));
+    return style.filter === "grayscale(0)" && new DOMMatrix(style.transform).a > 1.04;
+  });
+  assert.equal((await founder.boundingBox()).height, profileBounds.height, "Portrait zoom does not move profile content");
+  await page.mouse.move(0, 0);
+  await founder.locator("summary").focus();
+  await page.waitForFunction(() => getComputedStyle(document.querySelector("#vipin-tuteja img")).filter === "grayscale(0)");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  assert.equal(await founderImage.evaluate(el => getComputedStyle(el).transform), "none", "Portrait respects reduced motion");
+  const touchContext = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: "no-preference" });
+  const touchPage = await touchContext.newPage();
+  await touchPage.goto(base + "/practitioners", { waitUntil: "load" });
+  assert.equal(await touchPage.locator("#vipin-tuteja img").evaluate(el => getComputedStyle(el).filter), "none", "Touch devices receive colour portraits without needing hover");
+  await touchContext.close();
   const personImages = await page.locator('script[type="application/ld+json"]').evaluateAll(scripts => scripts.flatMap(s => JSON.parse(s.textContent)["@graph"] || []).filter(n => n["@type"] === "Person").map(n => n.image));
   assert.equal(personImages.length, 3);
   assert.ok(personImages.every(Boolean), "All named practitioners have schema portrait references");
@@ -217,7 +282,7 @@ try {
   const saveBounds = await page.getByRole("button", { name: "Save preferences", exact: true }).boundingBox();
   assert.ok(saveBounds && saveBounds.y >= 0 && saveBounds.y + saveBounds.height <= 569, "Cookie action reachable on a small screen");
   await page.screenshot({ path: path.join(reportDir, "cookie-mobile.png") });
-  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "cookie choices, theme memory, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/biography disclosure, client disclosure, accordion, validation, unavailable delivery, mocked success/duplicate prevention passed" };
+  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "cookie choices, theme memory, Home/Expertise navigation, expertise redirect/deep links/disclosures, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/hover/focus/touch/reduced motion/biography disclosure, client disclosure, accordion, validation, unavailable delivery, mocked success/duplicate prevention passed" };
   fs.writeFileSync(path.join(reportDir, "browser-check.json"), JSON.stringify(report, null, 2));
   console.log(JSON.stringify({ pages: pages.length, jsErrors: errors.length, accessibility: accessibility.length, overflow: overflow.length, brokenLinks: brokenLinks.length }));
   assert.equal(errors.length, 0, "Browser JS errors");

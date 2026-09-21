@@ -6,44 +6,24 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { CTASection } from "@/components/CTASection";
-import { Reveal } from "@/components/Reveal";
-import { MarkGlyph } from "@/components/Mark";
 import { caseStudies, caseStudyBySlug } from "@/lib/content";
+import styles from "../case-studies.module.css";
 
 export function generateStaticParams() {
   return caseStudies.map((c) => ({ slug: c.slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
-  const c = caseStudyBySlug(slug);
-  if (!c) notFound();
-  return pageMetadata(
-    c.title,
-    `${c.industry} case study: ${c.headline}`,
-    `/case-studies/${c.slug}`
-  );
-}
-
-const BLOCKS = [
-  { key: "edge", label: "WOY's edge" },
-  { key: "framework", label: "The framework" },
-  { key: "outcomes", label: "What changed" },
-] as const;
-
-export default async function CaseStudyPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const study = caseStudyBySlug(slug);
   if (!study) notFound();
+  return pageMetadata(study.title, `${study.industry} case study: ${study.headline}`, `/case-studies/${study.slug}`);
+}
 
+export default async function CaseStudyPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const study = caseStudyBySlug(slug);
+  if (!study) notFound();
   const index = caseStudies.findIndex((c) => c.slug === slug);
   const next = caseStudies[(index + 1) % caseStudies.length];
 
@@ -56,108 +36,66 @@ export default async function CaseStudyPage({
         }, [{ name: "Case Studies", path: "/case-studies" }]),
         caseStudySchema(study),
       ]} />
-      <section className="relative overflow-hidden border-b border-line bg-sunken">
-        <MarkGlyph className="pointer-events-none absolute -right-16 -top-20 h-[420px] w-[420px] text-red opacity-[0.045] md:right-[4%]" />
-
-        <div className="shell relative py-14 md:py-20">
-          <Link
-            href="/case-studies"
-            className="group inline-flex items-center gap-2 text-sm text-ink2 transition-colors hover:text-red"
-          >
-            <ArrowLeft
-              size={15}
-              weight="bold"
-              className="transition-transform duration-300 group-hover:-translate-x-1"
-            />
-            All case studies
-          </Link>
-
-          <Reveal>
-            <p className="mt-9 text-xs font-medium uppercase tracking-[0.1em] text-red">
-              {study.industry}
-            </p>
-          </Reveal>
-          <Reveal delay={0.06}>
-            <h1 className="t-h2 mt-4 max-w-[20ch]">{study.title}</h1>
-          </Reveal>
-          <Reveal delay={0.12}>
-            <p className="mt-6 max-w-[52ch] text-lg font-light leading-relaxed text-ink2">
-              {study.headline}
-            </p>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------- context */}
-      <section className="py-16 md:py-20">
-        <div className="shell grid gap-8 lg:grid-cols-[14rem_1fr] lg:gap-16">
-          <Reveal>
-            <h2 className="text-sm font-medium uppercase tracking-[0.1em] text-ink3">
-              The situation
-            </h2>
-          </Reveal>
-          <Reveal delay={0.06}>
-            <p className="max-w-[62ch] text-xl font-light leading-relaxed">
-              {study.context}
-            </p>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ------------------------------------------------------------ blocks */}
-      <section className="pb-4">
+      <header className={styles.detailHero}>
         <div className="shell">
-          {BLOCKS.map((block, bi) => (
-            <div
-              key={block.key}
-              className="grid gap-8 border-t border-line py-12 lg:grid-cols-[14rem_1fr] lg:gap-16 md:py-16"
-            >
-              <Reveal>
-                <h2 className="text-sm font-medium uppercase tracking-[0.1em] text-ink3">
-                  {block.label}
-                </h2>
-              </Reveal>
-              <ul role="list" className="grid gap-4">
-                {study[block.key].map((item, i) => (
-                  <Reveal key={item} delay={i * 0.05} as="li">
-                    <div className="relative max-w-[64ch] pl-8 font-light leading-relaxed text-ink2">
-                      <span className="absolute left-0 top-[0.72em] h-px w-4 bg-red" />
-                      {item}
-                    </div>
-                  </Reveal>
-                ))}
-              </ul>
-              {bi === BLOCKS.length - 1 && <span className="hidden" />}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* -------------------------------------------------------------- next */}
-      <section className="border-t border-line py-14">
-        <div className="shell">
-          <Link
-            href={`/case-studies/${next.slug}`}
-            className="group flex flex-wrap items-end justify-between gap-6"
-          >
+          <Link href="/case-studies" className={styles.backLink}><ArrowLeft size={16} aria-hidden="true" /> All case studies</Link>
+          <div className={styles.detailIntroduction}>
             <div>
-              <p className="text-sm text-ink3">Next case study</p>
-              <p className="mt-2 text-xs font-medium uppercase tracking-[0.1em] text-red">
-                {next.industry}
-              </p>
-              <h2 className="t-h3 mt-3 max-w-[20ch] transition-colors duration-300 group-hover:text-red">
-                {next.title}
-              </h2>
+              <p className={styles.eyebrow}>{study.industry} · Engagement brief</p>
+              <h1>{study.title}</h1>
             </div>
-            <ArrowRight
-              size={30}
-              className="mb-2 text-ink3 transition-all duration-300 group-hover:translate-x-2 group-hover:text-red"
-            />
-          </Link>
+            <p className={styles.detailHeadline}>{study.headline}</p>
+          </div>
+          <nav className={styles.chapterNav} aria-label="In this case study">
+            <a href="#situation">The situation</a>
+            <a href="#work">The work</a>
+            <a href="#outcomes">What changed</a>
+          </nav>
+        </div>
+      </header>
+
+      <div className={`shell ${styles.narrative}`}>
+        <section id="situation" className={styles.situation} aria-labelledby="situation-title">
+          <h2 id="situation-title" className={styles.sectionLabel}>The situation</h2>
+          <p>{study.context}</p>
+        </section>
+        <section id="work" className={styles.workSection} aria-labelledby="work-title">
+          <div className={styles.workHeading}>
+            <h2 id="work-title">The work</h2>
+            <p>A tailored intervention, shaped around the organisation and its leaders.</p>
+          </div>
+          <div className={styles.workColumns}>
+            <div className={styles.roleColumn}>
+              <h3>WOY’s role</h3>
+              <div className={styles.roleCopy}>{study.edge.map((item) => <p key={item}>{item}.</p>)}</div>
+            </div>
+            <div className={styles.frameworkColumn}>
+              <h3>Engagement design</h3>
+              <ul>{study.framework.map((item) => <li key={item}>{item}</li>)}</ul>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section id="outcomes" className={styles.outcomesSection} aria-labelledby="outcomes-title">
+        <div className={`shell ${styles.outcomesLayout}`}>
+          <div>
+            <p className={styles.navyEyebrow}>Observed outcomes</p>
+            <h2 id="outcomes-title">What changed.</h2>
+            <p className={styles.outcomesNote}>The shifts in thinking, capability and ways of working that emerged from the engagement.</p>
+          </div>
+          <ul className={styles.outcomeGrid}>{study.outcomes.map((item) => <li key={item}>{item}</li>)}</ul>
         </div>
       </section>
 
-      <CTASection />
+      <section className={`shell ${styles.nextSection}`} aria-labelledby="next-case-title">
+        <Link href={`/case-studies/${next.slug}`} className={styles.nextCase}>
+          <div><p className={styles.eyebrow}>Next engagement · {next.industry}</p><h2 id="next-case-title">{next.title}</h2></div>
+          <ArrowRight size={30} aria-hidden="true" />
+        </Link>
+        <p className={styles.confidentiality}>Client identity is withheld under confidentiality agreements.</p>
+      </section>
+      <CTASection title="Let’s discuss your context." body="Bring the challenge you are working through. Our partners will help you explore a practical way forward." />
     </>
   );
 }

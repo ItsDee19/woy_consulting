@@ -78,7 +78,8 @@ test("destinations accept only exact configured hosts, not arbitrary or lookalik
 test("loopback addresses remain on HTTP even when explicitly configured", async () => {
   for (const host of ["localhost", "local.localhost", "localhost.", "0.0.0.0", "127.0.0.1", "127.2.3.4", "[::1]", "[::ffff:127.0.0.1]"]) {
     const rules = await redirectRules({ SITE_URL: `http://${host}:5173` });
-    assert.deepEqual(rules, [], host);
+    assert.equal(redirect(rules, { host, pathname: "/about" }), null, host);
+    assert.equal(redirect(rules, { host, pathname: "/expertise" }).parsedDestination.pathname, "/");
   }
 });
 
@@ -97,16 +98,48 @@ test("Vercel production and preview hosts are included as fixed destinations", a
   assert.equal(redirect(rules, { host: "other-project.vercel.app" }), null);
 });
 
-test("legacy site URL works, origins deduplicate, and development has no redirects", async () => {
+test("legacy site URL works, origins deduplicate, and development has no HTTPS redirects", async () => {
   const legacy = await redirectRules({ NEXT_PUBLIC_SITE_URL: "http://project.vercel.app", VERCEL_URL: "project.vercel.app" });
-  assert.equal(legacy.length, 1);
+  assert.equal(legacy.filter((rule) => rule.has).length, 1);
   assert.ok(redirect(legacy, { host: "project.vercel.app" }));
-  assert.deepEqual(await redirectRules({ NODE_ENV: "development", SITE_URL: "https://example.com" }), []);
-  assert.deepEqual(await redirectRules(), []);
+  const development = await redirectRules({ NODE_ENV: "development", SITE_URL: "https://example.com" });
+  assert.equal(redirect(development, { host: "example.com", pathname: "/about" }), null);
+  assert.equal(redirect(await redirectRules(), { host: "localhost:5173", pathname: "/about" }), null);
 });
 
 test("invalid public origins fail configuration instead of entering the allowlist", async () => {
   for (const SITE_URL of ["javascript:alert(1)", "https://user:pass@example.com", "https://example.com/path", "https://example.com?next=evil", "https://example.com#fragment", "not a URL"]) {
     await assert.rejects(redirectRules({ SITE_URL }), /must be an HTTP\(S\) origin/);
   }
+});
+
+
+test("retired expertise page permanently redirects to the homepage section in every environment", async () => {
+  for (const environment of [
+    { NODE_ENV: "development" },
+    { NODE_ENV: "production" },
+    { NODE_ENV: "production", SITE_URL: "https://example.com" },
+  ]) {
+    const rules = await redirectRules(environment);
+    const host = environment.SITE_URL ? "example.com" : "localhost:5173";
+    const result = redirect(rules, { host, protocol: "https", pathname: "/expertise", query: { source: "old-link" } });
+    assert.ok(result);
+    assert.equal(result.permanent, true);
+    assert.equal(result.parsedDestination.pathname, "/");
+    assert.equal(result.parsedDestination.hash, "#expertise");
+    assert.deepEqual(result.parsedDestination.query, { source: "old-link" });
+    assert.equal(redirect(rules, { host, protocol: "https", pathname: "/" }), null);
+    assert.equal(redirect(rules, { host, protocol: "https", pathname: "/expertise-unrelated" }), null);
+  }
+});
+
+test("expertise migration upgrades configured public HTTP requests before the section redirect", async () => {
+  const rules = await redirectRules({ SITE_URL: "https://example.com" });
+  const first = redirect(rules, { host: "example.com", pathname: "/expertise" });
+  assert.equal(first.parsedDestination.protocol, "https:");
+  assert.equal(first.parsedDestination.hostname, "example.com");
+  assert.equal(first.parsedDestination.pathname, "/expertise");
+  const second = redirect(rules, { host: "example.com", protocol: "https", pathname: "/expertise" });
+  assert.equal(second.parsedDestination.pathname, "/");
+  assert.equal(second.parsedDestination.hash, "#expertise");
 });

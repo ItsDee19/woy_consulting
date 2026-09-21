@@ -43,8 +43,9 @@ const nextConfig = {
   async redirects() {
     // The hosting proxy must overwrite X-Forwarded-Proto on every request.
     // Fixed configured origins avoid interpolating untrusted Host headers.
-    if (!isProduction) return [];
-    return configuredSiteOrigins(process.env)
+    const expertiseRedirect = { source: "/expertise", destination: "/#expertise", permanent: true };
+    if (!isProduction) return [expertiseRedirect];
+    const httpsRedirects = configuredSiteOrigins(process.env)
       .filter((origin) => !isLocalHost(new URL(origin).hostname))
       .map((origin) => {
         const hostname = new URL(origin).hostname;
@@ -61,6 +62,8 @@ const nextConfig = {
           permanent: true,
         };
       });
+    // Upgrade public HTTP traffic before moving the retired service page.
+    return [...httpsRedirects, expertiseRedirect];
   },
 };
 

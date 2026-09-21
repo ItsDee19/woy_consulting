@@ -6,7 +6,8 @@
 - The homepage states what WOY is, what it does and when it was established in visible, server-rendered text.
 - The `/faq` page answers eight real questions about the firm, its services, practitioners, 4D approach, case studies and enquiries. Answers remain visible without opening controls, with links to supporting pages.
 - Organization and WebSite entities establish one shared site identity. Content pages add relevant page/breadcrumb, service, person and case-study entities based on the published copy. FAQ data mirrors visible answers. No ratings, addresses, credentials, client identities or unsupported outcomes are fabricated.
-- All public routes, including FAQs, appear in the sitemap. Footer links make the FAQ discoverable throughout the site.
+- All public content routes, including FAQs, appear in the sitemap. Footer links make the FAQ discoverable throughout the site.
+- Expertise is consolidated into the homepage’s `#expertise` section. The retired `/expertise` route permanently redirects there, is excluded from the sitemap, and service entities point to the corresponding visible homepage capability anchors.
 - Production robots rules allow crawling of public content while excluding the API. Local and Vercel preview builds remain noindex. Optional `SITE_INDEXING=disabled` protects other staging deployments.
 - Production Googlebot preview controls permit descriptive snippets and large image previews. JavaScript is not required to read the core page copy or structured data.
 - Structured data is safely serialized. Automated tests check entity relationships, canonical consistency, staging protection and matching FAQ copy.

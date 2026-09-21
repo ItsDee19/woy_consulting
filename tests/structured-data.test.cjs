@@ -66,6 +66,9 @@ test("visible services and practitioners share the site entity without invented 
     assert.equal(service.name, capability.title);
     assert.equal(service.description, capability.summary);
     assert.equal(service.provider["@id"], organization["@id"]);
+    assert.equal(service.url, `https://www.woy.test/#${capability.slug}`);
+    assert.equal(service["@id"], service.url);
+    assert.equal(service.mainEntityOfPage["@id"], "https://www.woy.test/#webpage");
   }
   const people = schema.practitionerGraph();
   assert.equal(people.length, content.practitioners.length);

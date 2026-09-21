@@ -69,15 +69,16 @@ export function Nav() {
           WebkitBackdropFilter: "blur(14px) saturate(140%)",
         }}
       >
-        <div className="shell flex h-[72px] items-center gap-4 lg:gap-8">
+        <div className="shell flex h-[72px] items-center gap-4 xl:gap-8">
           <Link href="/" aria-label={`${site.name}, home`} className="shrink-0 text-red">
             <Mark className="h-[42px] w-[92px]" />
           </Link>
 
-          <nav aria-label="Primary" className="ml-auto hidden items-center gap-5 lg:flex xl:gap-7">
+          <nav aria-label="Primary" className="ml-auto hidden items-center gap-4 lg:flex xl:gap-6">
             {nav.map((item) => {
               const active =
-                pathname === item.href || pathname.startsWith(item.href + "/");
+                !item.href.includes("#") &&
+                (pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href + "/")));
               return (
                 <Link
                   key={item.href}

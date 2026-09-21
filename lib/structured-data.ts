@@ -99,14 +99,14 @@ export function contentPageGraph(options: WebPageOptions, ancestors: Breadcrumb[
 export function serviceGraph(): SchemaNode[] {
   return capabilities.map((capability) => ({
     "@type": "Service",
-    "@id": schemaId("/expertise", capability.slug),
-    url: schemaUrl(`/expertise#${capability.slug}`),
+    "@id": schemaId("/", capability.slug),
+    url: schemaUrl(`/#${capability.slug}`),
     name: capability.title,
     description: capability.summary,
     serviceType: capability.title,
     category: pillars[capability.pillar].title,
     provider: organization(),
-    mainEntityOfPage: { "@id": schemaId("/expertise", "webpage") },
+    mainEntityOfPage: { "@id": schemaId("/", "webpage") },
   }));
 }
 
