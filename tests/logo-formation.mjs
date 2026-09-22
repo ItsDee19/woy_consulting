@@ -32,6 +32,58 @@ try {
       };
     });
   };
+  // Rasterize the live SVG geometry through the browser's stroke renderer so
+  // square caps and miter tips count; SVG getBBox() omits them in Chromium.
+  const paintedBounds = () => logo.evaluate(element => {
+    const scale = 8;
+    const origin = { x: 50, y: 30 };
+    const measure = selector => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 240 * scale;
+      canvas.height = 150 * scale;
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+      context.scale(scale, scale);
+      context.translate(-origin.x, -origin.y);
+      for (const node of element.querySelectorAll(selector)) {
+        const style = getComputedStyle(node);
+        context.lineWidth = parseFloat(style.strokeWidth);
+        context.lineCap = style.strokeLinecap;
+        context.lineJoin = style.strokeLinejoin;
+        context.miterLimit = parseFloat(style.strokeMiterlimit);
+        const path = new Path2D(node.getAttribute("d") || "");
+        if (node.tagName === "circle") {
+          path.arc(node.cx.baseVal.value, node.cy.baseVal.value, node.r.baseVal.value, 0, 2 * Math.PI);
+        }
+        context.stroke(path);
+      }
+      const { data } = context.getImageData(0, 0, canvas.width, canvas.height);
+      let top = canvas.height;
+      let bottom = -1;
+      for (let y = 0; y < canvas.height; y++) {
+        for (let x = 0; x < canvas.width; x++) {
+          if (data[(y * canvas.width + x) * 4 + 3] > 0) {
+            top = Math.min(top, y);
+            bottom = y;
+            break;
+          }
+        }
+      }
+      return { top: origin.y + top / scale, bottom: origin.y + (bottom + 1) / scale };
+    };
+    return {
+      ring: measure(".mk-ring"),
+      w: measure('[data-logo-letter="w"]'),
+      y: measure('[data-logo-letter="y"]'),
+      strokes: [...element.querySelectorAll(".mk-ring, .mk-letters path")].map(node => getComputedStyle(node).strokeWidth),
+    };
+  });
+  const assertAlignedLetters = bounds => {
+    for (const letter of ["w", "y"]) {
+      assert.ok(Math.abs(bounds[letter].top - bounds.ring.top) <= .25, `${letter.toUpperCase()} cap matches the ring's visible top`);
+      assert.ok(Math.abs(bounds[letter].bottom - bounds.ring.bottom) <= .25, `${letter.toUpperCase()} tip matches the ring's visible bottom`);
+    }
+    assert.ok(bounds.strokes.every(stroke => stroke === bounds.strokes[0]), "Letters retain the ring's stroke weight");
+  };
   for (const width of [320, 390, 768, 1440, 1920]) {
     await page.setViewportSize({ width, height: 1000 });
     await logo.scrollIntoViewIfNeeded();
@@ -62,7 +114,9 @@ try {
     assert.equal((await logo.boundingBox()).height, before.height, "The formation does not shift layout");
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth), false);
     if (width === 390 || width === 1440) await logo.screenshot({ path: `reports/logo-complete-${width}.png` });
-    results.push({ width, separated, merging, complete });
+    const painted = await paintedBounds();
+    assertAlignedLetters(painted);
+    results.push({ width, separated, merging, complete, painted });
   }
   await page.emulateMedia({ reducedMotion: "reduce" });
   assert.equal(await logo.locator(".mk-ring").evaluate(el => getComputedStyle(el).animationName), "none");
@@ -70,6 +124,7 @@ try {
   for (const selector of [".mk-ring", ".mk-star-core path", ".mk-needle", ".mk-letters path", ".mk-consulting"]) {
     assert.equal(await logo.locator(selector).first().evaluate(el => getComputedStyle(el).opacity), "1", `Complete reduced-motion mark: ${selector}`);
   }
+  assertAlignedLetters(await paintedBounds());
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.reload({ waitUntil: "load" });
   await page.getByRole("contentinfo").scrollIntoViewIfNeeded();
@@ -79,5 +134,5 @@ try {
   await page.waitForFunction(() => !document.querySelector("[data-logo-formation]").classList.contains("is-paused"));
   assert.ok(await logo.evaluate(el => el.getAnimations({ subtree: true }).every(animation => animation.playState === "running")), "All tracks resume together");
   fs.writeFileSync("reports/logo-formation.json", JSON.stringify({ results, reducedMotion: true, offscreenPause: true, resume: true }, null, 2));
-  console.log("Logo formation: separate symbols, convergence, complete lockup, responsive geometry, reduced motion and off-screen pause passed.");
+  console.log("Logo formation: separate symbols, convergence, complete lockup, aligned letter heights including strokes, responsive geometry, reduced motion and off-screen pause passed.");
 } finally { await browser.close(); }

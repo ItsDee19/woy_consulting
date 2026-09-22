@@ -1,12 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MARK } from "./mark-geometry";
+import { MARK, SOURCE_SYMBOLS } from "./mark-geometry";
 
 // The reference symbols are an introduction to the mark, not replacement artwork.
-// The finished ring, spokes, north marker and letters always use MARK geometry.
-const starOutline = "M180 60 L188.2 82.7 L212.3 83.5 L193.3 98.3 L200 121.5 L180 108 L160 121.5 L166.7 98.3 L147.7 83.5 L171.8 82.7 Z";
-const compassPoints = "M180 63 L185 82 L199.8 74.2 L192 89 L211 94 L192 99 L199.8 113.8 L185 106 L180 125 L175 106 L160.2 113.8 L168 99 L149 94 L168 89 L160.2 74.2 L175 82 Z";
+// The ring, spokes and north marker retain the shared MARK geometry.
+// Animation-only letter coordinates preserve their widths and 4-unit strokes.
+// Their square caps and miter tips align to the ring's painted y=58..130 bounds;
+// scaling a group would also compress the stroke and leave the W tips too tall.
+const formationLetters = {
+  w: "M70.4 60.474 L88.4 123.166 L106.4 67.802 L124.4 123.166 L142.4 60.474",
+  yFork: "M217.3 60.808 L243.7 94.5 L270.1 60.808",
+  yStem: "M243.7 94.5 L243.7 128",
+} as const;
+const { starOutline, compassPoints } = SOURCE_SYMBOLS;
 const dialTicks = Array.from({ length: 48 }, (_, index) => index * 7.5);
 
 /** A synchronized 12-second sequence: reveal, converge, resolve, hold, reset. */
@@ -34,7 +41,6 @@ export function LogoFormation({ className = "" }: { className?: string }) {
 
   return (
     <div ref={ref} aria-hidden="true" data-logo-formation className={`logo-formation relative ${paused ? "is-paused" : ""} ${className}`} style={{ aspectRatio: "230 / 150" }}>
-      <div className="mk-halo" />
       <svg viewBox={MARK.viewBox} className="relative h-full w-full overflow-hidden" focusable="false">
         <defs>
           <linearGradient id="woy-sheen" gradientUnits="userSpaceOnUse" x1="70" y1="44" x2="272" y2="160">
@@ -87,7 +93,9 @@ export function LogoFormation({ className = "" }: { className?: string }) {
         </g>
 
         <g className="mk-letters" fill="none" stroke="url(#woy-sheen)" strokeWidth={MARK.ringStroke} strokeLinecap="square" strokeLinejoin="miter">
-          <path d={MARK.w} pathLength="1" /><path d={MARK.yFork} pathLength="1" /><path d={MARK.yStem} pathLength="1" />
+          <path data-logo-letter="w" d={formationLetters.w} pathLength="1" />
+          <path data-logo-letter="y" d={formationLetters.yFork} pathLength="1" />
+          <path data-logo-letter="y" d={formationLetters.yStem} pathLength="1" />
         </g>
         <text className="mk-consulting" x={MARK.wordX} y={MARK.wordY - 2} textAnchor="middle" fill="var(--c-logo-red)">CONSULTING</text>
       </svg>

@@ -2,9 +2,9 @@ import { StructuredData } from "@/components/StructuredData";
 import { caseStudyListSchema, contentPageGraph, schemaId } from "@/lib/structured-data";
 import { pageMetadata } from "@/lib/metadata";
 import Link from "next/link";
-import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
+import { ArrowDown, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { caseStudies } from "@/lib/content";
-import styles from "./case-studies.module.css";
+import styles from "./case-study-index.module.css";
 
 export const metadata = pageMetadata(
   "Leadership & Transformation Case Studies",
@@ -25,66 +25,65 @@ export default function CaseStudiesPage() {
         }),
         caseStudyListSchema(),
       ]} />
-      <header className={`shell ${styles.indexHero}`}>
+
+      <header className={`shell ${styles.hero}`}>
         <div>
           <p className={styles.eyebrow}>Case studies</p>
-          <h1>Leadership challenges.<br /><span>Meaningful change.</span></h1>
+          <h1>The work behind<br /><em>meaningful change.</em></h1>
         </div>
-        <p className={styles.heroIntro}>Different sectors. Different starting points. A closer look at how we help leaders turn ambition into changes their organisations can sustain.</p>
+        <div className={styles.introduction}>
+          <p>From leadership capability to organisation-wide change, every engagement starts with a different reality. These are some of the ways we have helped leaders move forward.</p>
+          <a href="#engagements" className={styles.browseLink}>Explore the engagements <ArrowDown size={17} aria-hidden="true" /></a>
+        </div>
       </header>
 
-      <section className={`shell ${styles.featuredSection}`} aria-labelledby="featured-case-title">
-        <div className={styles.featured}>
-          <div className={styles.featuredCopy}>
-            <p className={styles.navyEyebrow}>Featured engagement · {featured.industry}</p>
-            <h2 id="featured-case-title">One institution.<br />A shared direction.</h2>
-            <p className={styles.featuredIntro}>{featured.headline}</p>
-            <p className={styles.featuredDescription}>Connecting strategy, governance and culture so academic and support teams could work to one growth agenda.</p>
-            <Link href={`/case-studies/${featured.slug}`} className={styles.navyLink}>
-              Explore the engagement <ArrowRight size={18} aria-hidden="true" />
+      <section id="engagements" className={`shell ${styles.engagements}`} aria-label="Selected engagements">
+        <article className={styles.featured} aria-labelledby="featured-case-title">
+          <div className={styles.featuredBrief}>
+            <p className={styles.featuredLabel}><span>Featured engagement</span><span>{featured.industry}</span></p>
+            <h2 id="featured-case-title">A shared direction<br />for a complex institution.</h2>
+            <p className={styles.featuredContext}>{featured.context}</p>
+            <Link href={`/case-studies/${featured.slug}`} className={styles.featuredLink}>
+              Read the education case study <ArrowUpRight size={19} aria-hidden="true" />
             </Link>
           </div>
-          <div className={styles.roadmap}>
-            <p className={styles.roadmapLabel}>From ambition to operating discipline</p>
-            <ol className={styles.horizons} aria-label="Connected planning horizons">
-              <li><span className={styles.horizonNumber}>5<span>yr</span></span><span>Long-term direction</span></li>
-              <li><span className={styles.horizonNumber}>3<span>yr</span></span><span>Strategic priorities</span></li>
-              <li><span className={styles.horizonNumber}>1<span>yr</span></span><span>Execution roadmap</span></li>
-            </ol>
-            <p className={styles.roadmapConnection}>One connected institutional agenda</p>
-            <ul className={styles.workstreams} aria-label="Supporting systems">
-              <li><strong>Governance</strong><span>Decision rights &amp; service commitments</span></li>
-              <li><strong>Culture</strong><span>Values translated into behaviours</span></li>
-              <li><strong>People</strong><span>Goals, reviews &amp; accountability</span></li>
-            </ul>
+          <div className={styles.featuredOutcome}>
+            <p className={styles.outcomeLabel}>What changed</p>
+            <p className={styles.outcomeStatement}>{featured.outcomes[0]}.</p>
+            <p className={styles.outcomeDetail}>{featured.outcomes[1]}.</p>
           </div>
-        </div>
-      </section>
+        </article>
 
-      <section className={`shell ${styles.collection}`} aria-labelledby="more-cases-title">
-        <div className={styles.collectionHeading}>
-          <h2 id="more-cases-title">More work. Different contexts.</h2>
-          <span>{otherStudies.length} engagements</span>
+        <div className={styles.collectionHeader}>
+          <h2>Different contexts.<br /><em>The same depth of commitment.</em></h2>
+          <p>Explore leadership, capability and organisational change across sectors.</p>
         </div>
-        <ul className={styles.caseList}>
+
+        <ul className={styles.collection} aria-label="More case studies">
           {otherStudies.map((study) => (
             <li key={study.slug}>
-              <Link href={`/case-studies/${study.slug}`} className={styles.caseRow}>
-                <p className={styles.caseIndustry}>{study.industry}</p>
-                <div className={styles.caseSubject}>
+              <article className={styles.case}>
+                <Link href={`/case-studies/${study.slug}`} className={styles.caseLink}>
+                  <div className={styles.caseTopline}>
+                    <p className={styles.industry}>{study.industry}</p>
+                    <span className={styles.caseArrow}><ArrowUpRight size={21} aria-hidden="true" /></span>
+                  </div>
                   <h3>{study.title}</h3>
-                  <p>{study.headline}</p>
-                </div>
-                <div className={styles.caseOutcome}>
-                  <span>What changed</span>
-                  <p>{study.outcomes[0]}</p>
-                  <span className={styles.readCase}>Read the case <ArrowRight size={17} aria-hidden="true" /></span>
-                </div>
-              </Link>
+                  <p className={styles.caseHeadline}>{study.headline}</p>
+                  <div className={styles.caseResult}>
+                    <span>Observed change</span>
+                    <p>{study.outcomes[0]}.</p>
+                  </div>
+                  <span className={styles.readCase}>Read the case study <ArrowUpRight size={16} aria-hidden="true" /></span>
+                </Link>
+              </article>
             </li>
           ))}
         </ul>
-        <p className={styles.confidentiality}>Client names are withheld under confidentiality agreements. The contexts, work and observed outcomes are drawn from WOY engagements.</p>
+        <aside className={styles.confidentiality} aria-label="Client confidentiality">
+          <p>Real work. Respected confidences.</p>
+          <p>Client names are withheld under confidentiality agreements. The contexts, work and observed outcomes are drawn from WOY engagements.</p>
+        </aside>
       </section>
     </>
   );

@@ -1,12 +1,14 @@
 # Footer and email CTA review
 
+> Typography update: the website now uses the owner-requested Georgia-based serif style. The footer layout and interactions described below remain in effect.
+
 Implemented on 21 September 2026 from the owner-supplied footer reference and `hello@woyconsulting.com` contact address.
 
 ## Result
 
-The shared footer now combines the closing conversation invitation with company details and site navigation. A large two-line heading, fine orbital geometry around the exact WOY compass glyph, navy background and red action establish the visual direction. Brief hover/focus movement adds feedback without autoplay or an additional JavaScript dependency.
+The footer combines a shorter closing invitation with three clear groups: company identity/address, navigation, and the D&B credential. Large serif type, coral italic emphasis, a navy surface and a red conversation action establish the visual direction. Orbital decoration and the separate full-width registration strip are retired. Tablet layouts stack navigation and registration together; phones use a single main column.
 
-The reference supplies the company display name and Gurgaon location. Its D-U-N-S block was not reproduced because no verified profile destination or usable badge asset was supplied. Existing legal links, cookie preferences and the AvlysAI credit remain visible. A Back to top link targets the main content.
+The reference supplies the company display name and Gurgaon location. The owner subsequently supplied the D-U-N-S seal and QR screenshot. The QR decodes to `https://dunsregistered.dnb.com/PA.aspx?Key1=3203111&PaArea=Email`; its D&B profile identifies WOY Consulting Private Limited and D-U-N-S number **861471529**. At the owner’s request, the footer no longer displays the number. It retains the direct profile link, supplied seal and native Show/Hide QR disclosure grouped together, with the trigger directly beneath the profile link. The original PNG is preserved, with CSS framing only, retaining the QR quiet zone. Existing legal links, cookie preferences and the AvlysAI credit remain visible. A Back to top link targets the main content.
 
 All prominent conversation links now open `mailto:hello@woyconsulting.com`. The address is also visible in the footer, Contact page and FAQ, and is included in the Organization structured data. The Contact page and its existing form remain available through footer navigation. Setting an email link does not configure the form's separate server delivery service.
 
@@ -16,9 +18,9 @@ Separate page-bottom CTA sections were removed so the closing invitation appears
 
 | Area | Treatment |
 |---|---|
-| Identity | Existing navy, on-navy, action and fixed red artwork tokens; Geist typography |
+| Identity | Existing navy, on-navy, action and fixed red artwork tokens; Georgia-based serif typography |
 | Reference | Large conversation prompt, red action, company information and quiet dividing rules |
-| Signature | Exact WOY compass within fine orbital lines; brief response to CTA hover/focus |
+| Signature | Large italic closing invitation and a compact, cohesive D&B seal/profile/QR group |
 | Navigation | Explore and WOY Consulting groups; Expertise stays out of the Navbar |
 | Accessibility | Native links, visible keyboard focus, decorative SVG hidden from assistive technology, reduced motion and forced colors |
 | Small screens | Stacked invitation and company details, two-column navigation and at least 44px mobile navigation targets |

@@ -60,14 +60,16 @@ test("visible services and practitioners share the site entity without invented 
   assert.equal(organization.email, "hello@woyconsulting.com");
   for (const unsupported of ["address", "telephone", "aggregateRating", "sameAs"]) assert.ok(!(unsupported in organization));
   const services = schema.serviceGraph();
-  assert.equal(services.length, content.capabilities.length);
+  assert.equal(services.length, 4);
+  assert.equal(services.length, content.expertiseAreas.length);
   for (const service of services) {
-    const capability = content.capabilities.find((item) => service.url.endsWith(`#${item.slug}`));
-    assert.ok(capability);
-    assert.equal(service.name, capability.title);
-    assert.equal(service.description, capability.summary);
+    const area = content.expertiseAreas.find((item) => service.url.endsWith(`#${item.slug}`));
+    assert.ok(area);
+    assert.equal(service.name, area.title);
+    assert.equal(service.description, area.summary);
+    assert.equal(service.category, area.title);
     assert.equal(service.provider["@id"], organization["@id"]);
-    assert.equal(service.url, `https://www.woy.test/#${capability.slug}`);
+    assert.equal(service.url, `https://www.woy.test/#${area.slug}`);
     assert.equal(service["@id"], service.url);
     assert.equal(service.mainEntityOfPage["@id"], "https://www.woy.test/#webpage");
   }
@@ -82,6 +84,16 @@ test("visible services and practitioners share the site entity without invented 
     if (!practitioner.photo) assert.ok(!("image" in person));
     assert.ok(!("hasCredential" in person));
   }
+});
+
+test("homepage expertise preserves every previous capability anchor exactly once", () => {
+  const aliases = content.expertiseAreas.flatMap((area) => area.legacySlugs);
+  const previousAnchors = content.capabilities.map((capability) => capability.slug);
+  assert.equal(new Set(aliases).size, aliases.length);
+  assert.deepEqual(plain(aliases).sort(), plain(previousAnchors).sort());
+  const currentAnchors = content.expertiseAreas.map((area) => area.slug);
+  assert.equal(new Set(currentAnchors).size, currentAnchors.length);
+  assert.ok(currentAnchors.every((slug) => !aliases.includes(slug)));
 });
 
 test("case-study listing and detail graphs identify the same published works without naming confidential clients", () => {

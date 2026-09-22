@@ -1,5 +1,7 @@
 # Navigation, expertise and case-study refinement
 
+> Homepage expertise update: the three-column treatment below has been replaced with four editorial accordion areas. See [the current expertise review](expertise-review.md). Navigation decisions remain in effect. The case-study index has also been updated: its planning-horizons/workstream diagram is replaced by a featured brief and outcome panel, followed by editorial engagement previews. The detailed case-study content and URLs remain unchanged.
+
 The owner requested explicit Home navigation, a stronger case-study presentation, a compact combination of expertise and delivery on the homepage, removal of the standalone Expertise page, and monochrome-to-colour practitioner interactions. The established WOY palette, source facts and logo remain the basis of the work.
 
 ## Changes

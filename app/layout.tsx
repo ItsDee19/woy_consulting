@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
 import "./globals.css";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
@@ -10,13 +9,6 @@ import { isIndexable, siteUrl } from "@/lib/site-url";
 import { pageMetadata } from "@/lib/metadata";
 import { StructuredData } from "@/components/StructuredData";
 import { siteEntityGraph } from "@/lib/structured-data";
-
-const geist = Geist({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-geist",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   ...pageMetadata("Practitioner-led Leadership Advisory", site.description, "/"),
@@ -63,7 +55,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={geist.variable} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>

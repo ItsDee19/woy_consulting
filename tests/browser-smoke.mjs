@@ -54,6 +54,9 @@ try {
       hrefs: [...document.querySelectorAll("a[href]")].map(a => a.getAttribute("href")),
       assets: [...document.images].map(image => image.currentSrc || image.src),
     }));
+    const typefaces = await page.evaluate(() => ["body", "h1", "nav a", "button", "input", "textarea"]
+      .flatMap(selector => { const element = document.querySelector(selector); return element ? [{ selector, family: getComputedStyle(element).fontFamily }] : []; }));
+    for (const { selector, family } of typefaces) assert.match(family, /^Georgia/, `Reference serif typography on ${selector}: ${route}`);
     assert.ok(meta.title && meta.description && meta.canonical && meta.og, `Metadata: ${route}`);
     assert.match(meta.title, /WOY Consulting/, `Branded title: ${route}`);
     assert.equal(meta.title.split("WOY Consulting").length - 1, 1, `Brand appears once: ${route}`);
@@ -64,19 +67,13 @@ try {
     assert.equal(await page.getByRole("button", { name: /(?:Pause|Resume) animations/ }).count(), 0);
     const schemaOrigin = new URL(meta.canonical).origin;
     for (const node of meta.schema) if (node["@id"]) assert.equal(new URL(node["@id"]).origin, schemaOrigin);
-    let heroImageSource;
     if (route === "/") {
-      const heroBackground = page.locator("[data-home-hero] [data-hero-background]");
-      assert.equal(await heroBackground.count(), 1, "The hero uses one shared background image");
-      assert.equal(await heroBackground.getAttribute("alt"), "", "The background is decorative");
-      assert.equal(await heroBackground.getAttribute("aria-hidden"), "true");
-      await heroBackground.evaluate(image => image.decode());
-      heroImageSource = await heroBackground.evaluate(image => {
-        if (!image.complete || image.naturalWidth === 0) throw new Error("Hero background failed to load");
-        return image.currentSrc;
-      });
+      assert.equal(await page.locator("[data-home-hero] img, [data-hero-background]").count(), 0, "The hero has no background image");
+      const caption = page.locator("[data-logo-caption]");
+      assert.equal((await caption.locator("p").nth(0).textContent()).trim(), "Win Over Yourself.");
+      assert.equal((await caption.locator("p").nth(1).textContent()).replace(/\s+/g, " ").trim(), "Growth. Excellence. Agility.");
       const services = meta.schema.filter(node => node["@type"] === "Service");
-      assert.equal(services.length, 6, "All expertise entities are now on the homepage");
+      assert.equal(services.length, 4, "The four visible expertise areas have matching Service metadata");
       for (const service of services) {
         const serviceUrl = new URL(service.url);
         assert.equal(serviceUrl.pathname, "/");
@@ -108,10 +105,9 @@ try {
     for (const theme of ["light", "dark"]) {
       await page.evaluate(theme => document.documentElement.setAttribute("data-theme", theme), theme);
       if (route === "/") {
-        const heroBackground = page.locator("[data-hero-background]");
-        assert.equal(await heroBackground.isVisible(), true, `Hero background is visible in ${theme} mode`);
-        assert.equal(await heroBackground.evaluate(image => image.currentSrc), heroImageSource, "Theme changes reuse the same image asset");
-        assert.ok(await heroBackground.evaluate(image => Number(getComputedStyle(image).opacity) > 0), `Hero image has visible opacity in ${theme} mode`);
+        const heroSurface = await page.locator("[data-home-hero]").evaluate(el => ({ image: getComputedStyle(el).backgroundImage, color: getComputedStyle(el).backgroundColor }));
+        assert.equal(heroSurface.image, "none", `Plain hero in ${theme} mode`);
+        assert.equal(heroSurface.color, theme === "light" ? "rgb(251, 249, 247)" : "rgb(14, 16, 19)");
       }
       const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
       if (result.violations.length) accessibility.push({ route, theme, violations: result.violations.map(v => ({ id: v.id, impact: v.impact, description: v.description, nodes: v.nodes.map(n => ({ target: n.target, summary: n.failureSummary })) })) });
@@ -123,15 +119,10 @@ try {
       if (route === "/") {
         for (const theme of ["light", "dark"]) {
           await page.evaluate(theme => document.documentElement.setAttribute("data-theme", theme), theme);
-          const background = page.locator("[data-hero-background]");
-          assert.equal(await background.isVisible(), true, `Hero background remains visible at ${width}px in ${theme} mode`);
           const heroBounds = await page.locator("[data-home-hero]").boundingBox();
-          const imageBounds = await background.boundingBox();
-          assert.ok(heroBounds && imageBounds, "Hero and background have rendered bounds");
-          for (const dimension of ["x", "y", "width", "height"]) {
-            assert.ok(Math.abs(heroBounds[dimension] - imageBounds[dimension]) <= 1, `Background fills hero ${dimension} at ${width}px in ${theme} mode`);
-          }
-          assert.equal(await background.evaluate(image => getComputedStyle(image).objectFit), "cover", "Image keeps its proportions while covering the hero");
+          const captionBounds = await page.locator("[data-logo-caption]").boundingBox();
+          assert.ok(heroBounds && captionBounds, "Hero and caption have rendered bounds");
+          assert.ok(captionBounds.x >= heroBounds.x && captionBounds.x + captionBounds.width <= heroBounds.x + heroBounds.width + 1, `Caption fits at ${width}px in ${theme} mode`);
         }
       }
     }
@@ -215,6 +206,12 @@ try {
   assert.equal(await staticExplorer.getByRole("tab").count(), 0, "No inert controls are shown without JavaScript");
   assert.equal(await staticExplorer.getByRole("heading", { level: 3 }).count(), 4, "Every stage remains readable without JavaScript");
   assert.equal(await staticExplorer.getByText("Capability transfer", { exact: true }).isVisible(), true);
+  await staticPage.goto(base, { waitUntil: "load" });
+  const staticExpertise = staticPage.locator("#expertise details");
+  assert.equal(await staticExpertise.first().getAttribute("open"), "", "Expertise is server-rendered with the first area expanded");
+  await staticExpertise.nth(1).locator("summary").press("Enter");
+  assert.equal(await staticExpertise.nth(1).getAttribute("open"), "", "Expertise works without JavaScript");
+  assert.equal(await staticPage.locator("#expertise details[open]").count(), 1);
   await staticContext.close();
   await page.getByRole("contentinfo").getByRole("link", { name: "Back to top", exact: true }).click();
   await page.waitForFunction(() => document.getElementById("main").getBoundingClientRect().top >= 0);
@@ -283,21 +280,33 @@ try {
   assert.equal(await homeLink.getAttribute("aria-current"), "page");
   await page.getByRole("contentinfo").getByRole("link", { name: "Expertise", exact: true }).click();
   await page.waitForURL(base + "/#expertise");
-  const capabilities = page.locator("#expertise details");
-  assert.equal(await capabilities.count(), 6);
-  await capabilities.first().locator("summary").focus();
+  const expertise = page.locator("#expertise details");
+  assert.equal(await expertise.count(), 4);
+  assert.equal(await expertise.first().getAttribute("open"), "", "Strategy is initially expanded");
+  await expertise.first().locator("summary").focus();
   await page.keyboard.press("Enter");
-  assert.equal(await capabilities.first().getAttribute("open"), "");
-  await capabilities.nth(2).locator("summary").click();
-  assert.equal(await page.locator("#expertise details[open]").count(), 1, "Capability details stay compact with a single open item");
-  await page.goto(base + "/#hr-capability-and-transformation", { waitUntil: "load" });
-  await page.waitForFunction(() => {
-    const target = document.getElementById("hr-capability-and-transformation");
-    const top = target?.getBoundingClientRect().top;
-    return target?.open && top >= 72 && top < 300;
-  });
-  const linkedCapability = await page.locator("#hr-capability-and-transformation").boundingBox();
-  assert.ok(linkedCapability.y >= 72 && linkedCapability.y < 300, "Saved capability link is below the sticky navigation");
+  assert.equal(await expertise.first().getAttribute("open"), null, "An open area can be collapsed with the keyboard");
+  await page.keyboard.press("Space");
+  assert.equal(await expertise.first().getAttribute("open"), "", "Space also operates the native disclosure");
+  for (let index = 1; index < 4; index++) {
+    await expertise.nth(index).locator("summary").click();
+    assert.equal(await expertise.nth(index).getAttribute("open"), "");
+    assert.equal(await page.locator("#expertise details[open]").count(), 1, "One expertise area stays open at a time");
+    assert.equal(await expertise.nth(index).locator("li").count(), 3, "Each area offers three concise deliverables");
+  }
+  for (const slug of ["strategy-growth-execution", "leadership-executive-coaching", "organisation-culture-change", "people-performance-systems",
+    "strategy-and-sales-management", "coaching-and-leadership-development", "inclusive-leadership-and-culture",
+    "people-and-culture-consulting", "organization-diagnostics-and-restructuring", "hr-capability-and-transformation"]) {
+    await page.goto(base + "/#" + slug, { waitUntil: "load" });
+    await page.waitForFunction(id => {
+      const disclosure = document.getElementById(id)?.closest("details");
+      const top = disclosure?.getBoundingClientRect().top;
+      return disclosure?.open && top >= 72 && top < 300;
+    }, slug);
+    assert.equal(await page.locator("#expertise details[open]").count(), 1, `Only the linked area is open: ${slug}`);
+  }
+  await page.locator("#expertise").getByRole("link", { name: "See our expertise in practice" }).click();
+  await page.waitForURL(base + "/case-studies");
   await page.goto(base + "/practitioners", { waitUntil: "load" });
   for (const [slug, name] of [["vipin-tuteja", "Vipin"], ["sandeep-bidani", "Sandeep"], ["kannan-swaminathan", "Kannan"]]) {
     const article = page.locator(`#${slug}`);
@@ -354,7 +363,7 @@ try {
   const saveBounds = await page.getByRole("button", { name: "Save preferences", exact: true }).boundingBox();
   assert.ok(saveBounds && saveBounds.y >= 0 && saveBounds.y + saveBounds.height <= 569, "Cookie action reachable on a small screen");
   await page.screenshot({ path: path.join(reportDir, "cookie-mobile.png") });
-  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "hero background loading/decorative semantics/shared theme asset/responsive coverage, footer email CTAs, Contact and back-to-top navigation, cookie choices, theme memory, Home/footer Expertise navigation; Expertise absent from both navbars, expertise redirect/deep links/disclosures, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/hover/focus/touch/reduced motion/biography disclosure, client disclosure, Approach explorer keyboard/click/next/previous/wrapping/stable panels/reduced motion/no-JS fallback, validation, unavailable delivery, mocked success/duplicate prevention passed" };
+  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "plain light/dark hero, updated philosophy caption and responsive containment, footer email CTAs, Contact and back-to-top navigation, cookie choices, theme memory, Home/footer Expertise navigation; Expertise absent from both navbars, four-area expertise accordion, all current/legacy deep links, keyboard and no-JS disclosures, site-wide serif typography, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/hover/focus/touch/reduced motion/biography disclosure, client disclosure, Approach explorer keyboard/click/next/previous/wrapping/stable panels/reduced motion/no-JS fallback, validation, unavailable delivery, mocked success/duplicate prevention passed" };
   fs.writeFileSync(path.join(reportDir, "browser-check.json"), JSON.stringify(report, null, 2));
   console.log(JSON.stringify({ pages: pages.length, jsErrors: errors.length, accessibility: accessibility.length, overflow: overflow.length, brokenLinks: brokenLinks.length }));
   assert.equal(errors.length, 0, "Browser JS errors");

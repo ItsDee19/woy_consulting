@@ -62,7 +62,7 @@ through a private channel rather than committing them.
 
 | Route | What it holds |
 |---|---|
-| `/` | Generated architectural hero background with light/dark treatments, animated brand mark, positioning, compact expertise and delivery section, clients, interactive 4D approach and a founder-led leadership section |
+| `/` | Plain light/dark hero, balanced animated brand mark and Growth / Excellence / Agility caption, positioning, compact expertise and delivery section, clients, interactive 4D approach and a founder-led leadership section |
 | `/about` | Concise firm introduction, logo philosophy, partnership principles and expandable client roster |
 | `/expertise` | Permanent redirect to the homepage’s `#expertise` section |
 | `/approach` | Interactive 4D journey, connected architectural planes and the ownership built into delivery |
@@ -90,7 +90,7 @@ Taken from the WOY introduction deck and the brand artwork, not invented.
 | Accent red | `#E83928` | sampled from the deck's cover band |
 | Ink / charcoal | `#14171D` | aligned to the deck's `#041D41` navy |
 | Warm white | `#FBF9F7` | page background |
-| Typeface | Geist | closest match to the deck's humanist sans |
+| Typeface | Georgia-based serif stack | reference-inspired editorial typography throughout the website |
 
 **Guiding principle: "Win Over Yourself."** The deck says *Win*, not *Wind*. The
 site uses *Win* throughout.
@@ -114,7 +114,7 @@ Spokes reach `0.745` of the ring's centreline radius.
 
 One 12-second CSS timeline in `globals.css`, shared by every part through
 `--mk-duration`. The reference circle, outlined five-point star and detailed
-compass rose are introduced separately before converging into the exact WOY mark.
+compass rose are introduced separately before converging into the WOY mark. The animation uses W/Y paths whose painted height matches the ring; shared static logo geometry is unchanged.
 Auto-loops; respects system reduced-motion preferences.
 
 | Time | What happens |

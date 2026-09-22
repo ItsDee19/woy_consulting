@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-/** Open the requested native disclosure when a saved service link is followed. */
+/** Keep current expertise links and saved capability links working together. */
 export function ExpertiseAnchors() {
   useEffect(() => {
     let frame = 0;
@@ -12,10 +12,11 @@ export function ExpertiseAnchors() {
       catch { return; }
       if (!id) return;
       const target = document.getElementById(id);
-      if (!(target instanceof HTMLDetailsElement) || !target.closest("#expertise")) return;
-      target.open = true;
+      const disclosure = target?.closest("details");
+      if (!(disclosure instanceof HTMLDetailsElement) || !disclosure.closest("#expertise")) return;
+      disclosure.open = true;
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => target.scrollIntoView({ block: "start", behavior: "instant" }));
+      frame = requestAnimationFrame(() => disclosure.scrollIntoView({ block: "start", behavior: "instant" }));
     }
     openLinkedCapability();
     window.addEventListener("hashchange", openLinkedCapability);

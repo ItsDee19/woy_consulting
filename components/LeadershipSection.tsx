@@ -52,7 +52,7 @@ export function LeadershipSection() {
         </div>
 
         <div className={styles.experience} aria-label="Vipin Tuteja’s leadership experience">
-          <p className={styles.tenure}><strong>35<span>+</span></strong><span>years of<br />leadership</span></p>
+          <p className={styles.credential}><strong>Business leadership</strong><span>Strategy, execution and P&amp;L ownership</span></p>
           <div className={styles.career}>
             <p>Experience across</p>
             <ul aria-label="Organisations where Vipin has held leadership roles">

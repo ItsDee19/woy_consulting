@@ -10,6 +10,12 @@ export const site = {
   legalName: "WOY Consulting Private Limited",
   location: "Gurgaon 122002, Haryana, India",
   email: contactEmail,
+  // Verified against the D&B profile reached through the owner-supplied QR.
+  duns: {
+    number: "861471529",
+    profileUrl: "https://dunsregistered.dnb.com/PA.aspx?Key1=3203111&PaArea=Email",
+    referenceImage: "/credentials/duns-registration-reference.png",
+  },
   ctaHref: `mailto:${contactEmail}`,
   principle: "Win Over Yourself",
   tagline: "Empowering leaders. Transforming organizations. Accelerating impact.",
@@ -277,6 +283,71 @@ export const capabilities: Capability[] = [
   },
 ];
 
+/* ---------------------------------------------------------- homepage expertise */
+export type ExpertiseArea = {
+  slug: string;
+  title: string;
+  summary: string;
+  deliverables: [string, string, string];
+  legacySlugs: string[];
+};
+
+/** Business priorities bring the six underlying capabilities into four clear areas. */
+export const expertiseAreas: ExpertiseArea[] = [
+  {
+    slug: "strategy-growth-execution",
+    title: "Strategy, growth & execution",
+    summary:
+      "Translate ambition into clear choices, practical roadmaps and disciplined execution. We help leadership teams connect growth priorities with the capabilities, decisions and operating rhythms they need.",
+    deliverables: [
+      "Strategy and execution roadmaps",
+      "Sales capability and effectiveness",
+      "Performance reviews and accountability",
+    ],
+    legacySlugs: ["strategy-and-sales-management"],
+  },
+  {
+    slug: "leadership-executive-coaching",
+    title: "Leadership & executive coaching",
+    summary:
+      "Strengthen the judgement, confidence and influence that leadership demands. We work with CEOs, CXOs and leadership teams to navigate transitions, align around shared priorities and lead through complexity.",
+    deliverables: [
+      "CEO, CXO and executive coaching",
+      "Leadership transition and assimilation",
+      "Leadership team alignment",
+    ],
+    legacySlugs: ["coaching-and-leadership-development"],
+  },
+  {
+    slug: "organisation-culture-change",
+    title: "Organisation, culture & change",
+    summary:
+      "Connect how your organisation is structured with how people work together. We help leaders diagnose culture, clarify roles and build the inclusion and ownership that make change last.",
+    deliverables: [
+      "Organisation design and diagnostics",
+      "Culture and inclusive leadership",
+      "Change readiness and stakeholder alignment",
+    ],
+    legacySlugs: [
+      "inclusive-leadership-and-culture",
+      "people-and-culture-consulting",
+      "organization-diagnostics-and-restructuring",
+    ],
+  },
+  {
+    slug: "people-performance-systems",
+    title: "People & performance systems",
+    summary:
+      "Build people practices that serve the business and support better performance. We align HR capability, talent decisions and performance frameworks with your strategy so teams can act with clarity and consistency.",
+    deliverables: [
+      "HR operating models and capability",
+      "Performance and talent frameworks",
+      "Structured selection and succession",
+    ],
+    legacySlugs: ["hr-capability-and-transformation"],
+  },
+];
+
 /* ------------------------------------------------------------------ 4D steps */
 export const approach = [
   {
@@ -504,7 +575,7 @@ export const practitioners: Practitioner[] = [
     lede: "Aligning strategy, people, culture and execution through growth and transformation.",
     bio: [
       "Vipin partners with CEOs, founders, CHROs, boards and senior leadership teams to help organisations navigate growth, transformation and change with strategic clarity and disciplined execution.",
-      "He brings over 35 years of leadership experience across Xerox, American Express, Ricoh and Samsung, where he held significant P&L roles, built businesses and managed complex transformation agendas across India, Southeast Asia, the US and the UK.",
+      "His leadership experience spans Xerox, American Express, Ricoh and Samsung, where he held significant P&L roles, built businesses and managed complex transformation agendas across India, Southeast Asia, the US and the UK.",
       "Since founding WOY in 2015, his work has focused on helping leadership teams translate strategic intent into operating rhythms, leadership behaviours, governance mechanisms and people systems that hold up over time.",
     ],
     expertise: [
@@ -524,7 +595,7 @@ export const practitioners: Practitioner[] = [
     lede: "Transforming leadership, culture and organisations from both sides of the table.",
     bio: [
       "Sandeep is a business-focused HR and transformation leader who has worked as a management consultant and change leader with KPMG, leading large-scale organisational and talent transformations across India and the Middle East.",
-      "He then served as CHRO and regional HR head for KPMG, American Express and IBM, with responsibility for over 38,000 people across India, Sri Lanka, the Middle East, the Philippines and the UK.",
+      "He then served as CHRO and regional HR head for KPMG, American Express and IBM, leading people and organisation agendas across India, Sri Lanka, the Middle East, the Philippines and the UK.",
       "That combination of consulting rigour and operator credibility defines his current work as an advisor, coach and change catalyst, helping organisations build future-ready leadership, HR capability and execution alignment.",
     ],
     expertise: [
@@ -541,11 +612,11 @@ export const practitioners: Practitioner[] = [
     name: "Kannan Swaminathan",
     initials: "KS",
     role: "Change Leader, Coach and Consultant",
-    lede: "Twenty-nine years of banking and financial services, brought to the coaching conversation.",
+    lede: "Banking and financial services leadership, brought to the coaching conversation.",
     bio: [
-      "Kannan is a senior business leader from the banking and financial services industry, with 29 years of corporate experience across The Royal Bank of Scotland Group, Tata Consultancy Services, ABN AMRO Bank, Standard Chartered Bank, ICICI Bank and ANZ Grindlays Bank.",
-      "Fifteen of those years were in leadership roles in business process services, spanning transitions, operations, business development, change management, customer management and strategy.",
-      "He is a Professional Certified Coach with the International Coaching Federation and credentialled as a Senior Practitioner by the European Mentoring and Coaching Council, with over 2,000 hours of coaching across India and globally.",
+      "Kannan is a senior business leader from the banking and financial services industry, with corporate experience across The Royal Bank of Scotland Group, Tata Consultancy Services, ABN AMRO Bank, Standard Chartered Bank, ICICI Bank and ANZ Grindlays Bank.",
+      "His leadership roles in business process services have spanned transitions, operations, business development, change management, customer management and strategy.",
+      "He is a Professional Certified Coach with the International Coaching Federation and credentialled as a Senior Practitioner by the European Mentoring and Coaching Council, coaching executives and senior leaders across India and globally.",
     ],
     expertise: [
       "Executive coaching across CXO and senior leadership",

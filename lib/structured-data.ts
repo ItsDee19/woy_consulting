@@ -1,4 +1,4 @@
-import { capabilities, caseStudies, pillars, practitioners, site, type CaseStudy } from "@/lib/content";
+import { caseStudies, expertiseAreas, practitioners, site, type CaseStudy } from "@/lib/content";
 import { siteUrl } from "@/lib/site-url";
 
 export type SchemaNode = Record<string, unknown>;
@@ -98,14 +98,14 @@ export function contentPageGraph(options: WebPageOptions, ancestors: Breadcrumb[
 }
 
 export function serviceGraph(): SchemaNode[] {
-  return capabilities.map((capability) => ({
+  return expertiseAreas.map((area) => ({
     "@type": "Service",
-    "@id": schemaId("/", capability.slug),
-    url: schemaUrl(`/#${capability.slug}`),
-    name: capability.title,
-    description: capability.summary,
-    serviceType: capability.title,
-    category: pillars[capability.pillar].title,
+    "@id": schemaId("/", area.slug),
+    url: schemaUrl(`/#${area.slug}`),
+    name: area.title,
+    description: area.summary,
+    serviceType: area.title,
+    category: area.title,
     provider: organization(),
     mainEntityOfPage: { "@id": schemaId("/", "webpage") },
   }));

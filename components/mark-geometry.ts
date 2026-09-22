@@ -42,3 +42,9 @@ export const MARK = {
   wordX: 170.25,
   wordY: 157,
 } as const;
+
+/** Explanatory source symbols used before the finished WOY mark forms. */
+export const SOURCE_SYMBOLS = {
+  starOutline: "M180 60 L188.2 82.7 L212.3 83.5 L193.3 98.3 L200 121.5 L180 108 L160 121.5 L166.7 98.3 L147.7 83.5 L171.8 82.7 Z",
+  compassPoints: "M180 63 L185 82 L199.8 74.2 L192 89 L211 94 L192 99 L199.8 113.8 L185 106 L180 125 L175 106 L160.2 113.8 L168 99 L149 94 L168 89 L160.2 74.2 L175 82 Z",
+} as const;

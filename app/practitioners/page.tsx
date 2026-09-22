@@ -15,18 +15,18 @@ export const metadata = pageMetadata(
 
 const experience: Record<string, { label: string; detail: string; background: string }> = {
   "vipin-tuteja": {
-    label: "35+ years",
-    detail: "of business leadership",
+    label: "Business leadership",
+    detail: "Strategy, execution and P&L ownership",
     background: "Xerox · American Express · Ricoh · Samsung",
   },
   "sandeep-bidani": {
-    label: "38,000+ people",
-    detail: "within his past HR leadership remit",
+    label: "HR & culture",
+    detail: "Organisation change across global teams",
     background: "KPMG · American Express · IBM",
   },
   "kannan-swaminathan": {
-    label: "2,000+ hours",
-    detail: "of coaching in India and globally",
+    label: "Executive coaching",
+    detail: "Coaching for CXOs and senior leaders",
     background: "ICF Professional Certified Coach · EMCC Senior Practitioner",
   },
 };

@@ -2,7 +2,7 @@
 
 The homepage’s Selected Engagements teaser is replaced by Experience in the room, directly above the shared footer. The redesigned section uses an asymmetric portrait and editorial heading, italic red emphasis, concise partnership copy, a navy nameplate and a compact leadership-experience strip. Its link opens the Practitioners page.
 
-Vipin’s supplied image is encoded as a 41,552-byte WebP without retouching. CSS frames the photograph and excludes the original image caption; his name and role are rendered as accessible HTML. The image loads lazily with responsive sources. Provenance and framing coordinates are recorded in `image-sources.json`. The 35+ years and named organisations refer to Vipin’s prior leadership roles, consistent with the firm’s existing content.
+Vipin’s supplied image is encoded as a 41,552-byte WebP without retouching. CSS frames the photograph and excludes the original image caption; his name and role are rendered as accessible HTML. The image loads lazily with responsive sources. Provenance and framing coordinates are recorded in `image-sources.json`. The original 35+ years proof point was replaced on 22 September 2026 with Business leadership, supported by Strategy, execution and P&L ownership. The named organisations continue to refer to Vipin’s prior leadership roles.
 
 The old homepage teaser component and styles were removed. On phones the headline precedes the photograph, copy and credentials. Existing theme tokens, focus styles and reduced-motion preferences govern the new section.
 

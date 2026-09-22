@@ -7,7 +7,7 @@ Reviewed and implemented on 21 September 2026. The requested application feature
 | 1 | Privacy policy | `/privacy-policy`; actual enquiry/security/storage behavior, choices and contact route. WOY will add the email later. |
 | 2 | Footer credit | Made by AvlysAI links to https://avlysai.com/. |
 | 3 | Terms & conditions | `/terms-and-conditions`; website use, enquiries, content and separate consulting engagements. |
-| 4 | Load speed | Measured and improved: compressed local WebP photos, responsive images, self-hosted fonts, immediate consent content, fewer logo hydrations and batched layout reads. Latest local scores with the generated hero background: 92 mobile / 100 desktop; confirm on the hosted site. |
+| 4 | Load speed | Measured and improved: compressed local WebP photos, responsive images, self-hosted fonts, immediate consent content, fewer logo hydrations and batched layout reads. Historical local scores with the previous generated hero background: 92 mobile / 100 desktop; confirm on the hosted site. |
 | 5 | Frontend secrets | Server-only endpoint/token/signing key, import boundary, no CONTACT_* configuration in browser bundles. |
 | 6 | Contrast | Accessible light/dark text, separate action/error colors, visible input borders and focus. |
 | 7 | HTTPS | Production 308 redirects for configured origins, HSTS/security headers; loopback exempt. Host supplies TLS. |
@@ -54,7 +54,7 @@ Production build at `http://localhost:5173/`, Chrome 153, Lighthouse 13.5. Run `
 
 SEO scores 69 locally because local/preview builds intentionally block indexing. This is not a production SEO result.
 
-The latest run includes the generated homepage hero background, using the same standard mobile and desktop presets with no competing browser audit. The earlier navigation and portrait refinement measured 96 mobile / 100 desktop; individual local runs vary. Historical runs on this machine scored 29/60 and 39/62 under much slower CPU conditions; those differences cannot be attributed solely to code changes. Four photos shrank from 223,896 to 120,386 bytes (46% smaller).
+The measurements above were captured with the previous generated homepage hero background, before the 22 September plain-background revision, using the standard mobile and desktop presets with no competing browser audit. The earlier navigation and portrait refinement measured 96 mobile / 100 desktop; individual local runs vary. Historical runs on this machine scored 29/60 and 39/62 under much slower CPU conditions; those differences cannot be attributed solely to code changes. Four photos shrank from 223,896 to 120,386 bytes (46% smaller).
 
 These are local lab observations, not real-user field measurements or a Core Web Vitals guarantee. Retest on the actual public host after the domain is provided. The assembling logo remains animated in red, respects reduced motion, and pauses off screen; visible animation controls have been removed as requested.
 
@@ -66,7 +66,9 @@ The owner-provided email now powers conversation CTAs. The footer has a unified 
 
 The logo now forms from the reference circle, outlined star and detailed compass rose. Sampled-state, reduced-motion and pause/resume checks pass; conversation buttons read **Start a conversation**. See [logo-formation-review.md](logo-formation-review.md).
 
-The homepage now uses a generated architectural background with responsive light/dark overlays. Image loading, copy contrast, image-failure fallback, forced colors and the existing logo animation passed. See [hero-background-review.md](hero-background-review.md) for image provenance and the latest local performance measurements. The owner approved publishing the background with the revised partner-led hero copy and red headline emphasis.
+The homepage returned to a plain light/dark surface on 22 September 2026. The image is no longer requested. The animated W and Y now match the central ring’s height, and the caption reads “Win Over Yourself.” followed by “Growth. Excellence. Agility.” The prior background-image measurements and provenance remain in [hero-background-review.md](hero-background-review.md) as historical evidence.
+
+The 22 September hero and practitioner refinement passed production build, TypeScript, ESLint, 31 unit tests, logo geometry/motion checks and the 15-page browser audit. The hero makes no request for the removed image. The new two-line caption, qualitative practitioner callouts, expanded biographies and matching homepage credential were visually checked at desktop and phone sizes. No JavaScript errors, automated accessibility violations, overflow or broken links were detected.
 
 ## Production setup
 

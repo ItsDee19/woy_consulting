@@ -2,7 +2,6 @@ import { pageMetadata } from "@/lib/metadata";
 import { StructuredData } from "@/components/StructuredData";
 import { webPageSchema, serviceGraph } from "@/lib/structured-data";
 import Link from "next/link";
-import Image from "next/image";
 import styles from "./home.module.css";
 import { ArrowRight, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { LogoFormation } from "@/components/LogoFormation";
@@ -11,6 +10,7 @@ import { Reveal } from "@/components/Reveal";
 import { Stats } from "@/components/Stats";
 import FourDApproach from "@/components/FourDApproach";
 import { ExpertiseSection } from "@/components/ExpertiseSection";
+import { PhilosophySection } from "@/components/PhilosophySection";
 import { LeadershipSection } from "@/components/LeadershipSection";
 import { site } from "@/lib/content";
 
@@ -26,8 +26,6 @@ export default function Home() {
       <StructuredData id="home-structured-data" nodes={[webPageSchema({ path: "/", name: "WOY Consulting | Leadership & Business Advisory", description: site.description }), ...serviceGraph()]} />
       {/* ------------------------------------------------------------ hero */}
       <section className={styles.hero} data-home-hero aria-labelledby="home-title">
-        <Image src="/images/woy-direction-hero.webp" alt="" aria-hidden="true" fill sizes="100vw" preload className={styles.backdrop} data-hero-background />
-        <div className={styles.veil} aria-hidden="true" />
         <div className={`shell ${styles.content}`}>
           <div className="grid w-full items-center gap-8 lg:grid-cols-[1.12fr_1fr] lg:gap-14">
             <div className="order-2 lg:order-1">
@@ -56,9 +54,12 @@ export default function Home() {
 
             <div className="order-1 flex flex-col items-center gap-5 lg:order-2">
               <LogoFormation className="w-full max-w-[520px]" />
-              <p className={`max-w-[32ch] text-center text-sm ${styles.logoCaption}`}>
-                Win Over Yourself. The philosophy behind WOY.
-              </p>
+              <div className={styles.logoCaption} data-logo-caption>
+                <p className={styles.captionTitle}>Win Over Yourself<span>.</span></p>
+                <p className={styles.captionValues}>
+                  <span>Growth.</span>{" "}<span>Excellence.</span>{" "}<span>Agility.</span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -107,6 +108,8 @@ export default function Home() {
 
       {/* -------------------------------------------------------- clients */}
       <ClientMarquee />
+
+      <PhilosophySection />
 
       <FourDApproach />
 

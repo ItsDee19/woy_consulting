@@ -1,5 +1,7 @@
 # Homepage hero background
 
+Historical review: the image treatment below was replaced with a plain theme background on 22 September 2026 at the owner’s request. The generated image is retained as an unused asset; the homepage no longer loads it.
+
 Implemented on 21 September 2026. The owner subsequently approved publishing the background, revised hero copy and final red emphasis together.
 
 ## Design and delivery

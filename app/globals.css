@@ -5,6 +5,7 @@
 
 /* ---------------------------------------------------------------- tokens --- */
 :root {
+  --font-editorial: Georgia, "Times New Roman", Times, serif;
   --c-bg:      #FBF9F7;   /* warm white */
   --c-raised:  #FFFFFF;
   --c-sunken:  #F3EEE9;
@@ -74,7 +75,8 @@
   --color-onblock2:  var(--c-onblock2);
   --color-blockline: var(--c-blockline);
 
-  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-editorial);
+  --font-serif: var(--font-editorial);
 
   --ease-brand: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -95,12 +97,12 @@
   body {
     background: var(--c-bg);
     color: var(--c-ink);
-    font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-editorial);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
 
-  h1, h2, h3, h4 { overflow-wrap: anywhere; letter-spacing: -0.028em; line-height: 1.08; font-weight: 500; }
+  h1, h2, h3, h4 { overflow-wrap: anywhere; letter-spacing: -0.02em; line-height: 1.12; font-weight: 400; }
 
   ::selection { background: var(--c-red); color: #fff; }
 
@@ -118,20 +120,20 @@
 /* fluid display scale */
 @utility t-display {
   font-size: clamp(2.15rem, 1.55rem + 2.5vw, 3.55rem);
-  letter-spacing: -0.035em;
-  line-height: 1.02;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
   font-weight: 400;
 }
 @utility t-h2 {
   font-size: clamp(1.95rem, 1.6rem + 1.75vw, 3.25rem);
-  letter-spacing: -0.032em;
-  line-height: 1.06;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
   font-weight: 400;
 }
 @utility t-h3 {
   font-size: clamp(1.5rem, 1.33rem + 0.84vw, 2rem);
-  letter-spacing: -0.03em;
-  line-height: 1.12;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
   font-weight: 400;
 }
 
@@ -139,10 +141,9 @@
    LOGO FORMATION: one shared clock, no delayed or independent loops.
    0–26%: circle / outlined star / compass. 26–46%: convergence.
    46–58%: wordmark resolves. 58–84%: hold. 84–100%: fade and reset.
-   Finished geometry comes from mark-geometry.ts, never the precursor symbols.
+   Ring and spokes use mark-geometry.ts; animation-only letters align to the ring height.
    ============================================================================= */
 .logo-formation { --mk-duration: 12s; --mk-travel: cubic-bezier(.65, 0, .2, 1); }
-.mk-halo { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 54% 45%, color-mix(in srgb, var(--c-logo-red) 7%, transparent), transparent 67%); }
 .mk-ring, .mk-star, .mk-star-outline, .mk-compass, .mk-compass-rose, .mk-orbit, .mk-lock-pulse {
   transform-box: view-box;
   transform-origin: 180px 94px;
