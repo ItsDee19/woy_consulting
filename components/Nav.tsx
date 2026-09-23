@@ -2,48 +2,36 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { List, X, Sun, Moon, ArrowUpRight } from "@phosphor-icons/react";
-import { Mark } from "./Mark";
-import styles from "./Nav.module.css";
-import { nav, site } from "@/lib/content";
+import { Menu, Moon, Sun } from "lucide-react";
+import { useState, useSyncExternalStore } from "react";
 import { hasPreferenceConsent } from "@/lib/cookie-consent";
+import { Sheet, SheetTrigger, SheetContent, SheetTitle, SheetDescription, SheetClose } from "@/components/recreation/ui/sheet";
+import { Button } from "@/components/recreation/ui/button";
+import controls from "./NavControls.module.css";
+import { Logo } from "@/components/recreation/Site";
+
+const links = [
+  ["/", "Home"],
+  ["/expertise", "Expertise"],
+  ["/work", "Selected work"],
+  ["/people", "Leadership & Partners"],
+  ["/approach", "Our approach"],
+];
 
 function subscribeTheme(callback: () => void) {
   window.addEventListener("woy-theme-changed", callback);
   return () => window.removeEventListener("woy-theme-changed", callback);
 }
 
-
 export function Nav() {
-  const pathname = usePathname();
-  const [menuPath, setMenuPath] = useState<string | null>(null);
-  const open = menuPath === pathname;
-  const menuButton = useRef<HTMLButtonElement>(null);
-  const [stuck, setStuck] = useState(false);
-  const dark = useSyncExternalStore(subscribeTheme, () => document.documentElement.getAttribute("data-theme") === "dark", () => false);
-  const sentinel = useRef<HTMLDivElement>(null);
-
-  /* Add a full-width separator after the page moves, without a scroll listener. */
-  useEffect(() => {
-    const el = sentinel.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([e]) => setStuck(!e.isIntersecting));
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && open) {
-        setMenuPath(null);
-        menuButton.current?.focus();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
+  const path = usePathname();
+  const [open, setOpen] = useState(false);
+  const dark = useSyncExternalStore(
+    subscribeTheme,
+    () => document.documentElement.getAttribute("data-theme") === "dark",
+    () => false,
+  );
+  const isActive = (href: string) => href === "/" ? path === "/" : path.startsWith(href);
 
   function toggleTheme() {
     const next = dark ? "light" : "dark";
@@ -52,81 +40,56 @@ export function Nav() {
     try {
       if (hasPreferenceConsent()) localStorage.setItem("woy-theme", next);
     } catch {
-      /* private mode */
+      // The toggle works even when browser storage is unavailable.
     }
   }
-
   return (
-    <>
-      <div ref={sentinel} aria-hidden className="absolute left-0 top-0 h-px w-px" />
-
-      <header className={styles.header} data-stuck={stuck || undefined}>
-        <div className={`shell ${styles.bar}`}>
-          <Link href="/" aria-label={`${site.name}, home`} className={styles.brandLink}>
-            <Mark className={styles.brand} />
-          </Link>
-
-          <nav aria-label="Primary" className={styles.primary}>
-            {nav.map((item) => {
-              const active =
-                !item.href.includes("#") &&
-                (pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href + "/")));
-              return (
-                <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={styles.navLink}>
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className={styles.actions}>
-            <a href={site.ctaHref} className={styles.conversation}>
-              <span>Let&#8217;s talk</span><ArrowUpRight size={18} aria-hidden="true" />
-            </a>
-            <button
-              type="button"
-              onClick={toggleTheme}
-              aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
-              title={dark ? "Switch to light theme" : "Switch to dark theme"}
-              className={styles.themeButton}
-            >
-              {dark ? <Sun size={19} aria-hidden="true" /> : <Moon size={19} aria-hidden="true" />}
-            </button>
-            <button
-              type="button"
-              ref={menuButton}
-              onClick={() => setMenuPath(open ? null : pathname)}
-              aria-expanded={open}
-              aria-controls="mobile-nav"
-              aria-label={open ? "Close menu" : "Open menu"}
-              className={styles.menuButton}
-            >
-              {open ? <X size={23} aria-hidden="true" /> : <List size={23} aria-hidden="true" />}
-            </button>
+    <div className="recreation">
+      <header className="header-shell">
+        <div className="wrap">
+          <div className={`site-header ${controls.header}`}>
+            <Link href="/" aria-label="WOY Consulting home"><Logo /></Link>
+            <nav className={`desktop-nav ${controls.navigation}`} aria-label="Main navigation">
+              {links.map(([href, label]) => (
+                <Link href={href} key={href} aria-current={isActive(href) ? "page" : undefined}>{label}</Link>
+              ))}
+              <a className="nav-cta" href="/contact" aria-current={path === "/contact" ? "page" : undefined}>
+                Let’s talk <span aria-hidden="true">↗</span>
+              </a>
+            </nav>
+            <div className={controls.controls}>
+              <button type="button" className={controls.toggle} onClick={toggleTheme}
+                aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
+                title={dark ? "Switch to light theme" : "Switch to dark theme"}>
+                {dark ? <Sun size={19} aria-hidden="true" /> : <Moon size={19} aria-hidden="true" />}
+              </button>
+              <div className="mobile-nav">
+                <Sheet open={open} onOpenChange={setOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" className="menu-button" aria-label="Open navigation menu">
+                      <Menu size={24} /><span>Menu</span>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent className="mobile-sheet" aria-describedby="navigation-description">
+                    <SheetTitle className="sr-only">WOY navigation</SheetTitle>
+                    <SheetDescription id="navigation-description" className="sr-only">Explore WOY Consulting.</SheetDescription>
+                    <Logo />
+                    <nav aria-label="Mobile navigation">
+                      {links.map(([href, label]) => (
+                        <SheetClose asChild key={href}>
+                          <Link href={href} aria-current={isActive(href) ? "page" : undefined}>{label}</Link>
+                        </SheetClose>
+                      ))}
+                      <SheetClose asChild><a className="red" href="/contact">Let’s talk ↗</a></SheetClose>
+                    </nav>
+                    <p className="eyebrow muted">Win Over Yourself.</p>
+                  </SheetContent>
+                </Sheet>
+              </div>
+            </div>
           </div>
         </div>
-
-        {open && (
-          <nav id="mobile-nav" aria-label="Mobile" className={styles.mobile}>
-            <div className={`shell ${styles.mobileInner}`}>
-              {nav.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMenuPath(null)}
-                  aria-current={pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href + "/")) ? "page" : undefined}
-                  className={styles.mobileLink}
-                >
-                  {item.label}<ArrowUpRight size={18} aria-hidden="true" />
-                </Link>
-              ))}
-              <a href={site.ctaHref} onClick={() => setMenuPath(null)} className={styles.mobileConversation}>
-                Let&#8217;s talk<ArrowUpRight size={19} aria-hidden="true" />
-              </a>
-            </div>
-          </nav>
-        )}
       </header>
-    </>
+    </div>
   );
 }

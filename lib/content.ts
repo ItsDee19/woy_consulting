@@ -288,7 +288,7 @@ export type ExpertiseArea = {
   slug: string;
   title: string;
   summary: string;
-  deliverables: [string, string, string];
+  href: string;
   legacySlugs: string[];
 };
 
@@ -299,35 +299,23 @@ export const expertiseAreas: ExpertiseArea[] = [
     title: "Strategy, growth & execution",
     summary:
       "Translate ambition into clear choices, practical roadmaps and disciplined execution. We help leadership teams connect growth priorities with the capabilities, decisions and operating rhythms they need.",
-    deliverables: [
-      "Strategy and execution roadmaps",
-      "Sales capability and effectiveness",
-      "Performance reviews and accountability",
-    ],
+    href: "/expertise#strategy",
     legacySlugs: ["strategy-and-sales-management"],
   },
   {
     slug: "leadership-executive-coaching",
     title: "Leadership & executive coaching",
     summary:
-      "Strengthen the judgement, confidence and influence that leadership demands. We work with CEOs, CXOs and leadership teams to navigate transitions, align around shared priorities and lead through complexity.",
-    deliverables: [
-      "CEO, CXO and executive coaching",
-      "Leadership transition and assimilation",
-      "Leadership team alignment",
-    ],
+      "Develop the judgement, alignment and adaptability to lead through complexity. Executive coaching complements our advisory work, helping leaders turn insight into sustained changes in how they lead.",
+    href: "/expertise#leadership",
     legacySlugs: ["coaching-and-leadership-development"],
   },
   {
     slug: "organisation-culture-change",
     title: "Organisation, culture & change",
     summary:
-      "Connect how your organisation is structured with how people work together. We help leaders diagnose culture, clarify roles and build the inclusion and ownership that make change last.",
-    deliverables: [
-      "Organisation design and diagnostics",
-      "Culture and inclusive leadership",
-      "Change readiness and stakeholder alignment",
-    ],
+      "Align structure, decision rights and everyday behaviour with business priorities. We work with leaders to diagnose friction, build shared ownership and make change practical.",
+    href: "/expertise#culture",
     legacySlugs: [
       "inclusive-leadership-and-culture",
       "people-and-culture-consulting",
@@ -338,12 +326,8 @@ export const expertiseAreas: ExpertiseArea[] = [
     slug: "people-performance-systems",
     title: "People & performance systems",
     summary:
-      "Build people practices that serve the business and support better performance. We align HR capability, talent decisions and performance frameworks with your strategy so teams can act with clarity and consistency.",
-    deliverables: [
-      "HR operating models and capability",
-      "Performance and talent frameworks",
-      "Structured selection and succession",
-    ],
+      "Build business-aligned HR, talent and performance systems that leaders and teams can use. Connect roles, capability, accountability and development to what the organisation is trying to achieve.",
+    href: "/expertise#people",
     legacySlugs: ["hr-capability-and-transformation"],
   },
 ];

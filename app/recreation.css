@@ -1,0 +1,445 @@
+/* Source recreation: selectors are isolated to the four requested pages and navbar.
+ * Rule order is retained from the supplied September 2026 snapshot. */
+.recreation{--background:#fcfcfc;--foreground:#252a31;--card:#f1f3f6;--card-foreground:#252a31;--popover:#fcfcfc;--popover-foreground:#252a31;--primary:#bc1830;--primary-foreground:#fff;--secondary:#edf0f4;--secondary-foreground:#252a31;--muted:#edf0f4;--muted-foreground:#606774;--accent:#f5e5e4;--accent-foreground:#9f1429;--destructive:#b81227;--border:#d6dae0;--input:#aeb5c0;--ring:#bc1830;--radius:0rem;--navy:#16324f;--navy-strong:#11283f;--surface-blue:#edf2f7;--sidebar:#fcfcfc;--sidebar-foreground:#252a31;--sidebar-primary:#bc1830;--sidebar-primary-foreground:#fff;--sidebar-accent:#edf0f4;--sidebar-accent-foreground:#252a31;--sidebar-border:#d6dae0;--sidebar-ring:#bc1830}
+
+:where(.recreation) *{box-sizing:border-box}
+.recreation{margin:0;background:var(--background);color:var(--foreground);font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6}
+:where(.recreation) a,:where(.recreation) button,:where(.recreation) input,:where(.recreation) textarea{ -webkit-tap-highlight-color:transparent}
+:where(.recreation) a{text-decoration:none;color:inherit}
+:where(.recreation) button,:where(.recreation) a,:where(.recreation) input,:where(.recreation) textarea,:where(.recreation) select{touch-action:manipulation}
+:where(.recreation) button{cursor:pointer}
+:where(.recreation) img{display:block;max-width:100%}
+:where(.recreation) h1,:where(.recreation) h2,:where(.recreation) h3,:where(.recreation) h4,:where(.recreation) p{margin:0}
+:where(.recreation) h1,:where(.recreation) h2,:where(.recreation) h3{font-family:Georgia,'Times New Roman',serif;font-weight:400;line-height:1.08;letter-spacing:-.04em}
+:where(.recreation) h1{font-size:clamp(3.25rem,6.4vw,6.75rem)}
+:where(.recreation) h2{font-size:clamp(2.45rem,4.2vw,4.5rem)}
+:where(.recreation) h3{font-size:2rem}
+:where(.recreation) p{max-width:65ch}
+:where(.recreation) a,:where(.recreation) button{transition:color .2s,background .2s,transform .2s}
+:where(.recreation) ::selection{background:#e8bcc1;color:#252a31}
+:where(.recreation) :focus-visible{outline:2px solid var(--ring);outline-offset:6px}
+:where(.recreation) .wrap{max-width:1440px;margin:auto;padding-inline:5.4%}
+:where(.recreation) .eyebrow{font-size:.8125rem;letter-spacing:.13em;text-transform:uppercase;font-weight:600}
+:where(.recreation) .muted{color:var(--muted-foreground)}
+:where(.recreation) .red{color:var(--primary)}
+:where(.recreation) .site-header{height:104px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);gap:32px}
+:where(.recreation) .logo-window{position:relative;display:block;width:112px;height:60px;overflow:hidden;flex-shrink:0}
+:where(.recreation) .logo-window img{position:absolute;max-width:none;width:233.67px;left:-60.7px;top:-39.1px}
+:where(.recreation) .desktop-nav{display:flex;align-items:center;gap:30px;font-size:.875rem}
+:where(.recreation) .desktop-nav a:hover{color:var(--primary)}
+:where(.recreation) .nav-cta{padding-bottom:5px;border-bottom:1px solid var(--primary);color:var(--primary)}
+:where(.recreation) .text-link{display:inline-flex;align-items:center;gap:16px;border-bottom:1px solid currentColor;padding-block:8px;font-size:.875rem}
+:where(.recreation) .text-link:hover{color:var(--primary)}
+:where(.recreation) .section{padding-block:90px}
+:where(.recreation) .section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:60px;margin-bottom:45px}
+:where(.recreation) .section-head .eyebrow{margin-bottom:22px}
+:where(.recreation) .section-head>p{max-width:380px;color:var(--muted-foreground)}
+:where(.recreation) .case-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:45px 36px}
+:where(.recreation) .case-card{display:block}
+:where(.recreation) .case-card h3{margin:18px 0 13px;max-width:520px;font-size:2.15rem}
+:where(.recreation) .case-card p{color:var(--muted-foreground);font-size:1rem}
+:where(.recreation) .case-card .case-meta{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;margin-top:23px;color:var(--primary)}
+:where(.recreation) .case-cover{background:#e9edf2;min-height:260px;padding:30px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;transition:background .25s}
+:where(.recreation) .case-cover-top{display:flex;justify-content:space-between;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em}
+:where(.recreation) .case-cover-title{font-family:Georgia,serif;font-size:clamp(2.8rem,4.8vw,4.7rem);line-height:1;letter-spacing:-.04em;max-width:440px}
+:where(.recreation) .case-cover-bottom{font-size:.8125rem;border-top:1px solid currentColor;padding-top:15px;margin-top:25px;opacity:.7}
+:where(.recreation) .case-card:hover .case-cover{background:#dee5ed}
+:where(.recreation) .case-card:hover h3{color:var(--primary)}
+:where(.recreation) .case-cover.navy{background:#16324f;color:#ffffff}
+:where(.recreation) .case-card:hover .case-cover.navy{background:#11283f}
+:where(.recreation) .case-cover.mist{background:#e9edf2}
+:where(.recreation) .case-cover.charcoal{background:#282d34;color:#ffffff}
+:where(.recreation) .case-cover.silver{background:#d7dfeb}
+@media(max-width:900px){:where(.recreation) .desktop-nav{gap:16px}
+:where(.recreation) .case-cover{min-height:230px}
+}
+@media(max-width:700px){:where(.recreation) .wrap{padding-inline:6%}
+:where(.recreation) .site-header{height:86px}
+:where(.recreation) .desktop-nav{display:none}
+:where(.recreation) .section{padding-block:55px}
+:where(.recreation) .section-head{display:block;margin-bottom:30px}
+:where(.recreation) .section-head>p{margin-top:22px}
+:where(.recreation) .case-grid{grid-template-columns:1fr;gap:38px}
+:where(.recreation) .case-cover{min-height:250px}
+:where(.recreation) .case-cover-title{font-size:3.5rem}
+:where(.recreation) .case-card h3{font-size:1.85rem}
+}
+@media(prefers-reduced-motion:reduce){:where(.recreation) *,:where(.recreation) *:before,:where(.recreation) *:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+:where(.recreation) h1 em,:where(.recreation) h2 em{font-weight:400;color:var(--primary)}
+:where(.recreation) .header-shell{background:var(--background)}
+:where(.recreation) .desktop-nav [aria-current=page]{color:var(--primary)}
+:where(.recreation) .mobile-nav{display:none}
+:where(.recreation) .mobile-sheet{padding:40px 28px;width:min(90vw,400px)}
+:where(.recreation) .mobile-sheet nav{display:flex;flex-direction:column;margin:35px 0;gap:22px;font-family:Georgia,serif;font-size:1.65rem}
+:where(.recreation) .mobile-sheet [data-slot=sheet-close]{min-width:44px;min-height:44px;display:grid;place-items:center}
+:where(.recreation) .menu-button{font-size:.875rem;gap:10px;padding:10px;min-height:44px}
+:where(.recreation) .logo-symbol{background-image:url('/assets/woy-philosophy.png');background-repeat:no-repeat;width:112px;height:116px;mix-blend-mode:multiply}
+:where(.recreation) .logo-symbol{display:block;flex:none}
+:where(.recreation) .logo-symbol.circle{background-position:-56px -344px;--slide:-100px}
+:where(.recreation) .logo-symbol.star{background-position:-56px -514px;--slide:0px}
+:where(.recreation) .logo-symbol.compass{background-position:-56px -687px;--slide:100px}
+:where(.recreation) .case-cover-title>span{display:block}
+:where(.recreation) .case-card-title{display:flex;justify-content:space-between;align-items:baseline;gap:20px}
+:where(.recreation) .case-card-title svg{flex:none;color:var(--primary)}
+:where(.recreation) .case-card-title h3{font-size:1.95rem;margin-top:13px}
+:where(.recreation) .case-grid .case-card .case-cover{aspect-ratio:1.8;min-height:280px}
+:where(.recreation) .case-cover-title{font-size:clamp(2.4rem,3.85vw,3.8rem)}
+:where(.recreation) .case-cover{padding:30px 32px}
+:where(.recreation) .case-cover-top{margin-bottom:28px}
+:where(.recreation) .case-cover-bottom{font-size:.75rem}
+:where(.recreation) .approach-band{background:#f0f3f6}
+:where(.recreation) .steps-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:35px}
+:where(.recreation) .step{border-top:1px solid #aeb5c0;padding-top:22px}
+:where(.recreation) .step-number{font-family:Georgia,serif;color:var(--primary);font-size:1.5rem}
+:where(.recreation) .step h3{margin:23px 0 18px;font-size:2rem}
+:where(.recreation) .step p{color:var(--muted-foreground);font-size:.9375rem}
+:where(.recreation) .page-intro{padding-block:80px 65px}
+:where(.recreation) .page-intro h1{margin-top:30px;font-size:clamp(3rem,6.1vw,6rem);max-width:1100px}
+:where(.recreation) .page-intro-description{margin:30px 0 0 auto;width:55%;font-size:1.125rem;color:var(--muted-foreground)}
+:where(.recreation) .expertise-detail{display:grid;grid-template-columns:1fr 1.05fr;gap:12%;border-top:1px solid var(--border);padding-block:65px}
+:where(.recreation) .expertise-detail-title>span{display:block;margin-bottom:25px}
+:where(.recreation) .expertise-detail-title h2{font-size:3.1rem;max-width:440px}
+:where(.recreation) .expertise-detail h3{font-size:1.9rem;line-height:1.25}
+:where(.recreation) .expertise-description{margin-top:20px}
+:where(.recreation) .service-list{list-style:none;padding:0;margin:28px 0 30px}
+:where(.recreation) .service-list li{padding:12px 0;border-bottom:1px solid var(--border);font-size:.9375rem;display:flex;gap:13px}
+:where(.recreation) .service-list li:before{content:'+';color:var(--primary)}
+:where(.recreation) .expertise-case>.eyebrow{display:block;font-size:.75rem}
+:where(.recreation) .expertise-case .text-link{line-height:1.5;align-items:center}
+:where(.recreation) .expertise-case svg{flex:none}
+:where(.recreation) .expertise-note{border-top:1px solid var(--border)}
+:where(.recreation) .expertise-note h2{margin-block:25px}
+:where(.recreation) .expertise-note p.muted{margin-bottom:22px;max-width:660px}
+:where(.recreation) .filter-bar{padding-block:25px;border-block:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;margin-bottom:48px;gap:20px}
+:where(.recreation) .filter-control{display:flex;align-items:center;gap:22px}
+:where(.recreation) .filter-control label{font-size:.875rem}
+:where(.recreation) .industry-select{min-width:220px;min-height:46px;border-radius:0;border-color:#aeb5c0;box-shadow:none;font-size:.9375rem}
+:where(.recreation) .filter-bar>p{font-size:.875rem}
+:where(.recreation) .work-library{padding-bottom:80px}
+:where(.recreation) .work-grid{gap:55px 36px}
+:where(.recreation) .portfolio-note{font-size:.8125rem;color:var(--muted-foreground);padding-top:40px}
+:where(.recreation) .people-section{padding-bottom:65px}
+:where(.recreation) .people-intro{display:flex;justify-content:space-between;gap:70px;border-top:1px solid var(--border);padding-block:30px 45px}
+:where(.recreation) .people-intro>p:last-child{max-width:580px}
+:where(.recreation) .people-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:34px}
+:where(.recreation) .portrait{overflow:hidden;background:#d6dae0}
+:where(.recreation) .portrait img{width:100%;aspect-ratio:.84;object-fit:cover;filter:grayscale(1);transition:filter .35s,transform .35s}
+:where(.recreation) .person-card:hover img{filter:grayscale(.15);transform:scale(1.025)}
+:where(.recreation) .portrait-vipin-tuteja img{object-position:50% 26%}
+:where(.recreation) .portrait-sandeep-bidani img{object-position:52% 15%}
+:where(.recreation) .portrait-kannan-swaminathan img{object-position:48% 8%}
+:where(.recreation) .person-card-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:23px}
+:where(.recreation) .person-card-title h3{font-size:1.9rem}
+:where(.recreation) .person-card-title svg{color:var(--primary);flex:none}
+:where(.recreation) .person-role{font-size:.875rem;color:var(--primary);margin-block:12px 13px}
+:where(.recreation) .person-card .muted{font-size:.9375rem}
+:where(.recreation) .people-principle{display:grid;grid-template-columns:1fr 1fr;gap:10%;border-top:1px solid var(--border)}
+:where(.recreation) .people-principle .text-link{margin-top:25px}
+:where(.recreation) .approach-principles{display:grid;grid-template-columns:1fr 1fr;gap:10%}
+:where(.recreation) .approach-principles h2{margin-top:25px;font-size:3rem}
+:where(.recreation) .principles-list>div{padding:28px 0;border-top:1px solid var(--border)}
+:where(.recreation) .principles-list>div:first-child{padding-top:0;border-top:0}
+:where(.recreation) .principles-list span{font-size:.8125rem;color:var(--primary)}
+:where(.recreation) .principles-list h3{font-size:1.75rem;margin:12px 0 15px}
+:where(.recreation) .principles-list p{color:var(--muted-foreground)}
+:where(.recreation) .philosophy-section{background:#edf2f7;padding-block:75px}
+:where(.recreation) .philosophy-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:12%;align-items:center}
+:where(.recreation) .philosophy-mark img{width:230px;margin:0 auto 30px;mix-blend-mode:multiply}
+:where(.recreation) .philosophy-mark{text-align:center}
+:where(.recreation) .philosophy-mark h2{font-size:3rem;margin-top:18px}
+:where(.recreation) .symbol-explanation{border-top:1px solid #cbd3de;padding-block:20px}
+:where(.recreation) .symbol-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.13em;color:var(--primary)}
+:where(.recreation) .symbol-explanation h3{font-size:1.5rem;margin-block:9px}
+:where(.recreation) .symbol-explanation p{font-size:.9375rem;color:var(--muted-foreground)}
+:where(.recreation) .philosophy-grid .text-link{margin-top:10px}
+
+
+@media(min-width:1440px){:where(.recreation) .wrap{padding-inline:78px}
+}
+
+@media(max-width:1080px){:where(.recreation) .people-grid{gap:22px}
+:where(.recreation) .person-card-title h3{font-size:1.6rem}
+:where(.recreation) .steps-grid{gap:25px}
+}
+
+@media(max-width:850px){:where(.recreation) .desktop-nav{display:none}
+:where(.recreation) .mobile-nav{display:block}
+:where(.recreation) .case-grid .case-card .case-cover{min-height:260px}
+:where(.recreation) .case-cover{padding:25px}
+:where(.recreation) .case-cover-title{font-size:2.8rem}
+:where(.recreation) .steps-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:38px}
+:where(.recreation) .page-intro-description{width:70%}
+:where(.recreation) .expertise-detail{gap:7%}
+:where(.recreation) .expertise-detail-title h2{font-size:2.55rem}
+:where(.recreation) .philosophy-grid{gap:7%}
+:where(.recreation) .philosophy-mark h2{font-size:2.5rem}
+}
+
+@media(max-width:700px){:where(.recreation) .case-grid .case-card .case-cover{min-height:260px;aspect-ratio:1.42}
+:where(.recreation) .case-cover-title{font-size:3rem}
+:where(.recreation) .case-cover-bottom{font-size:.75rem}
+:where(.recreation) .case-card-title h3{font-size:1.85rem}
+:where(.recreation) .steps-grid{gap:32px 22px}
+:where(.recreation) .step h3{font-size:1.8rem;margin:16px 0 13px}
+:where(.recreation) .step p{font-size:.9375rem}
+:where(.recreation) .page-intro{padding-block:45px 40px}
+:where(.recreation) .page-intro h1{font-size:2.95rem;margin-top:25px;line-height:1.1}
+:where(.recreation) .page-intro-description{width:100%;font-size:1rem;margin-top:24px}
+:where(.recreation) .expertise-detail{grid-template-columns:1fr;gap:27px;padding-block:42px}
+:where(.recreation) .expertise-detail-title h2{font-size:2.4rem;max-width:440px}
+:where(.recreation) .expertise-detail-title>span{margin-bottom:15px}
+:where(.recreation) .expertise-detail h3{font-size:1.65rem}
+:where(.recreation) .expertise-note h2{font-size:2.4rem}
+:where(.recreation) .filter-bar{gap:12px;align-items:flex-end;margin-bottom:32px;padding-block:20px}
+:where(.recreation) .filter-control{display:block;min-width:0}
+:where(.recreation) .filter-control label{display:block;margin-bottom:10px}
+:where(.recreation) .industry-select{min-width:200px}
+:where(.recreation) .filter-bar>p{font-size:.75rem;padding-bottom:13px;white-space:nowrap}
+:where(.recreation) .work-library{padding-bottom:50px}
+:where(.recreation) .portfolio-note{padding-top:30px}
+:where(.recreation) .people-intro{display:block;padding-block:23px 30px}
+:where(.recreation) .people-intro>p:last-child{margin-top:18px}
+:where(.recreation) .people-grid{grid-template-columns:1fr;gap:42px}
+:where(.recreation) .portrait img{aspect-ratio:1.04;max-height:480px}
+:where(.recreation) .person-card-title h3{font-size:2rem}
+:where(.recreation) .people-principle{grid-template-columns:1fr;gap:25px}
+:where(.recreation) .people-section{padding-bottom:45px}
+:where(.recreation) .approach-principles{grid-template-columns:1fr;gap:35px}
+:where(.recreation) .approach-principles h2{font-size:2.6rem}
+:where(.recreation) .philosophy-section{padding-block:50px}
+:where(.recreation) .philosophy-grid{grid-template-columns:1fr;gap:40px}
+:where(.recreation) .philosophy-mark img{width:180px}
+:where(.recreation) .philosophy-mark h2{font-size:2.6rem}
+}
+
+@media(max-width:380px){:where(.recreation) .industry-select{min-width:178px}
+:where(.recreation) .filter-bar>p{font-size:.75rem}
+:where(.recreation) .case-cover-title{font-size:2.6rem}
+:where(.recreation) .steps-grid{grid-template-columns:1fr}
+:where(.recreation) .page-intro h1{font-size:2.65rem}
+}
+
+:where(.recreation) .case-card,:where(.recreation) .case-cover{min-width:0}
+:where(.recreation) .case-cover{width:100%}
+
+@media(max-width:700px){:where(.recreation) .case-grid{grid-template-columns:minmax(0,1fr)}
+:where(.recreation) .case-grid .case-card .case-cover{aspect-ratio:auto;min-height:270px}
+:where(.recreation) .case-cover-title{font-size:clamp(2.4rem,10vw,3rem)}
+}
+
+.recreation{font-size:1rem}
+:where(.recreation) h1,:where(.recreation) h2,:where(.recreation) h3,:where(.recreation) .case-cover-title{overflow-wrap:anywhere}
+:where(.recreation) .site-header{min-height:104px;height:auto;padding-block:20px}
+:where(.recreation) .desktop-nav{flex-wrap:wrap;justify-content:flex-end}
+:where(.recreation) .case-card-title h3{min-width:0}
+
+@media(max-width:700px){:where(.recreation) .site-header{min-height:86px;padding-block:13px}
+:where(.recreation) .filter-bar{flex-wrap:wrap}
+:where(.recreation) .filter-control{max-width:100%}
+:where(.recreation) .industry-select{max-width:100%}
+}
+
+:where(.recreation) .steps-grid>*,:where(.recreation) .people-grid>*{min-width:0}
+:where(.recreation) .eyebrow{overflow-wrap:anywhere}
+:where(.recreation) .case-card-title h3{overflow-wrap:anywhere}
+
+@media(max-width:700px){:where(.recreation) .people-grid{grid-template-columns:minmax(0,1fr)}
+}
+
+.recreation{overflow-wrap:anywhere}
+
+:where(.recreation) .collective-experience{background:#fff;border-bottom:1px solid var(--border)}
+
+:where(.recreation) .experience-inner{padding-block:64px 58px}
+
+:where(.recreation) .experience-heading{display:grid;grid-template-columns:1fr 1.2fr;align-items:start;gap:56px;margin-bottom:32px}
+
+:where(.recreation) .experience-heading h2{font-size:clamp(2rem,3vw,2.8rem);max-width:370px}
+
+:where(.recreation) .experience-heading p{font-size:.9375rem;line-height:1.75;color:var(--muted-foreground);max-width:570px}
+
+:where(.recreation) .experience-logo-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));column-gap:22px;row-gap:12px}
+
+:where(.recreation) .experience-logo{min-width:0;min-height:112px;display:flex;align-items:center;justify-content:center;padding:14px 5px}
+
+:where(.recreation) .experience-logo-art{display:block;position:relative;overflow:hidden;flex-shrink:0}
+
+:where(.recreation) .experience-logo-art img{display:block;position:absolute;max-width:none;height:auto}
+
+:where(.recreation) .work-experience-link{margin-top:20px}
+
+@media(max-width:1100px){:where(.recreation) .experience-logo-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+:where(.recreation) .experience-heading{gap:30px;grid-template-columns:1fr 1.3fr}
+}
+
+@media(max-width:700px){:where(.recreation) .experience-inner{padding-block:42px 38px}
+:where(.recreation) .experience-heading{grid-template-columns:minmax(0,1fr);gap:18px;margin-bottom:22px}
+:where(.recreation) .experience-heading h2{font-size:2.2rem}
+:where(.recreation) .experience-logo-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px 20px}
+:where(.recreation) .experience-logo{min-height:98px;padding-inline:0}
+}
+
+@media(max-width:460px){:where(.recreation) .experience-logo-grid{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px}
+:where(.recreation) .experience-logo{min-height:104px;padding-inline:7px}
+}
+
+:where(.recreation) .case-cover.navy{background:var(--navy);color:#fff}
+
+:where(.recreation) .case-card:hover .case-cover.navy{background:var(--navy-strong)}
+
+:where(.recreation) .case-card:hover .case-cover.charcoal{background:#1d2229}
+
+:where(.recreation) .case-card:hover .case-cover.mist{background:#dee5ed}
+
+:where(.recreation) .case-card:hover .case-cover.silver{background:#cbd6e5}
+
+:where(.recreation) .case-cover.navy p,:where(.recreation) .case-cover.charcoal p{color:inherit}
+
+:where(.recreation) .philosophy-detail .philosophy-grid{grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:9%;align-items:start}
+
+:where(.recreation) .philosophy-detail-introduction{font-size:1.0625rem;line-height:1.8;margin-bottom:32px}
+
+:where(.recreation) .philosophy-detail-introduction p+p{margin-top:24px}
+
+:where(.recreation) .philosophy-detail .symbol-explanation{padding-block:28px}
+
+:where(.recreation) .philosophy-detail .symbol-explanation h3{font-size:1.75rem;margin-block:0 14px}
+
+:where(.recreation) .philosophy-detail .symbol-explanation p{font-size:1rem;line-height:1.8}
+
+:where(.recreation) .philosophy-detail .philosophy-pillar-top{margin-bottom:18px}
+
+:where(.recreation) .philosophy-pillar-top{display:flex;gap:16px;align-items:center;margin-bottom:20px}
+
+:where(.recreation) .philosophy-icon{display:block;width:54px;height:56px;flex:none;overflow:hidden}
+
+:where(.recreation) .philosophy-icon .logo-symbol{transform:scale(.48);transform-origin:top left}
+
+:where(.recreation) #our-philosophy{scroll-margin-top:35px}
+
+@media(max-width:700px){
+  :where(.recreation) .philosophy-pillar-top{margin-bottom:15px}
+
+  :where(.recreation) .philosophy-detail .philosophy-grid{grid-template-columns:minmax(0,1fr);gap:32px}
+
+  :where(.recreation) .philosophy-detail-introduction{font-size:1rem;line-height:1.75}
+
+}
+
+:where(.recreation) .people-overview p+p{margin-top:18px}
+
+:where(.recreation) .people-group-title{font-family:Arial,Helvetica,sans-serif;font-size:.8125rem;letter-spacing:.13em;line-height:1.6;font-weight:600;flex-shrink:0}
+
+:where(.recreation) .people-partners{padding-top:64px}
+
+@media(max-width:700px){:where(.recreation) .people-partners{padding-top:44px}
+}
+
+
+
+/* Keep every source menu link reachable in short phone and landscape windows. */
+:where(.recreation) .mobile-sheet { overflow-y: auto; overscroll-behavior: contain; }
+
+
+/* The owner retains the shared light/dark control. Source geometry and the
+ * supplied light palette stay unchanged; dark surfaces use the site tokens. */
+[data-theme="dark"] .recreation {
+  --background: var(--c-bg);
+  --foreground: var(--c-ink);
+  --card: var(--c-raised);
+  --card-foreground: var(--c-ink);
+  --popover: var(--c-raised);
+  --popover-foreground: var(--c-ink);
+  --primary: #bc1830; /* preserve the supplied light-mode brand red */
+  --primary-foreground: #0e1013; /* text colour remains independent of the canvas */
+  --secondary: #171a1f;
+  --secondary-foreground: var(--c-ink);
+  --muted: var(--c-raised);
+  --muted-foreground: var(--c-ink2);
+  --accent: #040506;
+  --accent-foreground: var(--c-ink);
+  --destructive: var(--c-danger);
+  --border: var(--c-line2);
+  --input: var(--c-control);
+  --ring: var(--c-redb);
+  --surface-blue: var(--c-raised);
+  --navy: #102030;
+  --navy-strong: #0b1724;
+  --sidebar: var(--c-bg);
+  --sidebar-foreground: var(--c-ink);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: #0e1013;
+  --sidebar-accent: var(--c-raised);
+  --sidebar-accent-foreground: var(--c-ink);
+  --sidebar-border: var(--c-line2);
+  --sidebar-ring: var(--c-redb);
+}
+
+[data-theme="dark"] :where(.recreation) .approach-band,
+[data-theme="dark"] :where(.recreation) .philosophy-section {
+  background: var(--card);
+}
+
+[data-theme="dark"] :where(.recreation) .step,
+[data-theme="dark"] :where(.recreation) .symbol-explanation {
+  border-color: var(--border);
+}
+
+[data-theme="dark"] :where(.recreation) .industry-select {
+  border-color: var(--input);
+  background: var(--card);
+}
+
+[data-theme="dark"] :where(.recreation) .industry-select:hover {
+  background: var(--secondary);
+}
+
+[data-theme="dark"] :where(.recreation) .case-cover.mist {
+  background: #15191e;
+}
+
+[data-theme="dark"] :where(.recreation) .case-card:hover .case-cover.mist {
+  background: #1e242c;
+}
+
+[data-theme="dark"] :where(.recreation) .case-cover.silver {
+  background: #1b2027;
+}
+
+[data-theme="dark"] :where(.recreation) .case-card:hover .case-cover.silver {
+  background: #252d37;
+}
+
+[data-theme="dark"] :where(.recreation) .case-cover.charcoal {
+  background: #12161b;
+}
+
+[data-theme="dark"] :where(.recreation) .case-card:hover .case-cover.charcoal {
+  background: #1b2129;
+}
+
+[data-theme="dark"] :where(.recreation) .portrait {
+  background: var(--card);
+}
+
+/* These original raster exports have white paper behind their red artwork.
+ * Screen blending removes that paper after inversion; the hue rotation keeps
+ * WOY's mark red and makes the original dark CONSULTING caption legible. */
+[data-theme="dark"] :where(.recreation) .logo-window img,
+[data-theme="dark"] :where(.recreation) .philosophy-mark img,
+[data-theme="dark"] :where(.recreation) .logo-symbol {
+  filter: invert(1) hue-rotate(180deg) saturate(2);
+  mix-blend-mode: screen;
+}
+
+/* Organisation artwork retains its original colours and white canvas. */
+[data-theme="dark"] :where(.recreation) .collective-experience {
+  --foreground: #252a31;
+  --muted-foreground: #606774;
+  --primary: #bc1830;
+  --border: #d6dae0;
+  color: var(--foreground);
+  color-scheme: light;
+}

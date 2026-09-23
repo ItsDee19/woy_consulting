@@ -14,6 +14,12 @@ const context = await browser.newContext({ viewport: { width: 1440, height: 1000
 const page = await context.newPage();
 const errors = [], pages = [], brokenLinks = [], accessibility = [], overflow = [];
 const hrefs = new Set(), assets = new Set();
+const homeExpertise = [
+  { title: "Strategy, growth & execution", destination: "/expertise#strategy", description: "Translate ambition into clear choices, practical roadmaps and disciplined execution. We help leadership teams connect growth priorities with the capabilities, decisions and operating rhythms they need." },
+  { title: "Leadership & executive coaching", destination: "/expertise#leadership", description: "Develop the judgement, alignment and adaptability to lead through complexity. Executive coaching complements our advisory work, helping leaders turn insight into sustained changes in how they lead." },
+  { title: "Organisation, culture & change", destination: "/expertise#culture", description: "Align structure, decision rights and everyday behaviour with business priorities. We work with leaders to diagnose friction, build shared ownership and make change practical." },
+  { title: "People & performance systems", destination: "/expertise#people", description: "Build business-aligned HR, talent and performance systems that leaders and teams can use. Connect roles, capability, accountability and development to what the organisation is trying to achieve." },
+];
 page.on("pageerror", error => errors.push({ url: page.url(), message: error.message }));
 const manifest = JSON.parse(fs.readFileSync(".next/prerender-manifest.json", "utf8"));
 const routes = Object.keys(manifest.routes).filter(route => !route.startsWith("/_") &&
@@ -23,18 +29,20 @@ try {
   const firstVisit = await page.goto(base, { waitUntil: "load" });
   assert.match(await firstVisit.text(), /id="cookie-preferences"/, "Cookie choice is server-rendered");
   await page.getByRole("button", { name: "Essential only", exact: true }).click();
-  await page.getByRole("button", { name: "Switch to dark theme" }).click();
+  await page.getByRole("button", { name: "Switch to dark theme", exact: true }).click();
   assert.equal(await page.evaluate(() => localStorage.getItem("woy-theme")), null);
   await page.reload({ waitUntil: "load" });
   assert.equal(await page.locator("html").getAttribute("data-theme"), "light");
   assert.equal(await page.locator("#cookie-preferences").isVisible(), false, "Saved choice stays hidden on reload");
   await page.getByRole("button", { name: "Cookie preferences", exact: true }).click();
   await page.getByRole("checkbox", { name: "Remember my light or dark theme" }).check();
+  await page.getByRole("button", { name: "Switch to dark theme", exact: true }).click();
   await page.getByRole("button", { name: "Save preferences", exact: true }).click();
-  await page.getByRole("button", { name: "Switch to dark theme" }).click();
   await page.reload({ waitUntil: "load" });
   assert.equal(await page.locator("html").getAttribute("data-theme"), "dark");
-  await page.getByRole("button", { name: "Switch to light theme" }).click();
+  if (await page.locator("html").getAttribute("data-theme") !== "light") await page.getByRole("button", { name: "Switch to light theme", exact: true }).click();
+  await page.getByRole("button", { name: "Cookie preferences", exact: true }).click();
+  await page.getByRole("button", { name: "Save preferences", exact: true }).click();
 
   for (const route of routes) {
     const response = await page.goto(base + route, { waitUntil: "load" });
@@ -54,8 +62,8 @@ try {
       hrefs: [...document.querySelectorAll("a[href]")].map(a => a.getAttribute("href")),
       assets: [...document.images].map(image => image.currentSrc || image.src),
     }));
-    const typefaces = await page.evaluate(() => ["body", "main h1", "main input", "main textarea", "header nav a", "header button", "footer h2", "footer a", "footer button"]
-      .flatMap(selector => { const element = document.querySelector(selector); return element ? [{ selector, family: getComputedStyle(element).fontFamily, sans: selector.startsWith("header") || selector.startsWith("footer") }] : []; }));
+    const typefaces = await page.evaluate(() => ["body", "main h1", "main input", "main textarea", "main .recreation p", ".header-shell nav a", ".header-shell button", "footer h2", "footer a", "footer button"]
+      .flatMap(selector => { const element = document.querySelector(selector); return element ? [{ selector, family: getComputedStyle(element).fontFamily, sans: selector.startsWith(".header-shell") || selector.startsWith("footer") || selector === "main .recreation p" }] : []; }));
     for (const { selector, family, sans } of typefaces) assert.match(family, sans ? /^Arial/ : /^Georgia/, `Reference typography on ${selector}: ${route}`);
     assert.ok(meta.title && meta.description && meta.canonical && meta.og, `Metadata: ${route}`);
     assert.match(meta.title, /WOY Consulting/, `Branded title: ${route}`);
@@ -102,7 +110,36 @@ try {
       assert.equal(await page.getByRole("heading", { name: "Experience across industries.", exact: true }).count(), 0);
       assert.equal(await page.locator("main img").count(), 0, "The retired About logo section has been removed");
     }
-    assert.equal(meta.hrefs.filter(href => href?.startsWith("/expertise")).length, 0, "No links target the retired page");
+    if (route === "/expertise") {
+      const sections = page.locator(".expertise-detail");
+      assert.equal(await sections.count(), 4, "Every source expertise area has a detailed section");
+      for (const id of ["strategy", "leadership", "culture", "people"]) {
+        const section = page.locator(`.expertise-detail#${id}`);
+        assert.equal(await section.locator("h2").count(), 1);
+        assert.equal(await section.locator(".service-list li").count(), 4);
+        assert.match(await section.locator(".expertise-case a").getAttribute("href"), /^\/work\//);
+      }
+    }
+    if (route === "/approach") {
+      assert.deepEqual(await page.locator(".steps-grid .step h3").allTextContents(), ["Discover", "Define", "Design", "Deliver"]);
+      assert.equal(await page.locator(".principles-list > div").count(), 4);
+      assert.equal(await page.locator("#our-philosophy .symbol-explanation").count(), 3);
+      assert.equal(await page.locator("#our-philosophy img").getAttribute("src"), "/assets/woy-mark.png", "Source emblem is preserved");
+    }
+    if (route === "/work") {
+      assert.equal(await page.locator(".work-grid .case-card").count(), 6);
+      assert.equal(await page.getByRole("combobox", { name: "Explore by industry" }).count(), 1);
+      assert.equal(await page.locator("#collective-experience h2").textContent(), "Our collective experience");
+      assert.match(await page.locator("#collective-experience").innerText(), /partner and affiliate platforms/);
+      assert.equal(await page.locator("#collective-experience .experience-logo").count(), 49, "The full source organisation roster is present");
+    }
+    if (route === "/people") {
+      assert.equal(await page.locator("#leadership .person-card").count(), 3);
+      for (const slug of ["vipin-tuteja", "sandeep-bidani", "kannan-swaminathan"]) {
+        assert.equal(await page.locator(`.person-card[href="/people/${slug}"]`).count(), 1);
+      }
+      assert.equal(await page.locator(".people-principle").getByRole("link", { name: "Start a conversation", exact: true }).getAttribute("href"), "/contact");
+    }
     if (route === "/faq") {
       const faq = meta.schema.find(node => node["@type"] === "FAQPage");
       assert.ok(faq?.mainEntity?.length >= 6, "FAQ schema has substantive answers");
@@ -111,13 +148,19 @@ try {
         assert.equal(await page.getByText(item.acceptedAnswer.text, { exact: true }).count(), 1);
       }
     }
-    assert.equal(await page.getByRole("navigation", { name: "Primary", exact: true }).getByRole("link", { name: "Expertise", exact: true }).count(), 0, "Expertise is absent from the main navigation");
-    const navbarAction = page.locator("header").getByRole("link", { name: "Let’s talk", exact: true });
-    assert.equal(await navbarAction.getAttribute("href"), "mailto:hello@woyconsulting.com", `Navbar email action: ${route}`);
-    const conversationLinks = page.getByRole("link", { name: "Start a conversation", exact: true });
-    assert.ok(await conversationLinks.count() >= 1, `Footer email action: ${route}`);
-    for (const link of await conversationLinks.all()) assert.equal(await link.getAttribute("href"), "mailto:hello@woyconsulting.com");
+    const mainNavigation = page.getByRole("navigation", { name: "Main navigation", exact: true });
+    assert.equal(await mainNavigation.getByRole("link", { name: "Home", exact: true }).count(), 1, "The requested Home link is preserved");
+    for (const [href, label] of [["/", "Home"], ["/expertise", "Expertise"], ["/work", "Selected work"], ["/people", "Leadership & Partners"], ["/approach", "Our approach"], ["/contact", "Let’s talk"]]) {
+      const link = mainNavigation.getByRole("link", { name: label, exact: true });
+      assert.equal(await link.getAttribute("href"), href);
+      assert.equal(await link.getAttribute("aria-current"), (href === "/" ? route === "/" : route.startsWith(href)) ? "page" : null);
+    }
+    const navbarLogo = page.locator(".header-shell").getByRole("img", { name: "WOY Consulting", exact: true });
+    assert.equal(await navbarLogo.getAttribute("src"), "/assets/woy-logo.png", "Navbar retains the original logo artwork");
+    assert.equal(await navbarLogo.evaluate(element => element.tagName), "IMG");
+    assert.equal(await page.locator(".header-shell").getByRole("button", { name: /Switch to .* theme/ }).count(), 1);
     const footer = page.getByRole("contentinfo");
+    assert.equal(await footer.getByRole("link", { name: "Start a conversation", exact: true }).getAttribute("href"), "mailto:hello@woyconsulting.com");
     assert.equal(await footer.getByRole("link", { name: "hello@woyconsulting.com", exact: true }).getAttribute("href"), "mailto:hello@woyconsulting.com");
     assert.equal(await footer.getByRole("link", { name: "Contact", exact: true }).getAttribute("href"), "/contact");
     assert.equal(await footer.getByRole("link", { name: /Made by AvlysAI/ }).getAttribute("href"), "https://avlysai.com/");
@@ -127,22 +170,29 @@ try {
     meta.assets.forEach(src => assets.add(src));
     pages.push({ route, title: meta.title, description: meta.description, status: response.status() });
     for (const theme of ["light", "dark"]) {
-      await page.evaluate(theme => document.documentElement.setAttribute("data-theme", theme), theme);
+      if (await page.locator("html").getAttribute("data-theme") !== theme) await page.getByRole("button", { name: `Switch to ${theme} theme`, exact: true }).click();
       if (route === "/") {
         const heroSurface = await page.locator("[data-home-hero]").evaluate(el => ({ image: getComputedStyle(el).backgroundImage, color: getComputedStyle(el).backgroundColor }));
         assert.equal(heroSurface.image, "none", `Plain hero in ${theme} mode`);
-        assert.equal(heroSurface.color, theme === "light" ? "rgb(251, 249, 247)" : "rgb(14, 16, 19)");
+        assert.equal(heroSurface.color, theme === "light" ? "rgb(251, 249, 247)" : "rgb(8, 9, 11)");
       }
       const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
       if (result.violations.length) accessibility.push({ route, theme, violations: result.violations.map(v => ({ id: v.id, impact: v.impact, description: v.description, nodes: v.nodes.map(n => ({ target: n.target, summary: n.failureSummary })) })) });
     }
     for (const width of [320, 375, 390, 414, 768, 1024, 1440, 1920]) {
       await page.setViewportSize({ width, height: 900 });
+      // Wait for responsive navigation to reflow after the browser viewport changes.
+      // A persistent overflow still fails this assertion instead of being hidden.
+      await page.waitForFunction(() => [...document.querySelectorAll(".header-shell button")].every(element => {
+        const bounds = element.getBoundingClientRect();
+        return !bounds.width || (bounds.left >= 0 && bounds.right <= innerWidth);
+      }), null, { timeout: 3000 });
+      assert.equal(await page.getByRole("button", { name: /Switch to .* theme/ }).isVisible(), true, `Theme toggle is available at ${width}px on ${route}`);
       const size = await page.evaluate(() => ({ content: document.documentElement.scrollWidth, viewport: document.documentElement.clientWidth }));
       if (size.content > size.viewport + 1) overflow.push({ route, width, ...size });
       if (route === "/") {
         for (const theme of ["light", "dark"]) {
-          await page.evaluate(theme => document.documentElement.setAttribute("data-theme", theme), theme);
+          if (await page.locator("html").getAttribute("data-theme") !== theme) await page.getByRole("button", { name: `Switch to ${theme} theme`, exact: true }).click();
           const heroBounds = await page.locator("[data-home-hero]").boundingBox();
           const captionBounds = await page.locator("[data-logo-caption]").boundingBox();
           assert.ok(heroBounds && captionBounds, "Hero and caption have rendered bounds");
@@ -158,10 +208,11 @@ try {
   assert.equal(new Set(pages.map(page => page.description)).size, pages.length, "Unique page descriptions");
   const sitemap = await (await context.request.get(base + "/sitemap.xml")).text();
   for (const page of pages) assert.ok(sitemap.includes(page.route === "/" ? "<loc>" : page.route + "</loc>"), `Sitemap route: ${page.route}`);
-  assert.ok(!sitemap.includes("/expertise</loc>"), "Retired expertise route is excluded from sitemap");
-  const expertiseRedirect = await context.request.get(base + "/expertise", { maxRedirects: 0 });
-  assert.equal(expertiseRedirect.status(), 308);
-  assert.match(expertiseRedirect.headers().location, /\/#expertise$/);
+  for (const route of ["/expertise", "/work", "/people", "/approach"]) {
+    assert.ok(sitemap.includes(route + "</loc>"), `Recreated route is included in sitemap: ${route}`);
+    const response = await context.request.get(base + route, { maxRedirects: 0 });
+    assert.equal(response.status(), 200, `Recreated route is served directly: ${route}`);
+  }
   for (const href of hrefs) {
     const url = new URL(href);
     if (url.origin !== new URL(base).origin) continue;
@@ -189,67 +240,103 @@ try {
 
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 900 });
+      // Wait for responsive navigation to reflow after the browser viewport changes.
+      // A persistent overflow still fails this assertion instead of being hidden.
+      await page.waitForFunction(() => [...document.querySelectorAll(".header-shell button")].every(element => {
+        const bounds = element.getBoundingClientRect();
+        return !bounds.width || (bounds.left >= 0 && bounds.right <= innerWidth);
+      }), null, { timeout: 3000 });
     await page.goto(base, { waitUntil: "load" });
     await page.getByRole("link", { name: "Explore our philosophy and approach", exact: true }).click();
-    await page.waitForURL(base + "/about#philosophy");
+    await page.waitForURL(base + "/approach#our-philosophy");
     await page.waitForFunction(() => {
-      const section = document.getElementById("philosophy");
-      const header = document.querySelector("body > header");
+      const section = document.getElementById("our-philosophy");
+      const header = document.querySelector(".header-shell");
       return section && header && section.getBoundingClientRect().top >= header.getBoundingClientRect().bottom - 1 && section.getBoundingClientRect().top < innerHeight;
     });
-    assert.equal(await page.locator("#philosophy h3").count(), 3, "About explains all three logo symbols");
+    assert.equal(await page.locator("#our-philosophy h3").count(), 3, "Our approach explains all three logo symbols");
   }
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(base, { waitUntil: "load" });
-  await page.getByRole("button", { name: "Open menu" }).click();
-  await page.keyboard.press("Escape");
-  assert.equal(await page.getByRole("button", { name: "Open menu" }).evaluate(e => e === document.activeElement), true);
-  await page.getByRole("button", { name: "Open menu" }).click();
-  await page.getByRole("navigation", { name: "Mobile", exact: true }).getByRole("link", { name: "Home", exact: true }).click();
-  assert.equal(await page.locator("#mobile-nav").count(), 0, "Home closes the mobile menu even on the home route");
-  await page.getByRole("button", { name: "Open menu" }).click();
-  assert.equal(await page.getByRole("navigation", { name: "Mobile", exact: true }).getByRole("link", { name: "Expertise", exact: true }).count(), 0, "Expertise is absent from the mobile navigation");
-  assert.equal(await page.locator("#mobile-nav").getByRole("link", { name: "Let’s talk", exact: true }).getAttribute("href"), "mailto:hello@woyconsulting.com", "Mobile navbar uses the same conversation label and email");
-  await page.locator('#mobile-nav a[href="/approach"]').click();
-  await page.waitForURL(base + "/approach");
-  const explorer = page.locator("[data-approach-explorer]");
-  const explorerTabs = explorer.getByRole("tablist", { name: "The four stages of the WOY approach" }).getByRole("tab");
-  assert.equal(await explorerTabs.count(), 4);
-  await explorerTabs.first().focus();
-  const explorerHeight = (await explorer.boundingBox()).height;
-  for (const [key, name] of [["ArrowRight", "Define"], ["End", "Deliver"], ["ArrowRight", "Discover"], ["ArrowLeft", "Deliver"], ["Home", "Discover"]]) {
-    await page.keyboard.press(key);
-    const selected = explorer.getByRole("tab", { selected: true });
-    assert.match(await selected.innerText(), new RegExp(name));
-    assert.equal(await selected.evaluate(el => document.activeElement === el), true, "Explorer keyboard navigation moves focus");
-    assert.equal(await explorer.getByRole("tabpanel").count(), 1, "Only the active explorer panel is exposed");
-    assert.equal(await explorer.getByRole("tabpanel").getAttribute("aria-labelledby"), await selected.getAttribute("id"));
-    assert.equal(await explorer.locator('[role="tabpanel"][inert]').count(), 3);
-    assert.equal((await explorer.boundingBox()).height, explorerHeight, "Changing stage preserves the layout height");
+  const navigationTrigger = page.getByRole("button", { name: "Open navigation menu", exact: true });
+  const mobileNavigation = page.getByRole("dialog", { name: "WOY navigation", exact: true });
+  await navigationTrigger.click();
+  await mobileNavigation.waitFor();
+  for (let index = 0; index < 10; index++) {
+    await page.keyboard.press("Tab");
+    assert.equal(await mobileNavigation.evaluate(element => element.contains(document.activeElement)), true, "Modal navigation traps keyboard focus");
   }
-  await explorerTabs.nth(2).click();
-  assert.match(await explorer.getByRole("tabpanel").innerText(), /Tailored journey/);
-  await explorer.getByRole("button", { name: "Next stage: Deliver", exact: true }).click();
-  assert.match(await explorer.getByRole("tabpanel").innerText(), /Capability transfer/);
-  await explorer.getByRole("button", { name: "Next stage: Discover", exact: true }).click();
-  await explorer.getByRole("button", { name: "Previous stage: Deliver", exact: true }).click();
-  assert.match(await explorer.getByRole("tabpanel").innerText(), /Sustained execution/);
-  assert.equal(await explorer.getByRole("tabpanel").evaluate(el => getComputedStyle(el).transitionDuration), "0s", "Explorer respects reduced motion");
+  await page.keyboard.press("Escape");
+  await mobileNavigation.waitFor({ state: "hidden" });
+  assert.equal(await navigationTrigger.evaluate(element => element === document.activeElement), true, "Escape returns focus to the navigation trigger");
+  await navigationTrigger.click();
+  await mobileNavigation.getByRole("button", { name: "Close", exact: true }).click();
+  await mobileNavigation.waitFor({ state: "hidden" });
+  await navigationTrigger.click();
+  await page.locator('[data-slot="sheet-overlay"]').click({ position: { x: 8, y: 180 } });
+  await mobileNavigation.waitFor({ state: "hidden" });
+  await navigationTrigger.click();
+  await mobileNavigation.getByRole("link", { name: "Home", exact: true }).click();
+  await mobileNavigation.waitFor({ state: "hidden" });
+  assert.equal(new URL(page.url()).pathname, "/", "Home closes the mobile navigation on the current route");
+  await navigationTrigger.click();
+  assert.equal(await mobileNavigation.getByRole("link", { name: /Let’s talk/ }).getAttribute("href"), "/contact");
+  await mobileNavigation.getByRole("link", { name: "Expertise", exact: true }).click();
+  await page.waitForURL(base + "/expertise");
+  assert.equal(await page.locator(".expertise-detail").count(), 4);
+  await navigationTrigger.click();
+  await mobileNavigation.getByRole("link", { name: "Our approach", exact: true }).click();
+  await page.waitForURL(base + "/approach");
+  assert.deepEqual(await page.locator(".steps-grid .step h3").allTextContents(), ["Discover", "Define", "Design", "Deliver"]);
+  assert.equal(await page.locator("#our-philosophy .symbol-explanation").count(), 3);
   await page.screenshot({ path: path.join(reportDir, "approach-mobile.png"), fullPage: true });
   const staticContext = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   const staticPage = await staticContext.newPage();
   await staticPage.goto(base + "/approach", { waitUntil: "load" });
-  const staticExplorer = staticPage.locator("[data-approach-explorer]");
-  assert.equal(await staticExplorer.getByRole("tab").count(), 0, "No inert controls are shown without JavaScript");
-  assert.equal(await staticExplorer.getByRole("heading", { level: 3 }).count(), 4, "Every stage remains readable without JavaScript");
-  assert.equal(await staticExplorer.getByText("Capability transfer", { exact: true }).isVisible(), true);
+  assert.equal(await staticPage.locator(".steps-grid .step").count(), 4, "Every stage remains readable without JavaScript");
+  assert.equal(await staticPage.locator("#our-philosophy .symbol-explanation").count(), 3, "All philosophy explanations are server-rendered");
+  await staticPage.goto(base + "/expertise", { waitUntil: "load" });
+  assert.equal(await staticPage.locator(".expertise-detail .service-list li").count(), 16, "All source expertise services are readable without JavaScript");
   await staticPage.goto(base, { waitUntil: "load" });
   const staticExpertise = staticPage.locator("#expertise details");
+  assert.equal(await staticExpertise.count(), 4, "All expertise areas have a native no-JavaScript fallback");
   assert.equal(await staticExpertise.first().getAttribute("open"), "", "Expertise is server-rendered with the first area expanded");
+  for (let index = 0; index < homeExpertise.length; index++) {
+    const area = staticExpertise.nth(index), expected = homeExpertise[index];
+    assert.ok((await area.locator("summary").textContent()).includes(expected.title), "Fallback keeps the exact expertise title");
+    assert.equal(await area.getByText(expected.description, { exact: true }).count(), 1, "Fallback contains the complete description");
+    assert.equal(await area.locator('a[href^="/expertise#"]').getAttribute("href"), expected.destination);
+  }
   await staticExpertise.nth(1).locator("summary").press("Enter");
   assert.equal(await staticExpertise.nth(1).getAttribute("open"), "", "Expertise works without JavaScript");
   assert.equal(await staticPage.locator("#expertise details[open]").count(), 1);
+  await staticExpertise.nth(1).locator("summary").press("Space");
+  assert.equal(await staticPage.locator("#expertise details[open]").count(), 0, "No-JavaScript visitors can also close every area");
   await staticContext.close();
+  await page.goto(base + "/work", { waitUntil: "load" });
+  const industryFilter = page.getByRole("combobox", { name: "Explore by industry" });
+  await industryFilter.click();
+  await page.getByRole("option", { name: "Education", exact: true }).click();
+  assert.equal(await page.locator(".work-grid .case-card").count(), 1, "Industry selection narrows the engagement list");
+  assert.equal(await page.locator(".work-grid .case-meta").textContent(), "Education");
+  assert.equal(await page.locator(".filter-bar [aria-live]").textContent(), "1 engagement");
+  await industryFilter.focus();
+  await page.keyboard.press("Enter");
+  await page.getByRole("listbox").waitFor();
+  await page.waitForFunction(() => document.activeElement?.getAttribute("role") === "option");
+  await page.keyboard.press("Home");
+  await page.waitForFunction(() => document.activeElement?.getAttribute("role") === "option" && document.activeElement.textContent === "All industries");
+  await page.keyboard.press("Enter");
+  await page.waitForFunction(() => document.querySelectorAll(".work-grid .case-card").length === 6);
+  assert.equal(await page.locator(".work-grid .case-card").count(), 6, "The keyboard can restore all industries");
+  const sourceCaseHref = await page.locator(".work-grid .case-card").first().getAttribute("href");
+  await page.locator(".work-grid .case-card").first().click();
+  await page.waitForURL(/\/case-studies\//);
+  assert.equal((await context.request.get(base + sourceCaseHref, { maxRedirects: 0 })).status(), 308, "Source case links preserve the established detailed case pages");
+  await page.goto(base + "/people", { waitUntil: "load" });
+  await page.locator('.person-card[href="/people/vipin-tuteja"]').click();
+  await page.waitForURL(base + "/practitioners#vipin-tuteja");
+  assert.equal(await page.locator("#vipin-tuteja").isVisible(), true);
   await page.getByRole("contentinfo").getByRole("link", { name: "Back to top", exact: true }).click();
   await page.waitForFunction(() => document.getElementById("main").getBoundingClientRect().top >= 0);
   await page.getByRole("contentinfo").getByRole("link", { name: "Contact", exact: true }).click();
@@ -280,11 +367,11 @@ try {
   await page.unroute("**/api/contact");
   await page.goto(base, { waitUntil: "load" });
   for (const theme of ["light", "dark"]) {
-    await page.evaluate(theme => document.documentElement.setAttribute("data-theme", theme), theme);
+    if (await page.locator("html").getAttribute("data-theme") !== theme) await page.getByRole("button", { name: `Switch to ${theme} theme`, exact: true }).click();
     const logo = await page.locator("#woy-sheen stop").evaluateAll(stops => stops.map(stop => getComputedStyle(stop).stopColor));
     assert.deepEqual(logo, ["rgb(205, 20, 33)", "rgb(232, 57, 40)", "rgb(205, 20, 33)"], `Red artwork: ${theme}`);
   }
-  await page.evaluate(() => document.documentElement.setAttribute("data-theme", "light"));
+  if (await page.locator("html").getAttribute("data-theme") !== "light") await page.getByRole("button", { name: "Switch to light theme", exact: true }).click();
   await page.emulateMedia({ reducedMotion: "no-preference" });
   assert.notEqual(await page.locator(".mk-ring").evaluate(el => getComputedStyle(el).animationName), "none", "Logo remains animated");
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -310,40 +397,68 @@ try {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.screenshot({ path: path.join(reportDir, "home-desktop.png"), fullPage: true });
   await page.goto(base + "/about", { waitUntil: "load" });
-  const homeLink = page.getByRole("navigation", { name: "Primary", exact: true }).getByRole("link", { name: "Home", exact: true });
-  assert.equal(await homeLink.getAttribute("aria-current"), null);
+  const homeLink = page.getByRole("navigation", { name: "Main navigation", exact: true }).getByRole("link", { name: "Home", exact: true });
   await homeLink.click();
   await page.waitForURL(base + "/");
-  assert.equal(await homeLink.getAttribute("aria-current"), "page");
+  assert.equal(await page.getByRole("navigation", { name: "Main navigation", exact: true }).locator('[aria-current="page"]').count(), 1, "Only Home is marked active after returning through the desktop link");
   await page.getByRole("contentinfo").getByRole("link", { name: "Expertise", exact: true }).click();
   await page.waitForURL(base + "/#expertise");
-  const expertise = page.locator("#expertise details");
+  const expertise = page.locator("#expertise [data-expertise-area]");
   assert.equal(await expertise.count(), 4);
-  assert.equal(await expertise.first().getAttribute("open"), "", "Strategy is initially expanded");
-  await expertise.first().locator("summary").focus();
-  await page.keyboard.press("Enter");
-  assert.equal(await expertise.first().getAttribute("open"), null, "An open area can be collapsed with the keyboard");
-  await page.keyboard.press("Space");
-  assert.equal(await expertise.first().getAttribute("open"), "", "Space also operates the native disclosure");
-  for (let index = 1; index < 4; index++) {
-    await expertise.nth(index).locator("summary").click();
-    assert.equal(await expertise.nth(index).getAttribute("open"), "");
-    assert.equal(await page.locator("#expertise details[open]").count(), 1, "One expertise area stays open at a time");
-    assert.equal(await expertise.nth(index).locator("li").count(), 3, "Each area offers three concise deliverables");
+  for (let index = 0; index < homeExpertise.length; index++) {
+    const area = expertise.nth(index), expected = homeExpertise[index];
+    const trigger = area.locator("h3 button"), panel = area.locator('[role="region"]');
+    assert.equal(await trigger.count(), 1, "Each expertise title is an accessible button inside its heading");
+    assert.ok((await trigger.textContent()).includes(expected.title), "Expertise titles preserve their requested order and wording");
+    const triggerId = await trigger.getAttribute("id"), panelId = await panel.getAttribute("id");
+    assert.ok(triggerId && panelId, "Accordion triggers and panels have stable IDs");
+    assert.equal(await page.locator(`[id="${triggerId}"]`).count(), 1, "Trigger ID is unique");
+    assert.equal(await page.locator(`[id="${panelId}"]`).count(), 1, "Panel ID is unique");
+    assert.equal(await trigger.getAttribute("aria-controls"), panelId, "Trigger controls its content panel");
+    assert.equal(await panel.getAttribute("aria-labelledby"), triggerId, "Panel is named by its expertise trigger");
+    assert.equal(await panel.getByText(expected.description, { exact: true }).count(), 1, "Panel contains the exact requested description");
+    assert.equal(await panel.locator("a").getAttribute("href"), expected.destination, "Each expertise links directly to its dedicated section");
+    assert.equal(await panel.locator("li").count(), 0, "The compact accordion has no retired deliverable list");
   }
+  const assertExpertiseOpen = async (openIndex, message) => {
+    await page.waitForFunction(index => [...document.querySelectorAll("#expertise [data-expertise-area] h3 button")]
+      .every((button, i) => button.getAttribute("aria-expanded") === String(i === index)), openIndex);
+    for (let index = 0; index < homeExpertise.length; index++) {
+      const panel = expertise.nth(index).locator('[role="region"]'), open = index === openIndex;
+      assert.equal(await panel.getAttribute("data-open"), String(open), message);
+      assert.equal(await panel.getAttribute("aria-hidden"), String(!open), "Closed panel content is hidden from assistive technology");
+      assert.equal(await panel.evaluate(element => element.inert), !open, "Closed panel links cannot receive focus");
+    }
+    assert.equal(await page.locator('#expertise [data-expertise-area] h3 button[aria-expanded="true"]').count(), openIndex < 0 ? 0 : 1, message);
+    assert.equal(await page.locator("#expertise").getByRole("link", { name: "Explore this expertise", exact: true }).count(), openIndex < 0 ? 0 : 1, "Only the expanded area's link is exposed");
+  };
+  await assertExpertiseOpen(0, "Strategy is initially expanded");
+  await expertise.first().locator("h3 button").focus();
+  await page.keyboard.press("Enter");
+  await assertExpertiseOpen(-1, "Enter closes the expanded area and allows all items to be collapsed");
+  await page.keyboard.press("Space");
+  await assertExpertiseOpen(0, "Space opens the focused expertise area");
+  for (let index = 1; index < homeExpertise.length; index++) {
+    await expertise.nth(index).locator("h3 button").click();
+    await assertExpertiseOpen(index, "Opening another area closes the previous one");
+  }
+  await expertise.last().locator("h3 button").click();
+  await assertExpertiseOpen(-1, "Clicking the expanded item closes it");
   for (const slug of ["strategy-growth-execution", "leadership-executive-coaching", "organisation-culture-change", "people-performance-systems",
     "strategy-and-sales-management", "coaching-and-leadership-development", "inclusive-leadership-and-culture",
     "people-and-culture-consulting", "organization-diagnostics-and-restructuring", "hr-capability-and-transformation"]) {
     await page.goto(base + "/#" + slug, { waitUntil: "load" });
     await page.waitForFunction(id => {
-      const disclosure = document.getElementById(id)?.closest("details");
-      const top = disclosure?.getBoundingClientRect().top;
-      return disclosure?.open && top >= 72 && top < 300;
+      const area = document.getElementById(id)?.closest("[data-expertise-area]");
+      const top = area?.getBoundingClientRect().top;
+      return area?.querySelector("h3 button")?.getAttribute("aria-expanded") === "true" && top >= 72 && top < 300;
     }, slug);
-    assert.equal(await page.locator("#expertise details[open]").count(), 1, `Only the linked area is open: ${slug}`);
+    assert.equal(await page.locator('#expertise [data-expertise-area] h3 button[aria-expanded="true"]').count(), 1, `Only the linked area is open: ${slug}`);
   }
-  await page.locator("#expertise").getByRole("link", { name: "See our expertise in practice" }).click();
-  await page.waitForURL(base + "/case-studies");
+  const expertiseOverview = page.locator("#expertise").getByRole("link", { name: "Our expertise", exact: true });
+  assert.equal(await expertiseOverview.getAttribute("href"), "/expertise");
+  await expertiseOverview.click();
+  await page.waitForURL(base + "/expertise");
   await page.goto(base + "/practitioners", { waitUntil: "load" });
   for (const [slug, name] of [["vipin-tuteja", "Vipin"], ["sandeep-bidani", "Sandeep"], ["kannan-swaminathan", "Kannan"]]) {
     const article = page.locator(`#${slug}`);
@@ -410,7 +525,7 @@ try {
   const saveBounds = await page.getByRole("button", { name: "Save preferences", exact: true }).boundingBox();
   assert.ok(saveBounds && saveBounds.y >= 0 && saveBounds.y + saveBounds.height <= 569, "Cookie action reachable on a small screen");
   await page.screenshot({ path: path.join(reportDir, "cookie-mobile.png") });
-  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "plain light/dark hero, updated philosophy caption and responsive containment, footer email CTAs, Contact and back-to-top navigation, cookie choices, theme memory, Home/footer Expertise navigation; Expertise absent from both navbars, four-area expertise accordion, all current/legacy deep links, keyboard and no-JS disclosures, editorial serif content with sans-serif navbar, footer and rule-free hero label, homepage philosophy link to About anchor clear of sticky navigation, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/hover/focus/touch/reduced motion/biography disclosure, six case cards with keyboard navigation, collective experience logo wall and removed About roster, Approach explorer keyboard/click/next/previous/wrapping/stable panels/reduced motion/no-JS fallback, validation, unavailable delivery, mocked success/duplicate prevention passed" };
+  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "desktop/mobile Home links, visible consent-aware light/dark toggle, source navigation links, original logo image, contact CTA and active-page states; mobile modal focus trap, Escape, overlay, Close and same-route Home; source Expertise content and no-JS services; static 4D stages and detailed philosophy; Work industry filter with keyboard reset and case aliases; People profile aliases; retained plain light/dark hero and caption, footer email CTAs, cookie choices/theme persistence, homepage 4D tabs and labelled expertise accordion panels, Enter/Space operation, all-closed/one-open states, no-JS fallback and legacy capability anchors, Our approach philosophy anchor, practitioner portraits/disclosures/motion, legacy case cards and collective experience, form validation and mocked success/duplicate prevention passed" };
   fs.writeFileSync(path.join(reportDir, "browser-check.json"), JSON.stringify(report, null, 2));
   console.log(JSON.stringify({ pages: pages.length, jsErrors: errors.length, accessibility: accessibility.length, overflow: overflow.length, brokenLinks: brokenLinks.length }));
   assert.equal(errors.length, 0, "Browser JS errors");

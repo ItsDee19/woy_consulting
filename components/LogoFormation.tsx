@@ -45,7 +45,7 @@ export function LogoFormation({ className = "" }: { className?: string }) {
         <g className="mk-guides" fill="none" stroke="var(--c-logo-red)">
           <path d="M77 94h206" strokeWidth=".35" strokeDasharray="1 3" />
           <path d="M78 64v-6h6M78 124v6h6M277 64v-6h-6M277 124v6h-6" strokeWidth=".65" />
-          <circle cx={MARK.cx} cy={MARK.cy} r="46" strokeWidth=".45" strokeDasharray="1 4" />
+          <circle data-logo-guide cx={MARK.cx} cy={MARK.cy} r="46" strokeWidth=".45" strokeDasharray="1 4" />
           <path className="mk-orbit" d="M134 94a46 46 0 0 1 46-46M226 94a46 46 0 0 1-46 46" strokeWidth=".9" />
         </g>
         <g className="mk-convergence" fill="none" stroke="var(--c-logo-accent)" strokeWidth=".65">
@@ -57,7 +57,8 @@ export function LogoFormation({ className = "" }: { className?: string }) {
         {/* Circle: enters from the left and becomes the finished logo ring. */}
         <circle className="mk-ring" cx={MARK.cx} cy={MARK.cy} r={MARK.r} pathLength="1" fill="none" stroke="url(#woy-sheen)" strokeWidth={MARK.ringStroke} strokeLinecap="square" />
 
-        {/* The outlined star resolves into WOY's original five internal spokes. */}
+        {/* The star stays concentric with the guide as the outer symbols converge. */}
+        {/* Its outline resolves into WOY's original five internal spokes. */}
         <g className="mk-star" fill="none" stroke="url(#woy-sheen)" strokeLinejoin="round">
           <path className="mk-star-outline" d={starOutline} pathLength="1" strokeWidth="3.1" />
           <g className="mk-star-core" strokeWidth={MARK.spokeStroke} strokeLinecap="square" strokeLinejoin="miter">

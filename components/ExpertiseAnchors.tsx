@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 
-/** Keep current expertise links and saved capability links working together. */
-export function ExpertiseAnchors() {
+/** Preserve current and saved capability links when the accordion layout changes. */
+export function ExpertiseAnchors({ onOpen }: { onOpen: (slug: string) => void }) {
   useEffect(() => {
     let frame = 0;
     function openLinkedCapability() {
@@ -12,11 +12,11 @@ export function ExpertiseAnchors() {
       catch { return; }
       if (!id) return;
       const target = document.getElementById(id);
-      const disclosure = target?.closest("details");
-      if (!(disclosure instanceof HTMLDetailsElement) || !disclosure.closest("#expertise")) return;
-      disclosure.open = true;
+      const area = target?.closest<HTMLElement>("[data-expertise-area]");
+      if (!area || !area.closest("#expertise")) return;
+      onOpen(area.id);
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => disclosure.scrollIntoView({ block: "start", behavior: "instant" }));
+      frame = requestAnimationFrame(() => area.scrollIntoView({ block: "start", behavior: "instant" }));
     }
     openLinkedCapability();
     window.addEventListener("hashchange", openLinkedCapability);
@@ -24,6 +24,6 @@ export function ExpertiseAnchors() {
       cancelAnimationFrame(frame);
       window.removeEventListener("hashchange", openLinkedCapability);
     };
-  }, []);
+  }, [onOpen]);
   return null;
 }

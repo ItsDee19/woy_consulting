@@ -43,8 +43,19 @@ const nextConfig = {
   async redirects() {
     // The hosting proxy must overwrite X-Forwarded-Proto on every request.
     // Fixed configured origins avoid interpolating untrusted Host headers.
-    const expertiseRedirect = { source: "/expertise", destination: "/#expertise", permanent: true };
-    if (!isProduction) return [expertiseRedirect];
+    const sourceDestinations = [
+      ["education-transformation", "education-institution-transformation"],
+      ["insurance-leadership", "insurance-senior-sales-leadership"],
+      ["consultative-selling", "it-ites-consultative-selling"],
+      ["automotive-alignment", "automotive-leadership-assimilation"],
+      ["entrepreneurial-mindset", "financial-services-entrepreneurial-mindset"],
+      ["medical-technology-leadership", "medical-technology-strategic-thinking"],
+    ].map(([source, destination]) => ({ source: `/work/${source}`, destination: `/case-studies/${destination}`, permanent: true }));
+    const profileDestinations = ["vipin-tuteja", "sandeep-bidani", "kannan-swaminathan"].map(slug => ({
+      source: `/people/${slug}`, destination: `/practitioners#${slug}`, permanent: true,
+    }));
+    const preservedDestinations = [...sourceDestinations, ...profileDestinations];
+    if (!isProduction) return preservedDestinations;
     const httpsRedirects = configuredSiteOrigins(process.env)
       .filter((origin) => !isLocalHost(new URL(origin).hostname))
       .map((origin) => {
@@ -62,8 +73,8 @@ const nextConfig = {
           permanent: true,
         };
       });
-    // Upgrade public HTTP traffic before moving the retired service page.
-    return [...httpsRedirects, expertiseRedirect];
+    // Upgrade public HTTP traffic before resolving the supplied source links.
+    return [...httpsRedirects, ...preservedDestinations];
   },
 };
 

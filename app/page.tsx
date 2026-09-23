@@ -3,11 +3,10 @@ import { StructuredData } from "@/components/StructuredData";
 import { webPageSchema, serviceGraph } from "@/lib/structured-data";
 import Link from "next/link";
 import styles from "./home.module.css";
-import { ArrowRight, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { LogoFormation } from "@/components/LogoFormation";
-import { ClientMarquee } from "@/components/ClientLogos";
-import { Reveal } from "@/components/Reveal";
 import { Stats } from "@/components/Stats";
+import { ClientMarquee } from "@/components/ClientLogos";
 import FourDApproach from "@/components/FourDApproach";
 import { ExpertiseSection } from "@/components/ExpertiseSection";
 import { PhilosophySection } from "@/components/PhilosophySection";
@@ -65,44 +64,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ------------------------------------------------- positioning band */}
-      <section className="border-t border-line bg-sunken py-16 md:py-24">
-        <div className="shell grid gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
-          <Reveal>
-            <h2 className="t-h2 max-w-[14ch]">
-              Strategic partners, not just advisors.
-            </h2>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <div className="grid max-w-[62ch] gap-5 font-light leading-relaxed text-ink2">
-              <p>
-                We have led businesses, built teams and navigated change. Today,
-                we bring that experience to your organisation’s most important
-                leadership, culture and execution challenges.
-              </p>
-              <p>
-                Our partners stay involved from the first conversation through
-                implementation, shaping solutions your teams can own and sustain.
-              </p>
-              <Link
-                href="/about"
-                className="group mt-2 inline-flex w-fit items-center gap-2 font-medium text-red"
-              >
-                More about WOY
-                <ArrowUpRight
-                  size={17}
-                  weight="bold"
-                  className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                />
-              </Link>
-            </div>
-          </Reveal>
-
-          <div className="lg:col-span-2">
-            <Stats />
-          </div>
-        </div>
-      </section>
+      <Stats />
 
       <ExpertiseSection />
 

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 /* dark mode is driven by a data attribute set on <html> */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -38,23 +39,24 @@
 @media (max-width: 1023px) { :root { --header-height: 80px; } }
 
 [data-theme="dark"] {
-  --c-bg:      #0E1013;
-  --c-raised:  #15181D;
-  --c-sunken:  #090B0D;
+  --c-bg:      #08090B;   /* ink canvas: preserve the brand reds without a blue cast */
+  --c-raised:  #0D0F12;   /* reading surfaces stay deep enough for red display text */
+  --c-sunken:  #040506;
   --c-ink:     #F2EEE9;
   --c-ink2:    #A9B0B9;
   --c-ink3:    #99A1AC;
-  --c-line:    #242A31;
-  --c-line2:   #333B44;
-  --c-red:     #FF7466;
+  --c-line:    #24272C;
+  --c-line2:   #373C43;
+  --c-red:     #CD1421;   /* keep brand text identical to light mode */
   --c-redb:    #FF7466;
-  --c-reddeep: #C41F16;
+  --c-reddeep: #A50F1A;
   --c-danger: #FF9A90;
   --c-control: #8993A1;
-  --c-block:   #090B0D;
+  --c-navy:    #0B1522;   /* quieter navy for footer, method and philosophy panels */
+  --c-block:   #040506;
   --c-onblock: #F2EEE9;
   --c-onblock2:#A9B0B9;
-  --c-blockline:#242A31;
+  --c-blockline:#24272C;
   color-scheme: dark;
 }
 
@@ -166,10 +168,11 @@
   100% { transform: translateX(-76px) scale(.64); }
 }
 .mk-star { animation: mkStarMerge var(--mk-duration) var(--mk-travel) infinite; }
+/* The guide and star share MARK's fixed centre throughout the sequence. */
 @keyframes mkStarMerge {
-  0%, 26% { transform: translateX(-8px) scale(.69); }
-  46%, 94% { transform: translateX(0) scale(1); }
-  100% { transform: translateX(-8px) scale(.69); }
+  0%, 26% { transform: scale(.69); }
+  46%, 94% { transform: scale(1); }
+  100% { transform: scale(.69); }
 }
 .mk-star-outline { stroke-dasharray: 1; opacity: 0; animation: mkStarOutline var(--mk-duration) linear infinite; }
 @keyframes mkStarOutline {
@@ -382,3 +385,6 @@
 /* A saved choice hides the server-rendered consent panel before hydration.
    Explicit reopening clears this attribute in CookieConsent. */
 [data-cookie-choice="saved"] #cookie-preferences { display: none; }
+
+/* Utility adapter for the isolated source components. */
+@theme inline{--color-background:var(--background);--color-foreground:var(--foreground);--color-card:var(--card);--color-card-foreground:var(--card-foreground);--color-popover:var(--popover);--color-popover-foreground:var(--popover-foreground);--color-primary:var(--primary);--color-primary-foreground:var(--primary-foreground);--color-secondary:var(--secondary);--color-secondary-foreground:var(--secondary-foreground);--color-muted:var(--muted);--color-muted-foreground:var(--muted-foreground);--color-accent:var(--accent);--color-accent-foreground:var(--accent-foreground);--color-destructive:var(--destructive);--color-border:var(--border);--color-input:var(--input);--color-ring:var(--ring);--radius-sm:0;--radius-md:0;--radius-lg:0;--radius-xl:0}

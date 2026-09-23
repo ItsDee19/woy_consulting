@@ -60,7 +60,7 @@ export function PhilosophySection() {
           ))}
         </ul>
         <div className={styles.next}>
-          <Link href="/about#philosophy" className={styles.link}>Explore our philosophy and approach <ArrowUpRight size={19} aria-hidden="true" /></Link>
+          <Link href="/approach#our-philosophy" className={styles.link}>Explore our philosophy and approach <ArrowUpRight size={19} aria-hidden="true" /></Link>
         </div>
       </div>
     </section>

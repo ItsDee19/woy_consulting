@@ -11,7 +11,9 @@ try {
   await page.goto(base, { waitUntil: "load" });
   await page.getByRole("button", { name: "Essential only", exact: true }).click();
   const logo = page.locator("[data-logo-formation]");
-  const navbarLogo = page.locator("header").getByRole("img", { name: "WOY Consulting", exact: true });
+  const navbarLogo = page.locator("header .logo-window");
+  const navbarImage = navbarLogo.getByRole("img", { name: "WOY Consulting", exact: true });
+  assert.equal(await navbarImage.getAttribute("src"), "/assets/woy-logo.png", "Navbar reuses the original source artwork");
   const footerLogo = page.getByRole("contentinfo").getByRole("img", { name: "WOY Consulting", exact: true });
   const sample = async time => {
     await logo.evaluate((element, time) => {
@@ -25,6 +27,7 @@ try {
       };
       return {
         circle: center(".mk-ring"), star: center(".mk-star"), compass: center(".mk-compass"),
+        guide: center("[data-logo-guide]"), starOutlineCenter: center(".mk-star-outline"), orbit: center(".mk-orbit"),
         outline: Number(style(".mk-star-outline").opacity), core: Number(style(".mk-star-core path").opacity),
         compassDetail: Number(style(".mk-compass-detail").opacity), needle: Number(style(".mk-needle").opacity),
         letters: Number(style(".mk-letters path").opacity), word: Number(style(".mk-consulting").opacity),
@@ -93,6 +96,17 @@ try {
     await page.setViewportSize({ width, height: 1000 });
     await logo.scrollIntoViewIfNeeded();
     const before = await logo.boundingBox();
+    // Sample both visible phases and the hidden reset. A fixed outer guide must
+    // remain concentric with the star even during nested outline scaling.
+    const centerSamples = [];
+    for (const time of [0, 360, 960, 1800, 2600, 3120, 3360, 3720, 3960, 4320, 4680, 5040, 5520, 6000, 6240, 7800, 10080, 10800, 11280, 11640, 11999]) {
+      const state = await sample(time);
+      for (const [name, center] of [["star", state.star], ["star outline", state.starOutlineCenter], ["rotating orbit", state.orbit]]) {
+        const offset = Math.hypot(center.x - state.guide.x, center.y - state.guide.y);
+        assert.ok(offset < .02, `${name} stays concentric with the pale guide at ${time}ms and ${width}px (offset ${offset}px)`);
+      }
+      centerSamples.push({ time, guide: state.guide, star: state.star, outline: state.starOutlineCenter, orbit: state.orbit });
+    }
     const separated = await sample(2600);
     assert.ok(separated.circle.x < separated.star.x && separated.star.x < separated.compass.x, "Reference symbols are separate and ordered");
     assert.equal(separated.outline, 1);
@@ -121,18 +135,18 @@ try {
     if (width === 390 || width === 1440) await logo.screenshot({ path: `reports/logo-complete-${width}.png` });
     const painted = await paintedBounds();
     assertAlignedLetters(painted);
-    const navbarPainted = await paintedBounds(navbarLogo);
-    assertAlignedLetters(navbarPainted);
+    const navbarBounds = await navbarLogo.boundingBox();
+    assert.equal(navbarBounds.width, 112);
+    assert.equal(navbarBounds.height, 60);
     const footerPainted = await paintedBounds(footerLogo);
     assertAlignedLetters(footerPainted);
-    assert.deepEqual(navbarPainted, footerPainted, "Navbar and footer share the reference static lockup");
     // The supplied reference measures W61px / O45px and Y38px / O45px.
     // Check the optical proportions rather than equating the static W with
     // the narrower, separately approved animated lettering.
-    assert.ok(Math.abs(navbarPainted.w.width / navbarPainted.ring.width - 61 / 45) < .025, "Static W has the reference's broader proportions");
-    assert.ok(Math.abs(navbarPainted.y.width / navbarPainted.ring.width - 38 / 45) < .025, "Static Y has the reference's proportions");
-    assert.deepEqual(navbarPainted.ring, painted.ring, "Static ring preserves the animated symbol geometry");
-    for (const staticLogo of [navbarLogo, footerLogo]) {
+    assert.ok(Math.abs(footerPainted.w.width / footerPainted.ring.width - 61 / 45) < .025, "Static W has the reference's broader proportions");
+    assert.ok(Math.abs(footerPainted.y.width / footerPainted.ring.width - 38 / 45) < .025, "Static Y has the reference's proportions");
+    assert.deepEqual(footerPainted.ring, painted.ring, "Static ring preserves the animated symbol geometry");
+    for (const staticLogo of [footerLogo]) {
       assert.match(await staticLogo.locator("text").evaluate(node => getComputedStyle(node).fontFamily), /^Arial/, "Static caption uses the reference sans serif");
       const captionRounding = await staticLogo.locator("text").evaluate(node => Math.abs(node.getBBox().width - 222) * node.getScreenCTM().a);
       assert.ok(captionRounding < 1.1, "Caption tracks across the lockup within one rendered pixel");
@@ -141,7 +155,7 @@ try {
       await navbarLogo.screenshot({ path: `reports/navbar-logo-${width}.png` });
       await footerLogo.screenshot({ path: `reports/footer-logo-${width}.png` });
     }
-    results.push({ width, separated, merging, complete, painted, navbarPainted, footerPainted });
+    results.push({ width, centerSamples, separated, merging, complete, painted, navbarBounds, footerPainted });
   }
   await page.emulateMedia({ reducedMotion: "reduce" });
   assert.equal(await logo.locator(".mk-ring").evaluate(el => getComputedStyle(el).animationName), "none");
@@ -150,6 +164,8 @@ try {
     assert.equal(await logo.locator(selector).first().evaluate(el => getComputedStyle(el).opacity), "1", `Complete reduced-motion mark: ${selector}`);
   }
   assertAlignedLetters(await paintedBounds());
+  const reducedCenter = await sample(0);
+  assert.ok(Math.hypot(reducedCenter.star.x - reducedCenter.guide.x, reducedCenter.star.y - reducedCenter.guide.y) < .02, "Reduced-motion final symbol retains the guide centre");
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.reload({ waitUntil: "load" });
   await page.getByRole("contentinfo").scrollIntoViewIfNeeded();
@@ -159,5 +175,5 @@ try {
   await page.waitForFunction(() => !document.querySelector("[data-logo-formation]").classList.contains("is-paused"));
   assert.ok(await logo.evaluate(el => el.getAnimations({ subtree: true }).every(animation => animation.playState === "running")), "All tracks resume together");
   fs.writeFileSync("reports/logo-formation.json", JSON.stringify({ results, reducedMotion: true, offscreenPause: true, resume: true }, null, 2));
-  console.log("Logo formation: separate symbols, convergence, complete lockup, aligned letter heights, reference static logo proportions, responsive geometry, reduced motion and off-screen pause passed.");
+  console.log("Logo formation: concentric guide and star throughout 21 animation samples at five widths, separate symbols, convergence, complete lockup, aligned letter heights, reference static logo proportions, responsive geometry, reduced motion and off-screen pause passed.");
 } finally { await browser.close(); }

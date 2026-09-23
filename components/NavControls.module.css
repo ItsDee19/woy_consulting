@@ -1,0 +1,12 @@
+.navigation.navigation { margin-left: auto; }
+.navigation a { white-space: nowrap; }
+.controls { display: flex; align-items: center; gap: .65rem; flex-shrink: 0; }
+.toggle { display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; border: 1px solid var(--border); border-radius: 50%; color: var(--muted-foreground); background: transparent; }
+.toggle:hover { color: var(--foreground); background: var(--muted); }
+.toggle:active { transform: scale(.96); }
+@media (prefers-reduced-motion: reduce) { .toggle:active { transform: none; } }
+
+@media (max-width: 1050px) {
+  .header.header { gap: 16px; }
+  .navigation.navigation { gap: 16px; }
+}

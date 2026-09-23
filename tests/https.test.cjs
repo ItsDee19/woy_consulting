@@ -79,7 +79,7 @@ test("loopback addresses remain on HTTP even when explicitly configured", async 
   for (const host of ["localhost", "local.localhost", "localhost.", "0.0.0.0", "127.0.0.1", "127.2.3.4", "[::1]", "[::ffff:127.0.0.1]"]) {
     const rules = await redirectRules({ SITE_URL: `http://${host}:5173` });
     assert.equal(redirect(rules, { host, pathname: "/about" }), null, host);
-    assert.equal(redirect(rules, { host, pathname: "/expertise" }).parsedDestination.pathname, "/");
+    assert.equal(redirect(rules, { host, pathname: "/expertise" }), null);
   }
 });
 
@@ -114,7 +114,7 @@ test("invalid public origins fail configuration instead of entering the allowlis
 });
 
 
-test("retired expertise page permanently redirects to the homepage section in every environment", async () => {
+test("recreated top-level pages are served directly in every environment", async () => {
   for (const environment of [
     { NODE_ENV: "development" },
     { NODE_ENV: "production" },
@@ -122,24 +122,65 @@ test("retired expertise page permanently redirects to the homepage section in ev
   ]) {
     const rules = await redirectRules(environment);
     const host = environment.SITE_URL ? "example.com" : "localhost:5173";
-    const result = redirect(rules, { host, protocol: "https", pathname: "/expertise", query: { source: "old-link" } });
-    assert.ok(result);
-    assert.equal(result.permanent, true);
-    assert.equal(result.parsedDestination.pathname, "/");
-    assert.equal(result.parsedDestination.hash, "#expertise");
-    assert.deepEqual(result.parsedDestination.query, { source: "old-link" });
-    assert.equal(redirect(rules, { host, protocol: "https", pathname: "/" }), null);
-    assert.equal(redirect(rules, { host, protocol: "https", pathname: "/expertise-unrelated" }), null);
+    for (const pathname of ["/", "/expertise", "/work", "/people", "/approach", "/expertise-unrelated"]) {
+      assert.equal(redirect(rules, { host, protocol: "https", pathname, query: { source: "old-link" } }), null);
+    }
   }
 });
 
-test("expertise migration upgrades configured public HTTP requests before the section redirect", async () => {
+test("recreated pages still upgrade configured public HTTP requests", async () => {
   const rules = await redirectRules({ SITE_URL: "https://example.com" });
-  const first = redirect(rules, { host: "example.com", pathname: "/expertise" });
+  for (const pathname of ["/expertise", "/work", "/people", "/approach"]) {
+    const first = redirect(rules, { host: "example.com", pathname });
+    assert.equal(first.parsedDestination.protocol, "https:");
+    assert.equal(first.parsedDestination.hostname, "example.com");
+    assert.equal(first.parsedDestination.pathname, pathname);
+    assert.equal(redirect(rules, { host: "example.com", protocol: "https", pathname }), null);
+  }
+});
+
+test("source case links retain published case destinations and query parameters", async () => {
+  const destinations = [
+    ["education-transformation", "education-institution-transformation"],
+    ["insurance-leadership", "insurance-senior-sales-leadership"],
+    ["consultative-selling", "it-ites-consultative-selling"],
+    ["automotive-alignment", "automotive-leadership-assimilation"],
+    ["entrepreneurial-mindset", "financial-services-entrepreneurial-mindset"],
+    ["medical-technology-leadership", "medical-technology-strategic-thinking"],
+  ];
+  for (const NODE_ENV of ["development", "production"]) {
+    const rules = await redirectRules({ NODE_ENV });
+    for (const [source, destination] of destinations) {
+      const result = redirect(rules, { host: "localhost:5173", pathname: `/work/${source}`, query: { source: "expertise" } });
+      assert.ok(result);
+      assert.equal(result.permanent, true);
+      assert.equal(result.parsedDestination.pathname, `/case-studies/${destination}`);
+      assert.deepEqual(result.parsedDestination.query, { source: "expertise" });
+    }
+    assert.equal(redirect(rules, { host: "localhost:5173", pathname: "/work/unknown-case" }), null, "Unknown source paths are not sent to an unrelated case");
+  }
+});
+
+test("source profile links land on the matching established practitioner", async () => {
+  for (const NODE_ENV of ["development", "production"]) {
+    const rules = await redirectRules({ NODE_ENV });
+    for (const slug of ["vipin-tuteja", "sandeep-bidani", "kannan-swaminathan"]) {
+      const result = redirect(rules, { host: "localhost:5173", pathname: `/people/${slug}`, query: { source: "people" } });
+      assert.ok(result);
+      assert.equal(result.permanent, true);
+      assert.equal(result.parsedDestination.pathname, "/practitioners");
+      assert.equal(result.parsedDestination.hash, `#${slug}`);
+      assert.deepEqual(result.parsedDestination.query, { source: "people" });
+    }
+    assert.equal(redirect(rules, { host: "localhost:5173", pathname: "/people/unknown-person" }), null);
+  }
+});
+
+test("HTTPS upgrade precedes a source compatibility redirect", async () => {
+  const rules = await redirectRules({ SITE_URL: "https://example.com" });
+  const first = redirect(rules, { host: "example.com", pathname: "/work/education-transformation" });
   assert.equal(first.parsedDestination.protocol, "https:");
-  assert.equal(first.parsedDestination.hostname, "example.com");
-  assert.equal(first.parsedDestination.pathname, "/expertise");
-  const second = redirect(rules, { host: "example.com", protocol: "https", pathname: "/expertise" });
-  assert.equal(second.parsedDestination.pathname, "/");
-  assert.equal(second.parsedDestination.hash, "#expertise");
+  assert.equal(first.parsedDestination.pathname, "/work/education-transformation");
+  const second = redirect(rules, { host: "example.com", protocol: "https", pathname: first.parsedDestination.pathname });
+  assert.equal(second.parsedDestination.pathname, "/case-studies/education-institution-transformation");
 });
