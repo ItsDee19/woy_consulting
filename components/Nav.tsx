@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { List, X, Sun, Moon, ArrowRight } from "@phosphor-icons/react";
+import { List, X, Sun, Moon, ArrowUpRight } from "@phosphor-icons/react";
 import { Mark } from "./Mark";
+import styles from "./Nav.module.css";
 import { nav, site } from "@/lib/content";
 import { hasPreferenceConsent } from "@/lib/cookie-consent";
 
@@ -23,7 +24,7 @@ export function Nav() {
   const dark = useSyncExternalStore(subscribeTheme, () => document.documentElement.getAttribute("data-theme") === "dark", () => false);
   const sentinel = useRef<HTMLDivElement>(null);
 
-  /* border appears only once the page has moved. no scroll listener. */
+  /* Add a full-width separator after the page moves, without a scroll listener. */
   useEffect(() => {
     const el = sentinel.current;
     if (!el) return;
@@ -59,63 +60,38 @@ export function Nav() {
     <>
       <div ref={sentinel} aria-hidden className="absolute left-0 top-0 h-px w-px" />
 
-      <header
-        className={`sticky top-0 z-50 border-b transition-colors duration-300 ${
-          stuck ? "border-line" : "border-transparent"
-        }`}
-        style={{
-          background: "color-mix(in srgb, var(--c-bg) 88%, transparent)",
-          backdropFilter: "blur(14px) saturate(140%)",
-          WebkitBackdropFilter: "blur(14px) saturate(140%)",
-        }}
-      >
-        <div className="shell flex h-[72px] items-center gap-4 xl:gap-8">
-          <Link href="/" aria-label={`${site.name}, home`} className="shrink-0 text-red">
-            <Mark className="h-[42px] w-[92px]" />
+      <header className={styles.header} data-stuck={stuck || undefined}>
+        <div className={`shell ${styles.bar}`}>
+          <Link href="/" aria-label={`${site.name}, home`} className={styles.brandLink}>
+            <Mark className={styles.brand} />
           </Link>
 
-          <nav aria-label="Primary" className="ml-auto hidden items-center gap-4 lg:flex xl:gap-6">
+          <nav aria-label="Primary" className={styles.primary}>
             {nav.map((item) => {
               const active =
                 !item.href.includes("#") &&
                 (pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href + "/")));
               return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  aria-current={active ? "page" : undefined}
-                  className={`group relative py-1.5 text-sm transition-colors ${
-                    active ? "text-ink" : "text-ink2 hover:text-ink"
-                  }`}
-                >
+                <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={styles.navLink}>
                   {item.label}
-                  <span
-                    className={`absolute bottom-0 left-0 h-px w-full origin-left bg-red transition-transform duration-300 ${
-                      active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
-                    }`}
-                  />
                 </Link>
               );
             })}
           </nav>
 
-          <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0">
+          <div className={styles.actions}>
+            <a href={site.ctaHref} className={styles.conversation}>
+              <span>{site.cta}</span><ArrowUpRight size={18} aria-hidden="true" />
+            </a>
             <button
               type="button"
               onClick={toggleTheme}
               aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
-              className="grid h-11 w-11 place-items-center rounded-[2px] border border-control text-ink2 transition-colors hover:border-line2 hover:text-ink"
+              title={dark ? "Switch to light theme" : "Switch to dark theme"}
+              className={styles.themeButton}
             >
-              {dark ? <Sun size={18} /> : <Moon size={18} />}
+              {dark ? <Sun size={19} aria-hidden="true" /> : <Moon size={19} aria-hidden="true" />}
             </button>
-
-            <Link
-              href={site.ctaHref}
-              className="hidden whitespace-nowrap rounded-[2px] bg-action px-5 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-action-hover hover:shadow-[0_8px_22px_-10px_rgba(205,20,33,.65)] active:translate-y-px lg:inline-flex"
-            >
-              {site.cta}
-            </Link>
-
             <button
               type="button"
               ref={menuButton}
@@ -123,35 +99,30 @@ export function Nav() {
               aria-expanded={open}
               aria-controls="mobile-nav"
               aria-label={open ? "Close menu" : "Open menu"}
-              className="grid h-11 w-11 place-items-center text-ink lg:hidden"
+              className={styles.menuButton}
             >
-              {open ? <X size={24} /> : <List size={24} />}
+              {open ? <X size={23} aria-hidden="true" /> : <List size={23} aria-hidden="true" />}
             </button>
           </div>
         </div>
 
         {open && (
-          <nav id="mobile-nav" aria-label="Mobile" className="max-h-[calc(100dvh-72px)] overflow-y-auto border-t border-line lg:hidden">
-            <div className="shell flex flex-col pb-7 pt-2">
+          <nav id="mobile-nav" aria-label="Mobile" className={styles.mobile}>
+            <div className={`shell ${styles.mobileInner}`}>
               {nav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setMenuPath(null)}
-                  aria-current={pathname === item.href ? "page" : undefined}
-                  className="border-b border-line py-3.5 text-lg text-ink"
+                  aria-current={pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href + "/")) ? "page" : undefined}
+                  className={styles.mobileLink}
                 >
-                  {item.label}
+                  {item.label}<ArrowUpRight size={18} aria-hidden="true" />
                 </Link>
               ))}
-              <Link
-                href={site.ctaHref}
-                onClick={() => setMenuPath(null)}
-                className="mt-5 inline-flex items-center justify-center gap-2 rounded-[2px] bg-action px-5 py-3.5 font-medium text-white"
-              >
-                {site.cta}
-                <ArrowRight size={17} weight="bold" />
-              </Link>
+              <a href={site.ctaHref} onClick={() => setMenuPath(null)} className={styles.mobileConversation}>
+                {site.cta}<ArrowUpRight size={19} aria-hidden="true" />
+              </a>
             </div>
           </nav>
         )}

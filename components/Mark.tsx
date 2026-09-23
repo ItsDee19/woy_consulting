@@ -22,10 +22,10 @@ export function Mark({
         strokeLinecap="square"
         strokeLinejoin="miter"
       >
-        <path d={MARK.w} />
-        <path d={MARK.yFork} />
-        <path d={MARK.yStem} />
-        <circle cx={MARK.cx} cy={MARK.cy} r={MARK.r} />
+        <path data-logo-letter="w" d={MARK.w} />
+        <path data-logo-letter="y" d={MARK.yFork} />
+        <path data-logo-letter="y" d={MARK.yStem} />
+        <circle data-logo-ring cx={MARK.cx} cy={MARK.cy} r={MARK.r} />
         <g strokeWidth={MARK.spokeStroke}>
           {MARK.spokes.map((d) => (
             <path key={d} d={d} />

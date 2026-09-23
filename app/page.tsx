@@ -27,11 +27,11 @@ export default function Home() {
       {/* ------------------------------------------------------------ hero */}
       <section className={styles.hero} data-home-hero aria-labelledby="home-title">
         <div className={`shell ${styles.content}`}>
-          <div className="grid w-full items-center gap-8 lg:grid-cols-[1.12fr_1fr] lg:gap-14">
-            <div className="order-2 lg:order-1">
+          <div className={styles.heroGrid}>
+            <div className={styles.heroCopy}>
               <p className={`mb-5 flex items-center gap-3 text-xs font-semibold tracking-[0.06em] ${styles.eyebrow}`}><span className="h-px w-8 bg-current" aria-hidden />Partner-led consulting · Since 2015</p>
-              <h1 id="home-title" className="t-display">
-                Turning strategic intent into <em className="text-red">sustained performance.</em>
+              <h1 id="home-title" className={styles.title}>
+                <span>Turning strategic intent into</span>{" "}<em>sustained performance.</em>
               </h1>
               <p className="mt-6 max-w-[34ch] text-lg font-light leading-relaxed text-ink2 md:text-xl">
                 We partner with CEOs, founders and leadership teams to align strategy,
@@ -52,7 +52,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="order-1 flex flex-col items-center gap-5 lg:order-2">
+            <div className={styles.heroIdentity}>
               <LogoFormation className="w-full max-w-[520px]" />
               <div className={styles.logoCaption} data-logo-caption>
                 <p className={styles.captionTitle}>Win Over Yourself<span>.</span></p>

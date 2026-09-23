@@ -163,6 +163,18 @@ try {
   assert.match(await page.title(), /not found/i);
   assert.match(await page.locator('meta[name="robots"]').last().getAttribute("content"), /noindex/);
 
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(base, { waitUntil: "load" });
+    await page.getByRole("link", { name: "Explore our philosophy and approach", exact: true }).click();
+    await page.waitForURL(base + "/about#philosophy");
+    await page.waitForFunction(() => {
+      const section = document.getElementById("philosophy");
+      const header = document.querySelector("body > header");
+      return section && header && section.getBoundingClientRect().top >= header.getBoundingClientRect().bottom - 1 && section.getBoundingClientRect().top < innerHeight;
+    });
+    assert.equal(await page.locator("#philosophy h3").count(), 3, "About explains all three logo symbols");
+  }
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(base, { waitUntil: "load" });
   await page.getByRole("button", { name: "Open menu" }).click();
@@ -363,7 +375,7 @@ try {
   const saveBounds = await page.getByRole("button", { name: "Save preferences", exact: true }).boundingBox();
   assert.ok(saveBounds && saveBounds.y >= 0 && saveBounds.y + saveBounds.height <= 569, "Cookie action reachable on a small screen");
   await page.screenshot({ path: path.join(reportDir, "cookie-mobile.png") });
-  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "plain light/dark hero, updated philosophy caption and responsive containment, footer email CTAs, Contact and back-to-top navigation, cookie choices, theme memory, Home/footer Expertise navigation; Expertise absent from both navbars, four-area expertise accordion, all current/legacy deep links, keyboard and no-JS disclosures, site-wide serif typography, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/hover/focus/touch/reduced motion/biography disclosure, client disclosure, Approach explorer keyboard/click/next/previous/wrapping/stable panels/reduced motion/no-JS fallback, validation, unavailable delivery, mocked success/duplicate prevention passed" };
+  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "plain light/dark hero, updated philosophy caption and responsive containment, footer email CTAs, Contact and back-to-top navigation, cookie choices, theme memory, Home/footer Expertise navigation; Expertise absent from both navbars, four-area expertise accordion, all current/legacy deep links, keyboard and no-JS disclosures, site-wide serif typography, homepage philosophy link to About anchor clear of sticky navigation, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/hover/focus/touch/reduced motion/biography disclosure, client disclosure, Approach explorer keyboard/click/next/previous/wrapping/stable panels/reduced motion/no-JS fallback, validation, unavailable delivery, mocked success/duplicate prevention passed" };
   fs.writeFileSync(path.join(reportDir, "browser-check.json"), JSON.stringify(report, null, 2));
   console.log(JSON.stringify({ pages: pages.length, jsErrors: errors.length, accessibility: accessibility.length, overflow: overflow.length, brokenLinks: brokenLinks.length }));
   assert.equal(errors.length, 0, "Browser JS errors");

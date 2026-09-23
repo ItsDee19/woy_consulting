@@ -11,6 +11,7 @@ try {
   await page.goto(base, { waitUntil: "load" });
   await page.getByRole("button", { name: "Essential only", exact: true }).click();
   const logo = page.locator("[data-logo-formation]");
+  const navbarLogo = page.locator("header").getByRole("img", { name: "WOY Consulting", exact: true });
   const sample = async time => {
     await logo.evaluate((element, time) => {
       for (const animation of element.getAnimations({ subtree: true })) { animation.pause(); animation.currentTime = time; }
@@ -34,7 +35,7 @@ try {
   };
   // Rasterize the live SVG geometry through the browser's stroke renderer so
   // square caps and miter tips count; SVG getBBox() omits them in Chromium.
-  const paintedBounds = () => logo.evaluate(element => {
+  const paintedBounds = (target = logo) => target.evaluate(element => {
     const scale = 8;
     const origin = { x: 50, y: 30 };
     const measure = selector => {
@@ -71,10 +72,10 @@ try {
       return { top: origin.y + top / scale, bottom: origin.y + (bottom + 1) / scale };
     };
     return {
-      ring: measure(".mk-ring"),
+      ring: measure(".mk-ring, [data-logo-ring]"),
       w: measure('[data-logo-letter="w"]'),
       y: measure('[data-logo-letter="y"]'),
-      strokes: [...element.querySelectorAll(".mk-ring, .mk-letters path")].map(node => getComputedStyle(node).strokeWidth),
+      strokes: [...element.querySelectorAll(".mk-ring, [data-logo-ring], [data-logo-letter]")].map(node => getComputedStyle(node).strokeWidth),
     };
   });
   const assertAlignedLetters = bounds => {
@@ -116,7 +117,11 @@ try {
     if (width === 390 || width === 1440) await logo.screenshot({ path: `reports/logo-complete-${width}.png` });
     const painted = await paintedBounds();
     assertAlignedLetters(painted);
-    results.push({ width, separated, merging, complete, painted });
+    const navbarPainted = await paintedBounds(navbarLogo);
+    assertAlignedLetters(navbarPainted);
+    assert.deepEqual(navbarPainted, painted, "Static and animated logos share the same painted geometry");
+    if (width === 390 || width === 1440) await navbarLogo.screenshot({ path: `reports/navbar-logo-${width}.png` });
+    results.push({ width, separated, merging, complete, painted, navbarPainted });
   }
   await page.emulateMedia({ reducedMotion: "reduce" });
   assert.equal(await logo.locator(".mk-ring").evaluate(el => getComputedStyle(el).animationName), "none");
@@ -134,5 +139,5 @@ try {
   await page.waitForFunction(() => !document.querySelector("[data-logo-formation]").classList.contains("is-paused"));
   assert.ok(await logo.evaluate(el => el.getAnimations({ subtree: true }).every(animation => animation.playState === "running")), "All tracks resume together");
   fs.writeFileSync("reports/logo-formation.json", JSON.stringify({ results, reducedMotion: true, offscreenPause: true, resume: true }, null, 2));
-  console.log("Logo formation: separate symbols, convergence, complete lockup, aligned letter heights including strokes, responsive geometry, reduced motion and off-screen pause passed.");
+  console.log("Logo formation: separate symbols, convergence, complete lockup, matching static and animated letter heights including strokes, responsive geometry, reduced motion and off-screen pause passed.");
 } finally { await browser.close(); }

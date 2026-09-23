@@ -6,8 +6,8 @@ import { contentPageGraph, schemaId } from "@/lib/structured-data";
 import { pageMetadata } from "@/lib/metadata";
 import { Reveal } from "@/components/Reveal";
 import { ClientGrid } from "@/components/ClientLogos";
-import { MARK } from "@/components/mark-geometry";
-import { clientLogos, logoDisclaimer, site } from "@/lib/content";
+import { MARK, SOURCE_SYMBOLS } from "@/components/mark-geometry";
+import { clientLogos, logoDisclaimer, site, symbols } from "@/lib/content";
 import styles from "./about.module.css";
 
 export const metadata = pageMetadata(
@@ -16,26 +16,14 @@ export const metadata = pageMetadata(
   "/about"
 );
 
-const principles = [
-  {
-    key: "circle",
-    name: "The circle",
-    title: "Grow with a shared vision.",
-    body: "Connect self-aware leadership with a unified direction for the organisation.",
-  },
-  {
-    key: "star",
-    name: "The five-point star",
-    title: "Make excellence a habit.",
-    body: "Build the capability to set benchmarks, deliver value and sustain your advantage.",
-  },
-  {
-    key: "compass",
-    name: "The compass",
-    title: "Stay clear. Stay adaptable.",
-    body: "Navigate uncertainty with the judgement, agility and resilience to keep moving.",
-  },
-] as const;
+type SymbolKey = (typeof symbols)[number]["key"];
+
+// Expanded from the logo philosophy in the September 2026 introduction, page 4.
+const principleDetails: Record<SymbolKey, string> = {
+  ring: "Growth begins with self-awareness in leaders. The circle brings that personal perspective together with the wider organisation: connecting diverse viewpoints into a unified strategy, so leadership, teams and business priorities support sustainable growth and continuous innovation.",
+  star: "The five-point star represents the pursuit of excellence across leadership and business. It is a commitment to setting benchmarks, building the capability to deliver exceptional value and sustaining a competitive advantage through the quality of everyday decisions and execution.",
+  needle: "The compass represents direction in changing conditions. It calls on leaders and organisations to navigate uncertainty with clarity and resilience, respond proactively to market shifts and keep evolving so the business remains relevant, adaptable and competitive.",
+};
 
 const differences = [
   {
@@ -61,18 +49,30 @@ const featuredBrands = [
   "Maruti Suzuki", "Capgemini", "Dr. Reddy's", "GE HealthCare",
 ];
 
-function PhilosophySymbol({ part }: { part?: "circle" | "star" | "compass" }) {
+function PhilosophySymbol({ part }: { part?: SymbolKey }) {
   return (
-    <svg viewBox="136 39 88 100" fill="none" aria-hidden="true">
-      {(!part || part === "circle" || part === "compass") && (
+    <svg viewBox="120 34 120 120" fill="none" aria-hidden="true" focusable="false">
+      {(!part || part === "ring") && (
         <circle cx={MARK.cx} cy={MARK.cy} r={MARK.r} stroke="currentColor" strokeWidth={MARK.ringStroke} />
       )}
-      {(!part || part === "star") && (
-        <g stroke="currentColor" strokeWidth={MARK.spokeStroke}>
-          {MARK.spokes.map((path) => <path key={path} d={path} />)}
+      {!part && (
+        <>
+          <g stroke="currentColor" strokeWidth={MARK.spokeStroke}>
+            {MARK.spokes.map((path) => <path key={path} d={path} />)}
+          </g>
+          <path d={MARK.needle} fill="currentColor" />
+        </>
+      )}
+      {part === "star" && <path d={SOURCE_SYMBOLS.starOutline} stroke="currentColor" strokeWidth="3.1" strokeLinejoin="round" />}
+      {part === "needle" && (
+        <g stroke="currentColor">
+          <circle cx={MARK.cx} cy={MARK.cy} r="40" strokeWidth="1" />
+          <circle cx={MARK.cx} cy={MARK.cy} r="34" strokeWidth="1.25" />
+          <path d={SOURCE_SYMBOLS.compassPoints} strokeWidth="1.5" />
+          <path d="M180 50v88M136 94h88" strokeWidth="1" />
+          <path d="M180 63v31l5-12Z M211 94h-31l12 5Z M180 125V94l-5 12Z M149 94h31l-12-5Z" fill="currentColor" stroke="none" />
         </g>
       )}
-      {(!part || part === "compass") && <path d={MARK.needle} fill="currentColor" />}
     </svg>
   );
 }
@@ -115,25 +115,34 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className={styles.philosophy} aria-labelledby="philosophy-title">
+      <section id="philosophy" className={styles.philosophy} aria-labelledby="philosophy-title">
         <div className={`shell ${styles.philosophyGrid}`}>
           <Reveal className={styles.philosophyIdentity}>
-            <p className={styles.eyebrow}>The idea behind our name</p>
+            <p className={styles.eyebrow}>Our philosophy, in our name and mark</p>
             <h2 id="philosophy-title">Win Over<br /><span>Yourself.</span></h2>
+            <p className={styles.philosophyIntro}>
+              WOY stands for Win Over Yourself. Our guiding principle connects
+              personal growth with organisational progress: greater self-awareness,
+              a commitment to excellence and the ability to adapt.
+            </p>
             <div className={styles.philosophySignature}>
               <div className={styles.brandSymbol}><PhilosophySymbol /></div>
-              <p>Meaningful transformation starts with the capacity to grow, excel and adapt.</p>
+              <p>Three symbols become one mark. Together, they express how leaders
+                and organisations can grow, excel and navigate change.</p>
             </div>
+            <Link href="/approach" className={`${styles.textLink} ${styles.philosophyLink}`}>
+              How this shapes our 4D approach <ArrowRight size={18} aria-hidden="true" />
+            </Link>
           </Reveal>
           <Reveal delay={0.08}>
             <ul className={styles.principles}>
-              {principles.map((principle) => (
-                <li key={principle.key}>
-                  <div className={styles.partSymbol}><PhilosophySymbol part={principle.key} /></div>
+              {symbols.map((symbol) => (
+                <li key={symbol.key}>
+                  <div className={styles.partSymbol}><PhilosophySymbol part={symbol.key} /></div>
                   <div>
-                    <p className={styles.symbolLabel}>{principle.name}</p>
-                    <h3>{principle.title}</h3>
-                    <p className={styles.principleBody}>{principle.body}</p>
+                    <p className={styles.symbolLabel}>{symbol.name}</p>
+                    <h3>{symbol.lede}</h3>
+                    <p className={styles.principleBody}>{principleDetails[symbol.key]}</p>
                   </div>
                 </li>
               ))}

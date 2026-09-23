@@ -5,14 +5,6 @@ import { MARK, SOURCE_SYMBOLS } from "./mark-geometry";
 
 // The reference symbols are an introduction to the mark, not replacement artwork.
 // The ring, spokes and north marker retain the shared MARK geometry.
-// Animation-only letter coordinates preserve their widths and 4-unit strokes.
-// Their square caps and miter tips align to the ring's painted y=58..130 bounds;
-// scaling a group would also compress the stroke and leave the W tips too tall.
-const formationLetters = {
-  w: "M70.4 60.474 L88.4 123.166 L106.4 67.802 L124.4 123.166 L142.4 60.474",
-  yFork: "M217.3 60.808 L243.7 94.5 L270.1 60.808",
-  yStem: "M243.7 94.5 L243.7 128",
-} as const;
 const { starOutline, compassPoints } = SOURCE_SYMBOLS;
 const dialTicks = Array.from({ length: 48 }, (_, index) => index * 7.5);
 
@@ -93,9 +85,9 @@ export function LogoFormation({ className = "" }: { className?: string }) {
         </g>
 
         <g className="mk-letters" fill="none" stroke="url(#woy-sheen)" strokeWidth={MARK.ringStroke} strokeLinecap="square" strokeLinejoin="miter">
-          <path data-logo-letter="w" d={formationLetters.w} pathLength="1" />
-          <path data-logo-letter="y" d={formationLetters.yFork} pathLength="1" />
-          <path data-logo-letter="y" d={formationLetters.yStem} pathLength="1" />
+          <path data-logo-letter="w" d={MARK.w} pathLength="1" />
+          <path data-logo-letter="y" d={MARK.yFork} pathLength="1" />
+          <path data-logo-letter="y" d={MARK.yStem} pathLength="1" />
         </g>
         <text className="mk-consulting" x={MARK.wordX} y={MARK.wordY - 2} textAnchor="middle" fill="var(--c-logo-red)">CONSULTING</text>
       </svg>

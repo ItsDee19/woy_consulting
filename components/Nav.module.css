@@ -1,0 +1,115 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--c-bg);
+}
+.header::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: var(--c-line2);
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none;
+}
+.header[data-stuck]::after { opacity: 1; }
+.bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: clamp(1.25rem, 2.5vw, 2.5rem);
+  height: var(--header-height);
+}
+.bar::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: clamp(1.25rem, 5vw, 4.5rem);
+  right: clamp(1.25rem, 5vw, 4.5rem);
+  height: 1px;
+  background: var(--c-line2);
+  pointer-events: none;
+}
+.brandLink { display: flex; flex-shrink: 0; align-items: center; color: var(--c-logo-red); }
+.brand { display: block; width: 148px; height: 96px; }
+.primary { display: flex; align-items: center; gap: clamp(1.15rem, 2.1vw, 2rem); margin-left: auto; }
+.navLink {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  white-space: nowrap;
+  font-size: 1rem;
+  color: var(--c-ink2);
+  transition: color .2s;
+}
+.navLink::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 1px;
+  height: 1px;
+  background: var(--c-red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .2s;
+}
+.navLink:hover, .navLink[aria-current] { color: var(--c-ink); }
+.navLink:hover::after, .navLink:focus-visible::after, .navLink[aria-current]::after { transform: scaleX(1); }
+.actions { display: flex; flex-shrink: 0; align-items: center; gap: 1.4rem; }
+.conversation {
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
+  min-height: 44px;
+  color: var(--c-red);
+  border-bottom: 1px solid currentColor;
+  font-size: 1rem;
+  white-space: nowrap;
+  transition: color .2s;
+}
+.conversation svg { transition: transform .2s; }
+.conversation:hover { color: var(--c-ink); }
+.conversation:hover svg { transform: translate(2px, -2px); }
+.themeButton, .menuButton {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  color: var(--c-ink2);
+  transition: color .2s, background-color .2s;
+}
+.themeButton { border: 1px solid var(--c-line2); border-radius: 50%; }
+.themeButton:hover, .menuButton:hover { color: var(--c-ink); background: var(--c-sunken); }
+.menuButton, .mobile { display: none; }
+@media (max-width: 1099px) and (min-width: 1024px) {
+  .bar { gap: 1.25rem; }
+  .brand { width: 126px; }
+  .primary { gap: 1rem; }
+  .actions { gap: .85rem; }
+  .navLink, .conversation { font-size: .9375rem; }
+}
+@media (max-width: 1023px) {
+  .brand { width: 120px; height: 78px; }
+  .primary, .conversation { display: none; }
+  .actions { margin-left: auto; gap: .65rem; }
+  .menuButton { display: grid; }
+  .mobile { display: block; max-height: calc(100dvh - var(--header-height)); overflow-y: auto; overscroll-behavior: contain; }
+  .mobileInner { padding-top: .5rem; padding-bottom: 1.75rem; }
+  .mobileLink { display: flex; justify-content: space-between; align-items: center; gap: 1rem; min-height: 58px; padding-block: .75rem; border-bottom: 1px solid var(--c-line); font-size: 1.35rem; transition: color .2s; }
+  .mobileLink svg { color: var(--c-ink3); }
+  .mobileLink[aria-current], .mobileLink:hover { color: var(--c-red); }
+  .mobileConversation { display: flex; justify-content: space-between; align-items: center; gap: 1rem; min-height: 52px; padding: .8rem 1rem; margin-top: 1.5rem; color: white; background: var(--c-action); transition: background-color .2s; }
+  .mobileConversation:hover { background: var(--c-action-hover); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .header::after, .navLink, .navLink::after, .conversation, .conversation svg, .themeButton, .menuButton, .mobileLink, .mobileConversation { transition: none; }
+  .conversation:hover svg { transform: none; }
+}
+@media (forced-colors: active) {
+  .bar::after, .header::after, .navLink::after { background: CanvasText; }
+  .brandLink { color: LinkText; }
+  .mobileConversation { border: 1px solid ButtonText; }
+}

@@ -21,11 +21,15 @@ export const MARK = {
   ringStroke: 4,
   spokeStroke: 3.4,
 
-  /** W, drawn as one continuous polyline */
-  w: "M70.4 56 L88.4 133 L106.4 65 L124.4 133 L142.4 56",
+  /**
+   * Letter heights align square caps and miter tips to the ring's painted
+   * y=58..130 bounds. Coordinates preserve the original widths and 4-unit
+   * strokes; scaling a group would also compress their stroke weight.
+   */
+  w: "M70.4 60.474 L88.4 123.166 L106.4 67.802 L124.4 123.166 L142.4 60.474",
   /** Y, as the fork and the stem */
-  yFork: "M217.3 56 L243.7 94.5 L270.1 56",
-  yStem: "M243.7 94.5 L243.7 133",
+  yFork: "M217.3 60.808 L243.7 94.5 L270.1 60.808",
+  yStem: "M243.7 94.5 L243.7 128",
 
   /** five spokes, ordered north, east, west, south west, south east */
   spokes: [

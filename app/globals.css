@@ -5,6 +5,7 @@
 
 /* ---------------------------------------------------------------- tokens --- */
 :root {
+  --header-height: 104px;
   --font-editorial: Georgia, "Times New Roman", Times, serif;
   --c-bg:      #FBF9F7;   /* warm white */
   --c-raised:  #FFFFFF;
@@ -32,6 +33,8 @@
   --c-blockline:#262D37;
   color-scheme: light;
 }
+
+@media (max-width: 1023px) { :root { --header-height: 80px; } }
 
 [data-theme="dark"] {
   --c-bg:      #0E1013;
@@ -85,7 +88,7 @@
 @layer base {
   * { border-color: var(--c-line); }
 
-  html { scroll-behavior: smooth; scroll-padding-top: 6rem; scrollbar-gutter: stable; }
+  html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-height) + 1rem); scrollbar-gutter: stable; }
   * { scrollbar-color: var(--c-ink3) var(--c-sunken); scrollbar-width: thin; }
   button, a, summary, input[type="checkbox"] { -webkit-tap-highlight-color: transparent; }
   button:enabled, summary { cursor: pointer; }
@@ -141,7 +144,7 @@
    LOGO FORMATION: one shared clock, no delayed or independent loops.
    0–26%: circle / outlined star / compass. 26–46%: convergence.
    46–58%: wordmark resolves. 58–84%: hold. 84–100%: fade and reset.
-   Ring and spokes use mark-geometry.ts; animation-only letters align to the ring height.
+   Shared mark-geometry.ts keeps static and animated letters aligned to the ring height.
    ============================================================================= */
 .logo-formation { --mk-duration: 12s; --mk-travel: cubic-bezier(.65, 0, .2, 1); }
 .mk-ring, .mk-star, .mk-star-outline, .mk-compass, .mk-compass-rose, .mk-orbit, .mk-lock-pulse {
