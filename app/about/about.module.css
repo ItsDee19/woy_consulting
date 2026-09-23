@@ -79,30 +79,9 @@
 .difference h3 { font-size: 1.06rem; font-weight: 600; line-height: 1.4; letter-spacing: -0.02em; }
 .difference p { margin-top: 0.5rem; color: var(--c-ink2); font-size: 0.9rem; line-height: 1.6; max-width: 58ch; }
 
-.clients { border-top: 1px solid var(--c-line); padding-block: 3rem; }
-.clientsHeading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.75rem 2rem; }
-.clientsHeading h2 { font-size: clamp(1.45rem, 2.3vw, 1.85rem); font-weight: 500; letter-spacing: -0.035em; }
-.clientsHeading p { color: var(--c-ink2); font-size: 0.85rem; }
-.featuredBrands { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 1.5rem; align-items: center; margin-block: 2.75rem 2.25rem; list-style: none; }
-.featuredBrands li { min-width: 0; height: 58px; display: flex; align-items: center; justify-content: center; }
-.featuredBrands img { display: block; max-width: 100%; width: auto; height: auto; max-height: 58px; object-fit: contain; }
-.disclaimer { max-width: 90ch; color: var(--c-ink3); font-size: 0.72rem; line-height: 1.65; }
-.allClients { margin-top: 0.7rem; }
-.allClients summary { display: flex; width: fit-content; align-items: center; gap: 0.65rem; padding-block: 0.7rem; font-size: 0.8rem; font-weight: 600; list-style: none; min-height: 44px; text-underline-offset: 4px; }
-.allClients summary:hover { text-decoration: underline; }
-.allClients summary::-webkit-details-marker { display: none; }
-.allClients summary svg { color: var(--c-red); transition: transform 180ms ease; }
-.allClients[open] summary svg { transform: rotate(45deg); }
-.whenOpen, .allClients[open] .whenClosed { display: none; }
-.allClients[open] .whenOpen { display: inline; }
-.clientGrid { padding-top: 2.25rem; padding-bottom: 1rem; }
-.clientGrid :global(.logo-plate) { width: 100%; max-width: 200px; }
-
 @media (max-width: 1023px) {
   .introGrid { gap: 2rem; }
   .philosophyGrid, .partnershipGrid { gap: 2.5rem; }
-  .featuredBrands { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2rem; }
-  .featuredBrands img { max-width: 148px; width: 100%; }
 }
 
 @media (max-width: 767px) {
@@ -129,17 +108,9 @@
   .sectionTitle br { display: none; }
   .partnershipLede { margin-top: 1rem; }
   .partnershipGrid { gap: 1.8rem; }
-  .clients { padding-block: 2.5rem; }
-  .featuredBrands { margin-block: 2rem; }
-}
-
-@media (max-width: 479px) {
-  .featuredBrands { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.65rem 2rem; }
-  .featuredBrands img { max-width: 125px; }
-  .featuredBrands li, .featuredBrands img { max-height: 48px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .textLink svg, .allClients summary svg { transition: none; }
+  .textLink svg { transition: none; }
   .textLink:hover svg { transform: none; }
 }

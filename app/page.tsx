@@ -29,7 +29,7 @@ export default function Home() {
         <div className={`shell ${styles.content}`}>
           <div className={styles.heroGrid}>
             <div className={styles.heroCopy}>
-              <p className={`mb-5 flex items-center gap-3 text-xs font-semibold tracking-[0.06em] ${styles.eyebrow}`}><span className="h-px w-8 bg-current" aria-hidden />Partner-led consulting · Since 2015</p>
+              <p className={`mb-5 ${styles.eyebrow}`}>Partner-led consulting · Since&nbsp;2015</p>
               <h1 id="home-title" className={styles.title}>
                 <span>Turning strategic intent into</span>{" "}<em>sustained performance.</em>
               </h1>

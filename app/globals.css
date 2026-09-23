@@ -7,6 +7,7 @@
 :root {
   --header-height: 104px;
   --font-editorial: Georgia, "Times New Roman", Times, serif;
+  --font-interface: Arial, Helvetica, sans-serif;
   --c-bg:      #FBF9F7;   /* warm white */
   --c-raised:  #FFFFFF;
   --c-sunken:  #F3EEE9;

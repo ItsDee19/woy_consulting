@@ -81,7 +81,7 @@ export function Nav() {
 
           <div className={styles.actions}>
             <a href={site.ctaHref} className={styles.conversation}>
-              <span>{site.cta}</span><ArrowUpRight size={18} aria-hidden="true" />
+              <span>Let&#8217;s talk</span><ArrowUpRight size={18} aria-hidden="true" />
             </a>
             <button
               type="button"
@@ -121,7 +121,7 @@ export function Nav() {
                 </Link>
               ))}
               <a href={site.ctaHref} onClick={() => setMenuPath(null)} className={styles.mobileConversation}>
-                {site.cta}<ArrowUpRight size={19} aria-hidden="true" />
+                Let&#8217;s talk<ArrowUpRight size={19} aria-hidden="true" />
               </a>
             </div>
           </nav>

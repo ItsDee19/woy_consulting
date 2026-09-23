@@ -54,9 +54,9 @@ try {
       hrefs: [...document.querySelectorAll("a[href]")].map(a => a.getAttribute("href")),
       assets: [...document.images].map(image => image.currentSrc || image.src),
     }));
-    const typefaces = await page.evaluate(() => ["body", "h1", "nav a", "button", "input", "textarea"]
-      .flatMap(selector => { const element = document.querySelector(selector); return element ? [{ selector, family: getComputedStyle(element).fontFamily }] : []; }));
-    for (const { selector, family } of typefaces) assert.match(family, /^Georgia/, `Reference serif typography on ${selector}: ${route}`);
+    const typefaces = await page.evaluate(() => ["body", "main h1", "main input", "main textarea", "header nav a", "header button", "footer h2", "footer a", "footer button"]
+      .flatMap(selector => { const element = document.querySelector(selector); return element ? [{ selector, family: getComputedStyle(element).fontFamily, sans: selector.startsWith("header") || selector.startsWith("footer") }] : []; }));
+    for (const { selector, family, sans } of typefaces) assert.match(family, sans ? /^Arial/ : /^Georgia/, `Reference typography on ${selector}: ${route}`);
     assert.ok(meta.title && meta.description && meta.canonical && meta.og, `Metadata: ${route}`);
     assert.match(meta.title, /WOY Consulting/, `Branded title: ${route}`);
     assert.equal(meta.title.split("WOY Consulting").length - 1, 1, `Brand appears once: ${route}`);
@@ -69,6 +69,11 @@ try {
     for (const node of meta.schema) if (node["@id"]) assert.equal(new URL(node["@id"]).origin, schemaOrigin);
     if (route === "/") {
       assert.equal(await page.locator("[data-home-hero] img, [data-hero-background]").count(), 0, "The hero has no background image");
+      const eyebrow = page.locator("[data-home-hero]").getByText("Partner-led consulting · Since 2015", { exact: true });
+      assert.equal(await eyebrow.locator("span").count(), 0, "Hero label has no leading rule");
+      const eyebrowType = await eyebrow.evaluate(el => ({ family: getComputedStyle(el).fontFamily, transform: getComputedStyle(el).textTransform }));
+      assert.match(eyebrowType.family, /^Arial/);
+      assert.equal(eyebrowType.transform, "uppercase");
       const caption = page.locator("[data-logo-caption]");
       assert.equal((await caption.locator("p").nth(0).textContent()).trim(), "Win Over Yourself.");
       assert.equal((await caption.locator("p").nth(1).textContent()).replace(/\s+/g, " ").trim(), "Growth. Excellence. Agility.");
@@ -80,6 +85,23 @@ try {
         assert.equal(await page.locator(serviceUrl.hash).count(), 1, "Service schema points to a real homepage capability");
       }
     }
+    if (route === "/case-studies") {
+      const list = meta.schema.find(node => node["@type"] === "ItemList");
+      const cards = page.locator("[data-case-card]");
+      assert.equal(await cards.count(), list.numberOfItems, "Every published case has one card");
+      for (const entry of list.itemListElement) {
+        const link = cards.getByRole("link", { name: entry.item.name, exact: true });
+        assert.equal(await link.getAttribute("href"), new URL(entry.item.url).pathname, "Cards preserve their published case URLs");
+        assert.equal(await link.locator("dt").count(), 2, "Each card separates the challenge from its outcome");
+      }
+      assert.equal(await page.locator("#collective-experience").getByRole("heading", { level: 2 }).count(), 1);
+      assert.equal((await page.locator("#collective-experience-title").textContent()).replace(/\s+/g, " ").trim(), "Our collective experience.", "Heading words remain separated when the desktop line break is hidden");
+      assert.equal(await page.locator("#collective-experience img").count(), 47, "Full supplied logo roster is visible without a disclosure");
+    }
+    if (route === "/about") {
+      assert.equal(await page.getByRole("heading", { name: "Experience across industries.", exact: true }).count(), 0);
+      assert.equal(await page.locator("main img").count(), 0, "The retired About logo section has been removed");
+    }
     assert.equal(meta.hrefs.filter(href => href?.startsWith("/expertise")).length, 0, "No links target the retired page");
     if (route === "/faq") {
       const faq = meta.schema.find(node => node["@type"] === "FAQPage");
@@ -90,8 +112,10 @@ try {
       }
     }
     assert.equal(await page.getByRole("navigation", { name: "Primary", exact: true }).getByRole("link", { name: "Expertise", exact: true }).count(), 0, "Expertise is absent from the main navigation");
+    const navbarAction = page.locator("header").getByRole("link", { name: "Let’s talk", exact: true });
+    assert.equal(await navbarAction.getAttribute("href"), "mailto:hello@woyconsulting.com", `Navbar email action: ${route}`);
     const conversationLinks = page.getByRole("link", { name: "Start a conversation", exact: true });
-    assert.ok(await conversationLinks.count() >= 2, `Header and footer email actions: ${route}`);
+    assert.ok(await conversationLinks.count() >= 1, `Footer email action: ${route}`);
     for (const link of await conversationLinks.all()) assert.equal(await link.getAttribute("href"), "mailto:hello@woyconsulting.com");
     const footer = page.getByRole("contentinfo");
     assert.equal(await footer.getByRole("link", { name: "hello@woyconsulting.com", exact: true }).getAttribute("href"), "mailto:hello@woyconsulting.com");
@@ -185,6 +209,7 @@ try {
   assert.equal(await page.locator("#mobile-nav").count(), 0, "Home closes the mobile menu even on the home route");
   await page.getByRole("button", { name: "Open menu" }).click();
   assert.equal(await page.getByRole("navigation", { name: "Mobile", exact: true }).getByRole("link", { name: "Expertise", exact: true }).count(), 0, "Expertise is absent from the mobile navigation");
+  assert.equal(await page.locator("#mobile-nav").getByRole("link", { name: "Let’s talk", exact: true }).getAttribute("href"), "mailto:hello@woyconsulting.com", "Mobile navbar uses the same conversation label and email");
   await page.locator('#mobile-nav a[href="/approach"]').click();
   await page.waitForURL(base + "/approach");
   const explorer = page.locator("[data-approach-explorer]");
@@ -364,18 +389,28 @@ try {
   assert.equal(personImages.length, 3);
   assert.ok(personImages.every(Boolean), "All named practitioners have schema portrait references");
   await page.goto(base + "/about", { waitUntil: "load" });
-  const clientDisclosure = page.locator("main details");
-  await clientDisclosure.locator("summary").click();
-  assert.equal(await clientDisclosure.getAttribute("open"), "");
-  assert.ok(await clientDisclosure.locator("img").count() >= 40, "Full client roster remains reachable");
-  await clientDisclosure.locator("summary").click();
+  assert.equal(await page.locator("main details").count(), 0, "About no longer contains the client roster disclosure");
+  await page.goto(base + "/case-studies", { waitUntil: "load" });
+  await page.getByRole("link", { name: "Our collective experience", exact: true }).click();
+  await page.waitForURL(base + "/case-studies#collective-experience");
+  const logoWall = page.locator("#collective-experience");
+  assert.equal(await logoWall.locator("img").count(), 47);
+  assert.match(await logoWall.innerText(), /partner and affiliate platforms/);
+  assert.match(await logoWall.innerText(), /do not identify the organisations in the anonymised case studies/);
+  await page.locator("[data-case-card] a").first().focus();
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Shift+Tab");
+  assert.equal(await page.locator("[data-case-card] a").first().evaluate(el => getComputedStyle(el).outlineStyle), "solid", "Case cards have visible keyboard focus");
+  const firstCaseHref = await page.locator("[data-case-card] a").first().getAttribute("href");
+  await page.keyboard.press("Enter");
+  await page.waitForURL(base + firstCaseHref);
   await page.getByRole("button", { name: "Cookie preferences", exact: true }).click();
   await page.setViewportSize({ width: 320, height: 568 });
   await page.getByRole("button", { name: "Save preferences", exact: true }).scrollIntoViewIfNeeded();
   const saveBounds = await page.getByRole("button", { name: "Save preferences", exact: true }).boundingBox();
   assert.ok(saveBounds && saveBounds.y >= 0 && saveBounds.y + saveBounds.height <= 569, "Cookie action reachable on a small screen");
   await page.screenshot({ path: path.join(reportDir, "cookie-mobile.png") });
-  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "plain light/dark hero, updated philosophy caption and responsive containment, footer email CTAs, Contact and back-to-top navigation, cookie choices, theme memory, Home/footer Expertise navigation; Expertise absent from both navbars, four-area expertise accordion, all current/legacy deep links, keyboard and no-JS disclosures, site-wide serif typography, homepage philosophy link to About anchor clear of sticky navigation, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/hover/focus/touch/reduced motion/biography disclosure, client disclosure, Approach explorer keyboard/click/next/previous/wrapping/stable panels/reduced motion/no-JS fallback, validation, unavailable delivery, mocked success/duplicate prevention passed" };
+  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "plain light/dark hero, updated philosophy caption and responsive containment, footer email CTAs, Contact and back-to-top navigation, cookie choices, theme memory, Home/footer Expertise navigation; Expertise absent from both navbars, four-area expertise accordion, all current/legacy deep links, keyboard and no-JS disclosures, editorial serif content with sans-serif navbar, footer and rule-free hero label, homepage philosophy link to About anchor clear of sticky navigation, mobile menu/Escape, 4D keyboard/click navigation, practitioner photos/hover/focus/touch/reduced motion/biography disclosure, six case cards with keyboard navigation, collective experience logo wall and removed About roster, Approach explorer keyboard/click/next/previous/wrapping/stable panels/reduced motion/no-JS fallback, validation, unavailable delivery, mocked success/duplicate prevention passed" };
   fs.writeFileSync(path.join(reportDir, "browser-check.json"), JSON.stringify(report, null, 2));
   console.log(JSON.stringify({ pages: pages.length, jsErrors: errors.length, accessibility: accessibility.length, overflow: overflow.length, brokenLinks: brokenLinks.length }));
   assert.equal(errors.length, 0, "Browser JS errors");

@@ -1,8 +1,16 @@
 # Navigation, expertise and case-study refinement
 
-> Homepage expertise update: the three-column treatment below has been replaced with four editorial accordion areas. See [the current expertise review](expertise-review.md). Navigation decisions remain in effect. The case-study index has also been updated: its planning-horizons/workstream diagram is replaced by a featured brief and outcome panel, followed by editorial engagement previews. The detailed case-study content and URLs remain unchanged.
+> Current updates: homepage expertise now uses four editorial accordions; see [the expertise review](expertise-review.md). The case-study index now presents all six engagements as readable cards and adds the full “Our collective experience” logo wall. The former About logo section is removed. See DESIGN.md for the current design contract. The notes below record earlier iterations; case-detail content and URLs remain unchanged.
 
 The owner requested explicit Home navigation, a stronger case-study presentation, a compact combination of expertise and delivery on the homepage, removal of the standalone Expertise page, and monochrome-to-colour practitioner interactions. The established WOY palette, source facts and logo remain the basis of the work.
+
+## Latest reference refinement, 23 September 2026
+
+The navbar, full footer and homepage hero label now use an Arial/Helvetica sans-serif stack based on the supplied screenshot. Main content retains its editorial serif. The hero label is uppercase and tracked, with its leading rule removed. Desktop and mobile navbar actions read “Let’s talk” and keep the supplied email destination. The static navbar/footer logos now follow the reference’s broader W/Y proportions; see [the logo review](logo-formation-review.md).
+
+This release also includes the six readable case-study cards, the 47-logo collective-experience section, the removal of About’s former industry roster, and the source-verified transparency repairs for five logos.
+
+Verification: production build and TypeScript, ESLint, all 32 unit tests, strict design audit and design-document lint passed. The production browser suite checked 15 pages in both themes and eight widths with no JavaScript errors, automated accessibility violations, horizontal overflow or broken internal links/assets. Focused logo checks passed at five widths, and footer checks verified the grouped D&B profile/QR control, keyboard and no-JavaScript disclosure, contrast and responsive layout. Local screenshots and detailed reports remain in ignored `reports/`.
 
 ## Changes
 

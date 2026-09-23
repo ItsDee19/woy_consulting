@@ -47,6 +47,21 @@ export const MARK = {
   wordY: 157,
 } as const;
 
+/**
+ * The compact static lockup follows the supplied header reference: its W is
+ * deliberately wider than the round symbol, while both letters retain the
+ * symbol's painted height and four-unit stroke. The animated mark keeps its
+ * separately approved geometry above.
+ */
+export const STATIC_MARK = {
+  ...MARK,
+  viewBox: "31 30 254 150",
+  w: "M50 60.568 L73.1 124.24 L96.2 63.6 L119.3 124.24 L142.4 60.568",
+  yFork: "M216.2 60.814 L243.7 94.5 L271.2 60.814",
+  wordX: 159,
+  wordWidth: 222,
+} as const;
+
 /** Explanatory source symbols used before the finished WOY mark forms. */
 export const SOURCE_SYMBOLS = {
   starOutline: "M180 60 L188.2 82.7 L212.3 83.5 L193.3 98.3 L200 121.5 L180 108 L160 121.5 L166.7 98.3 L147.7 83.5 L171.8 82.7 Z",

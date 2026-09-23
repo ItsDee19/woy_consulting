@@ -1,4 +1,5 @@
 .footer {
+  font-family: var(--font-interface);
   background: var(--c-navy);
   color: var(--c-on-navy);
   border-top: 3px solid var(--c-logo-red);

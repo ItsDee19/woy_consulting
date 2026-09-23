@@ -12,6 +12,7 @@ try {
   await page.getByRole("button", { name: "Essential only", exact: true }).click();
   const logo = page.locator("[data-logo-formation]");
   const navbarLogo = page.locator("header").getByRole("img", { name: "WOY Consulting", exact: true });
+  const footerLogo = page.getByRole("contentinfo").getByRole("img", { name: "WOY Consulting", exact: true });
   const sample = async time => {
     await logo.evaluate((element, time) => {
       for (const animation of element.getAnimations({ subtree: true })) { animation.pause(); animation.currentTime = time; }
@@ -37,10 +38,10 @@ try {
   // square caps and miter tips count; SVG getBBox() omits them in Chromium.
   const paintedBounds = (target = logo) => target.evaluate(element => {
     const scale = 8;
-    const origin = { x: 50, y: 30 };
+    const origin = { x: 30, y: 30 };
     const measure = selector => {
       const canvas = document.createElement("canvas");
-      canvas.width = 240 * scale;
+      canvas.width = 260 * scale;
       canvas.height = 150 * scale;
       const context = canvas.getContext("2d", { willReadFrequently: true });
       context.scale(scale, scale);
@@ -60,16 +61,19 @@ try {
       const { data } = context.getImageData(0, 0, canvas.width, canvas.height);
       let top = canvas.height;
       let bottom = -1;
+      let left = canvas.width;
+      let right = -1;
       for (let y = 0; y < canvas.height; y++) {
         for (let x = 0; x < canvas.width; x++) {
           if (data[(y * canvas.width + x) * 4 + 3] > 0) {
             top = Math.min(top, y);
             bottom = y;
-            break;
+            left = Math.min(left, x);
+            right = Math.max(right, x);
           }
         }
       }
-      return { top: origin.y + top / scale, bottom: origin.y + (bottom + 1) / scale };
+      return { top: origin.y + top / scale, bottom: origin.y + (bottom + 1) / scale, width: (right - left + 1) / scale };
     };
     return {
       ring: measure(".mk-ring, [data-logo-ring]"),
@@ -119,9 +123,25 @@ try {
     assertAlignedLetters(painted);
     const navbarPainted = await paintedBounds(navbarLogo);
     assertAlignedLetters(navbarPainted);
-    assert.deepEqual(navbarPainted, painted, "Static and animated logos share the same painted geometry");
-    if (width === 390 || width === 1440) await navbarLogo.screenshot({ path: `reports/navbar-logo-${width}.png` });
-    results.push({ width, separated, merging, complete, painted, navbarPainted });
+    const footerPainted = await paintedBounds(footerLogo);
+    assertAlignedLetters(footerPainted);
+    assert.deepEqual(navbarPainted, footerPainted, "Navbar and footer share the reference static lockup");
+    // The supplied reference measures W61px / O45px and Y38px / O45px.
+    // Check the optical proportions rather than equating the static W with
+    // the narrower, separately approved animated lettering.
+    assert.ok(Math.abs(navbarPainted.w.width / navbarPainted.ring.width - 61 / 45) < .025, "Static W has the reference's broader proportions");
+    assert.ok(Math.abs(navbarPainted.y.width / navbarPainted.ring.width - 38 / 45) < .025, "Static Y has the reference's proportions");
+    assert.deepEqual(navbarPainted.ring, painted.ring, "Static ring preserves the animated symbol geometry");
+    for (const staticLogo of [navbarLogo, footerLogo]) {
+      assert.match(await staticLogo.locator("text").evaluate(node => getComputedStyle(node).fontFamily), /^Arial/, "Static caption uses the reference sans serif");
+      const captionRounding = await staticLogo.locator("text").evaluate(node => Math.abs(node.getBBox().width - 222) * node.getScreenCTM().a);
+      assert.ok(captionRounding < 1.1, "Caption tracks across the lockup within one rendered pixel");
+    }
+    if (width === 390 || width === 1440) {
+      await navbarLogo.screenshot({ path: `reports/navbar-logo-${width}.png` });
+      await footerLogo.screenshot({ path: `reports/footer-logo-${width}.png` });
+    }
+    results.push({ width, separated, merging, complete, painted, navbarPainted, footerPainted });
   }
   await page.emulateMedia({ reducedMotion: "reduce" });
   assert.equal(await logo.locator(".mk-ring").evaluate(el => getComputedStyle(el).animationName), "none");
@@ -139,5 +159,5 @@ try {
   await page.waitForFunction(() => !document.querySelector("[data-logo-formation]").classList.contains("is-paused"));
   assert.ok(await logo.evaluate(el => el.getAnimations({ subtree: true }).every(animation => animation.playState === "running")), "All tracks resume together");
   fs.writeFileSync("reports/logo-formation.json", JSON.stringify({ results, reducedMotion: true, offscreenPause: true, resume: true }, null, 2));
-  console.log("Logo formation: separate symbols, convergence, complete lockup, matching static and animated letter heights including strokes, responsive geometry, reduced motion and off-screen pause passed.");
+  console.log("Logo formation: separate symbols, convergence, complete lockup, aligned letter heights, reference static logo proportions, responsive geometry, reduced motion and off-screen pause passed.");
 } finally { await browser.close(); }

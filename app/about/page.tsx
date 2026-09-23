@@ -1,13 +1,11 @@
 import Link from "next/link";
-import { getImageProps } from "next/image";
-import { ArrowRight, Plus } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { StructuredData } from "@/components/StructuredData";
 import { contentPageGraph, schemaId } from "@/lib/structured-data";
 import { pageMetadata } from "@/lib/metadata";
 import { Reveal } from "@/components/Reveal";
-import { ClientGrid } from "@/components/ClientLogos";
 import { MARK, SOURCE_SYMBOLS } from "@/components/mark-geometry";
-import { clientLogos, logoDisclaimer, site, symbols } from "@/lib/content";
+import { site, symbols } from "@/lib/content";
 import styles from "./about.module.css";
 
 export const metadata = pageMetadata(
@@ -42,11 +40,6 @@ const differences = [
     title: "Change your teams can sustain",
     body: "We leave behind stronger capability, clear ownership and practical rhythms that support lasting progress.",
   },
-];
-
-const featuredBrands = [
-  "Reliance Industries", "Samsung", "Siemens Financial Services", "EY",
-  "Maruti Suzuki", "Capgemini", "Dr. Reddy's", "GE HealthCare",
 ];
 
 function PhilosophySymbol({ part }: { part?: SymbolKey }) {
@@ -173,39 +166,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className={`logo-band ${styles.clients}`} aria-labelledby="brands-title">
-        <div className="shell">
-          <div className={styles.clientsHeading}>
-            <h2 id="brands-title">Experience across industries.</h2>
-            <p>Selected brands supported by WOY</p>
-          </div>
-          <ul className={styles.featuredBrands}>
-            {featuredBrands.map((name) => {
-              const logo = clientLogos.find((item) => item.name === name)!;
-              const { props } = getImageProps({
-                src: logo.file, alt: `${logo.name} logo`, width: logo.w, height: logo.h,
-                sizes: "(max-width: 639px) 120px, 170px", loading: "lazy",
-              });
-              return (
-                <li key={logo.name}>
-                  {/* Responsive optimisation without a client component for each logo. */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img {...props} alt={props.alt} />
-                </li>
-              );
-            })}
-          </ul>
-          <p className={styles.disclaimer}>{logoDisclaimer}</p>
-          <details className={styles.allClients}>
-            <summary>
-              <span className={styles.whenClosed}>View full brand list</span>
-              <span className={styles.whenOpen}>Close full brand list</span>
-              <Plus size={18} aria-hidden="true" />
-            </summary>
-            <div className={styles.clientGrid}><ClientGrid /></div>
-          </details>
-        </div>
-      </section>
     </>
   );
 }

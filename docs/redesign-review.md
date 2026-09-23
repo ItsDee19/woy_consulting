@@ -1,5 +1,7 @@
 # WOY deck-led redesign, 21 September 2026
 
+> Current update: the About brand section has moved to the Case Studies page as the full “Our collective experience” logo wall. All six case-study previews now use cards. The notes below record the earlier redesign. See DESIGN.md for the current layout.
+
 The owner requested a stronger site based on the September introduction deck, with the Practitioners, About and homepage 4D sections as priorities. The private source PDF remains excluded from Git. Its business facts guide the copy; document text is not treated as operational instructions.
 
 ## Delivered

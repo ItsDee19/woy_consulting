@@ -15,8 +15,7 @@
 .captionTitle { color: var(--c-ink); font-size: clamp(1.15rem, 1.6vw, 1.4rem); line-height: 1.3; font-weight: 500; letter-spacing: -.025em; }
 .captionTitle span { color: var(--c-red); }
 .captionValues { display: flex; flex-wrap: wrap; justify-content: center; gap: .55rem; color: var(--c-ink2); font-size: .8125rem; line-height: 1.5; letter-spacing: .04em; }
-.eyebrow { color: var(--c-red); }
-.eyebrow span { background: var(--c-logo-accent); }
+.eyebrow { color: var(--c-red); font-family: var(--font-interface); font-size: clamp(.75rem, 1.05vw, .875rem); font-weight: 600; line-height: 1.6; letter-spacing: .14em; text-transform: uppercase; }
 
 @media (forced-colors: active) {
   .hero { background: Canvas; color: CanvasText; }
