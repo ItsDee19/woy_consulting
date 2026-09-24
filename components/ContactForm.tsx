@@ -114,7 +114,7 @@ export function ContactForm() {
             onBlur={(event) => setErrors((previous) => ({ ...previous, [field]: validateContactField(field, event.target.value) }))}
             aria-invalid={errors[field] ? true : undefined}
             aria-describedby={`err-${field}`}
-            className={`w-full rounded-[2px] border bg-raised px-4 py-3 text-base text-ink transition-colors placeholder:text-ink3 focus:outline-none focus:ring-[3px] ${errors[field] ? "border-danger focus:ring-danger/20" : "border-control hover:border-ink3 focus:border-action focus:ring-action/20"}`}
+            className={`w-full rounded-[2px] border bg-raised dark:bg-sunken px-4 py-3 text-base text-ink transition-colors placeholder:text-ink3 focus:outline-none focus:ring-[3px] ${errors[field] ? "border-danger focus:ring-danger/20" : "border-control hover:border-ink3 focus:border-action focus:ring-action/20"}`}
           />
           <p id={`err-${field}`} className="min-h-5 text-sm font-medium text-danger">{errors[field] || ""}</p>
         </div>

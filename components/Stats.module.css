@@ -25,6 +25,13 @@
   line-height: 1.5;
   color: var(--c-ink2);
 }
+/* A recessed band separates the facts from the hero without changing type. */
+:global([data-theme="dark"]) .section {
+  background: var(--c-sunken);
+  box-shadow: inset 0 1px var(--c-line), inset 0 -1px var(--c-line);
+}
+:global([data-theme="dark"]) .grid { border-top-color: transparent; }
+
 @media (max-width: 767px) {
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.75rem 1.5rem; }
 }

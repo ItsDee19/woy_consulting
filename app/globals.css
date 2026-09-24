@@ -360,6 +360,14 @@
   --c-red:   #CD1421;
 }
 
+/* Keep authentic client artwork on one white panel, framed by dark gutters.
+ * Both galleries and the homepage marquee share the same responsive inset. */
+[data-theme="dark"] .logo-band,
+[data-theme="dark"] .recreation .collective-experience {
+  margin-block: clamp(1.5rem, 3vw, 3rem);
+  margin-inline: clamp(.75rem, 3vw, 3rem);
+}
+
 .logo-plate img {
   transition: transform .45s cubic-bezier(.16,1,.3,1);
 }
