@@ -10,6 +10,7 @@ import { ClientMarquee } from "@/components/ClientLogos";
 import FourDApproach from "@/components/FourDApproach";
 import { ExpertiseSection } from "@/components/ExpertiseSection";
 import { PhilosophySection } from "@/components/PhilosophySection";
+import { SelectedWorkSection } from "@/components/SelectedWorkSection";
 import { LeadershipSection } from "@/components/LeadershipSection";
 import { site } from "@/lib/content";
 
@@ -72,6 +73,8 @@ export default function Home() {
       <ClientMarquee />
 
       <PhilosophySection />
+
+      <SelectedWorkSection />
 
       <FourDApproach />
 

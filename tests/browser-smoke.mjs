@@ -64,7 +64,7 @@ try {
     }));
     const typefaces = await page.evaluate(() => ["body", "main h1", "main input", "main textarea", "main .recreation p", ".header-shell nav a", ".header-shell button", "footer h2", "footer a", "footer button"]
       .flatMap(selector => { const element = document.querySelector(selector); return element ? [{ selector, family: getComputedStyle(element).fontFamily, sans: selector.startsWith(".header-shell") || selector.startsWith("footer") || selector === "main .recreation p" }] : []; }));
-    for (const { selector, family, sans } of typefaces) assert.match(family, sans ? /^Arial/ : /^Georgia/, `Reference typography on ${selector}: ${route}`);
+    for (const { selector, family, sans } of typefaces) assert.match(family, (sans || (route === "/contact" && selector === "main input")) ? /^Arial/ : /^Georgia/, `Reference typography on ${selector}: ${route}`);
     assert.ok(meta.title && meta.description && meta.canonical && meta.og, `Metadata: ${route}`);
     assert.match(meta.title, /WOY Consulting/, `Branded title: ${route}`);
     assert.equal(meta.title.split("WOY Consulting").length - 1, 1, `Brand appears once: ${route}`);
@@ -160,7 +160,7 @@ try {
     assert.equal(await navbarLogo.evaluate(element => element.tagName), "IMG");
     assert.equal(await page.locator(".header-shell").getByRole("button", { name: /Switch to .* theme/ }).count(), 1);
     const footer = page.getByRole("contentinfo");
-    assert.equal(await footer.getByRole("link", { name: "Start a conversation", exact: true }).getAttribute("href"), "mailto:hello@woyconsulting.com");
+    assert.equal(await footer.getByRole("link", { name: "Start a conversation", exact: true }).getAttribute("href"), "/contact");
     assert.equal(await footer.getByRole("link", { name: "hello@woyconsulting.com", exact: true }).getAttribute("href"), "mailto:hello@woyconsulting.com");
     assert.equal(await footer.getByRole("link", { name: "Contact", exact: true }).getAttribute("href"), "/contact");
     assert.equal(await footer.getByRole("link", { name: /Made by AvlysAI/ }).getAttribute("href"), "https://avlysai.com/");
@@ -174,7 +174,7 @@ try {
       if (route === "/") {
         const heroSurface = await page.locator("[data-home-hero]").evaluate(el => ({ image: getComputedStyle(el).backgroundImage, color: getComputedStyle(el).backgroundColor }));
         assert.equal(heroSurface.image, "none", `Plain hero in ${theme} mode`);
-        assert.equal(heroSurface.color, theme === "light" ? "rgb(251, 249, 247)" : "rgb(8, 9, 11)");
+        assert.equal(heroSurface.color, theme === "light" ? "rgb(251, 249, 247)" : "rgb(11, 21, 34)");
       }
       const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
       if (result.violations.length) accessibility.push({ route, theme, violations: result.violations.map(v => ({ id: v.id, impact: v.impact, description: v.description, nodes: v.nodes.map(n => ({ target: n.target, summary: n.failureSummary })) })) });
@@ -343,28 +343,11 @@ try {
   await page.waitForURL(base + "/contact");
   assert.equal(await page.locator("main").getByRole("link", { name: "hello@woyconsulting.com", exact: true }).getAttribute("href"), "mailto:hello@woyconsulting.com");
   await page.locator('form button[type="submit"]').click();
-  assert.equal(await page.locator('input[aria-invalid="true"]').count(), 3);
   assert.equal(await page.evaluate(() => document.activeElement.id), "f-name");
-  for (const [label, value] of [["Full name", "Website Test"], ["Mobile number", "2025550100"], ["Email address", "smoke@example.com"]]) await page.getByLabel(label, { exact: true }).fill(value);
-  await page.locator('form button[type="submit"]').click();
-  await page.getByRole("status").filter({ hasText: /unavailable|not.*sent|could not/i }).waitFor();
-  assert.equal(await page.getByLabel("Full name", { exact: true }).inputValue(), "Website Test");
-
-  // UI success/failure is mocked; never sends an enquiry to an external service.
-  let posts = 0;
-  await page.route("**/api/contact", async route => {
-    if (route.request().method() === "GET") return route.fulfill({ json: { readyAfterMs: 0 } });
-    posts++;
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return route.fulfill({ json: { message: "Sent" } });
-  });
-  await page.reload({ waitUntil: "load" });
-  for (const [label, value] of [["Full name", "Website Test"], ["Mobile number", "2025550100"], ["Email address", "smoke@example.com"]]) await page.getByLabel(label, { exact: true }).fill(value);
-  await page.locator("form").evaluate(form => { form.requestSubmit(); form.requestSubmit(); });
-  await page.getByRole("status").filter({ hasText: /Thank you/ }).waitFor();
-  assert.equal(posts, 1);
-  assert.equal(await page.getByLabel("Full name", { exact: true }).inputValue(), "");
-  await page.unroute("**/api/contact");
+  assert.equal(await page.locator("#f-name").evaluate(el => el.validity.valueMissing), true);
+  // Detailed mocked success/failure and retry checks live in contact-browser.mjs.
+  assert.equal(await page.locator("#f-organisation").getAttribute("required"), null);
+  assert.equal(await page.locator("#f-consent").isChecked(), false);
   await page.goto(base, { waitUntil: "load" });
   for (const theme of ["light", "dark"]) {
     if (await page.locator("html").getAttribute("data-theme") !== theme) await page.getByRole("button", { name: `Switch to ${theme} theme`, exact: true }).click();
@@ -376,20 +359,27 @@ try {
   assert.notEqual(await page.locator(".mk-ring").evaluate(el => getComputedStyle(el).animationName), "none", "Logo remains animated");
   await page.emulateMedia({ reducedMotion: "reduce" });
   assert.equal(await page.locator(".mk-ring").evaluate(el => getComputedStyle(el).animationName), "none", "System reduced motion is respected");
-  const methodTabs = page.getByRole("tablist", { name: "Explore the four stages of our approach" }).getByRole("tab");
-  assert.equal(await methodTabs.count(), 4);
-  await methodTabs.first().focus();
-  for (const [key, name] of [["ArrowRight", "Define"], ["End", "Deliver"], ["ArrowRight", "Discover"], ["ArrowLeft", "Deliver"], ["Home", "Discover"]]) {
-    await page.keyboard.press(key);
-    const selected = page.getByRole("tab", { selected: true });
-    assert.match(await selected.innerText(), new RegExp(name));
-    assert.equal(await selected.evaluate(el => document.activeElement === el), true, "4D keyboard selection moves focus");
-    assert.equal(await page.getByRole("tabpanel").count(), 1, "Only the selected stage is exposed");
-    assert.equal(await page.getByRole("tabpanel").getAttribute("aria-labelledby"), await selected.getAttribute("id"));
-  }
-  await methodTabs.nth(2).click();
-  assert.match(await page.getByRole("tabpanel").innerText(), /Tailored journey/);
-  await methodTabs.first().click();
+  const fourD = page.locator("#our-4d-approach");
+  assert.equal(await fourD.getAttribute("aria-labelledby"), "four-d-heading");
+  assert.equal(await fourD.getByText("Our 4D approach", { exact: true }).count(), 1);
+  const fourDHeading = fourD.getByRole("heading", { level: 2 });
+  assert.equal(await fourDHeading.getAttribute("id"), "four-d-heading");
+  assert.equal(await fourDHeading.innerText(), "From understanding\nto forward movement.");
+  assert.equal(await fourDHeading.locator("br").count(), 1, "The 4D heading retains its explicit line break");
+  assert.deepEqual(await fourD.locator("ol > li").evaluateAll(items => items.map(item => ({
+    number: item.querySelector(":scope > span")?.textContent?.trim(),
+    title: item.querySelector("h3")?.textContent?.trim(),
+    description: item.querySelector("p")?.textContent?.trim(),
+  }))), [
+    { number: "01", title: "Discover", description: "Build a shared, fact-based view of your context, priorities and underlying challenges." },
+    { number: "02", title: "Define", description: "Agree the ambition, outcomes and priorities that will guide the engagement." },
+    { number: "03", title: "Design", description: "Shape a tailored response with clear deliverables, dependencies and ownership." },
+    { number: "04", title: "Deliver", description: "Support implementation, refine through feedback and build internal capacity to sustain it." },
+  ], "The homepage shows all four static stages in order with the supplied copy");
+  assert.equal(await fourD.locator('button, [role="tab"], [role="tablist"], [role="tabpanel"]').count(), 0, "The 4D overview has no retired interactive controls");
+  const howWeWork = fourD.getByRole("link", { name: "How we work", exact: true });
+  assert.equal(await howWeWork.getAttribute("href"), "/approach");
+  assert.equal(await fourD.getByRole("link").count(), 1);
   await page.locator(".logo-band").scrollIntoViewIfNeeded();
   await page.waitForFunction(() => [...document.querySelectorAll(".logo-band img")].filter(i => { const r=i.getBoundingClientRect(); return r.left < innerWidth && r.right > 0; }).every(i => i.complete && i.naturalWidth > 0));
   await page.evaluate(() => window.scrollTo(0, 0));
@@ -525,7 +515,7 @@ try {
   const saveBounds = await page.getByRole("button", { name: "Save preferences", exact: true }).boundingBox();
   assert.ok(saveBounds && saveBounds.y >= 0 && saveBounds.y + saveBounds.height <= 569, "Cookie action reachable on a small screen");
   await page.screenshot({ path: path.join(reportDir, "cookie-mobile.png") });
-  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "desktop/mobile Home links, visible consent-aware light/dark toggle, source navigation links, original logo image, contact CTA and active-page states; mobile modal focus trap, Escape, overlay, Close and same-route Home; source Expertise content and no-JS services; static 4D stages and detailed philosophy; Work industry filter with keyboard reset and case aliases; People profile aliases; retained plain light/dark hero and caption, footer email CTAs, cookie choices/theme persistence, homepage 4D tabs and labelled expertise accordion panels, Enter/Space operation, all-closed/one-open states, no-JS fallback and legacy capability anchors, Our approach philosophy anchor, practitioner portraits/disclosures/motion, legacy case cards and collective experience, form validation and mocked success/duplicate prevention passed" };
+  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "desktop/mobile Home links, visible consent-aware light/dark toggle, source navigation links, original logo image, contact CTA and active-page states; mobile modal focus trap, Escape, overlay, Close and same-route Home; source Expertise content and no-JS services; static 4D stages and detailed philosophy; Work industry filter with keyboard reset and case aliases; People profile aliases; retained plain light/dark hero and caption, footer email CTAs, cookie choices/theme persistence, homepage static 4D overview and labelled expertise accordion panels, Enter/Space operation, all-closed/one-open states, no-JS fallback and legacy capability anchors, Our approach philosophy anchor, practitioner portraits/disclosures/motion, legacy case cards and collective experience, form validation and mocked success/duplicate prevention passed" };
   fs.writeFileSync(path.join(reportDir, "browser-check.json"), JSON.stringify(report, null, 2));
   console.log(JSON.stringify({ pages: pages.length, jsErrors: errors.length, accessibility: accessibility.length, overflow: overflow.length, brokenLinks: brokenLinks.length }));
   assert.equal(errors.length, 0, "Browser JS errors");

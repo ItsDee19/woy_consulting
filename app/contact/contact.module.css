@@ -1,0 +1,159 @@
+.page {
+  width: 100%;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 10%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: 80px 5.4% 90px;
+}
+
+.introduction {
+  min-width: 0;
+}
+
+.eyebrow {
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin-block: 27px 30px;
+  font-size: clamp(3.3rem, 5.7vw, 5.75rem);
+  overflow-wrap: break-word;
+}
+
+.title em {
+  color: var(--primary);
+  font-style: italic;
+}
+
+.lead {
+  max-width: 400px;
+  margin-bottom: 20px;
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.description {
+  color: var(--muted-foreground);
+}
+
+.directContact {
+  margin-top: 28px;
+}
+
+.email {
+  display: inline-block;
+  max-width: 100%;
+  margin-top: 9px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--primary);
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.signature {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 36px;
+}
+
+.portrait {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 25%;
+  filter: grayscale(1);
+}
+
+.name {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18.4px;
+}
+
+.role {
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.note {
+  margin-top: 35px;
+  padding-top: 25px;
+  border-top: 1px solid var(--border);
+}
+
+.noteDescription {
+  margin-top: 10px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+}
+
+.formPanel {
+  min-width: 0;
+  align-self: start;
+  padding: 36px 34px;
+  background: #f1f3f6;
+}
+
+:global([data-theme="dark"]) .formPanel {
+  background: var(--c-raised);
+}
+
+@media (min-width: 1440px) {
+  .layout {
+    padding-inline: 78px;
+  }
+}
+
+@media (max-width: 1080px) {
+  .layout {
+    column-gap: 6%;
+  }
+
+  .formPanel {
+    padding: 27px;
+  }
+}
+
+@media (max-width: 700px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 35px;
+    padding: 45px 6% 50px;
+  }
+
+  .title {
+    font-size: 3.45rem;
+  }
+
+  .lead {
+    font-size: 18.4px;
+  }
+
+  .email {
+    font-size: 16px;
+  }
+
+  .signature {
+    margin-top: 26px;
+  }
+
+  .note {
+    display: none;
+  }
+
+  .formPanel {
+    padding: 27px 24px;
+  }
+}

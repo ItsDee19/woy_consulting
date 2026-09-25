@@ -42,7 +42,7 @@ npm run build
 npm start -- -p 5173
 ```
 
-With that production server running, use `npm run test:browser` for the route, accessibility and interaction checks, and `npm run test:performance` for mobile/desktop Lighthouse reports. These use Chrome on Windows or Playwright Chromium elsewhere; set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use another installed Chromium browser. Results are written to ignored `reports/`.
+With that production server running, use `npm run test:browser` for the route, accessibility and interaction checks, and `npm run test:performance` for mobile/desktop Lighthouse reports. These use Chrome on Windows or Playwright Chromium elsewhere; set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use another installed Chromium browser. Results are written to ignored `reports/`. Run `npm run test:theme-navigation` to check theme preservation across internal links on desktop and mobile, with optional theme memory enabled, declined or unavailable. Set `TEST_BASE_URL` when using a preview port other than 5173.
 
 ## Deploy to Vercel
 
@@ -69,7 +69,7 @@ through a private channel rather than committing them.
 | `/case-studies` | Featured engagement and outcome-led portfolio of six cases |
 | `/case-studies/[slug]` | Six detail pages, generated from `lib/content.ts` |
 | `/practitioners` | Authentic portraits with monochrome/colour hover, experience highlights and expandable biographies |
-| `/contact` | Direct email to hello@woyconsulting.com, plus the name, mobile and email form |
+| `/contact` | Direct email to hello@woyconsulting.com, plus the name, email, optional organisation and message form with required consent |
 | `/faq` | Answers about WOY, its services, approach and enquiries |
 | `/privacy-policy` | Information handling and cookie choices |
 | `/terms-and-conditions` | Website terms and enquiries |

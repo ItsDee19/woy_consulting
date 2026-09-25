@@ -3,6 +3,7 @@
   padding-block: clamp(3.5rem, 6.5vw, 6rem);
   scroll-margin-top: 1.5rem;
 }
+:global([data-theme="dark"]) .section { background: var(--c-navy); }
 .headingRow {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

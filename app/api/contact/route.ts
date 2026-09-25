@@ -1,4 +1,4 @@
-import { contactFields, validateContact } from "../../../lib/contact-validation";
+import { contactFields, PRIVACY_NOTICE_VERSION, validateContact } from "../../../lib/contact-validation";
 import {
   beginDelivery, CHALLENGE_LIFETIME_MS, consumeRateLimit, CONTACT_COOKIE,
   ContactBodyError, createChallenge, fingerprint, finishDelivery, getContactSecret,
@@ -10,7 +10,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const UNAVAILABLE = "The contact form is temporarily unavailable. Your details have not been sent. Please try again later.";
-const SUCCESS = "Thank you. Your request has been sent to WOY Consulting.";
+const SUCCESS = "Your enquiry has been received by WOY Consulting.";
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function json(body: Record<string, unknown>, status = 200, headers: Record<string, string> = {}) {
   return Response.json(body, { status, headers: { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", ...headers } });
@@ -57,14 +58,21 @@ export async function POST(request: Request) {
   } catch (error) {
     return json({ message: "We could not read your request. Please check your details and try again." }, error instanceof ContactBodyError ? error.status : 400);
   }
-  if (typeof body.website !== "string" || body.website !== "" || Object.keys(body).some((key) => ![...contactFields, "website"].includes(key))) {
+  if (typeof body.website !== "string" || body.website !== "" || Object.keys(body).some((key) => ![...contactFields, "website", "id", "consent", "privacyNoticeVersion"].includes(key))) {
     return json({ message: "We could not verify your request. Please reload the page and try again." }, 400);
   }
+  if (typeof body.id !== "string" || !UUID.test(body.id) || body.privacyNoticeVersion !== PRIVACY_NOTICE_VERSION) {
+    return json({ message: "Your form is out of date or could not be verified. Please reload the page and try again." }, 400);
+  }
   const errors = validateContact(body);
+  if (body.consent !== true) errors.consent = "Please consent to WOY Consulting using your details to respond to this enquiry.";
   if (Object.keys(errors).length) return json({ message: "Please correct the highlighted fields.", errors }, 422);
   const values = contactFields.map((field) => [field, (body[field] as string).trim()] as const);
-  const deliveryKey = fingerprint(JSON.stringify([challenge.id, values]), config.secret);
-  const delivery = beginDelivery(deliveryKey);
+  const id = body.id.toLowerCase();
+  const deliveryKey = fingerprint(`enquiry:${id}`, config.secret);
+  const payload = fingerprint(JSON.stringify([values, true, PRIVACY_NOTICE_VERSION]), config.secret);
+  const delivery = beginDelivery(deliveryKey, payload);
+  if (delivery === "conflict") return json({ message: "This enquiry ID was already used with different details. Please start a new enquiry." }, 409);
   if (delivery === "sent") return json({ message: SUCCESS });
   if (delivery === "pending") return json({ message: "Your request is already being sent. Please wait before trying again." }, 409);
   if (delivery === "full") return json({ message: UNAVAILABLE }, 503);
@@ -78,7 +86,10 @@ export async function POST(request: Request) {
   try {
     const form = new FormData();
     for (const [key, value] of values) form.append(key, value);
-    const headers: Record<string, string> = { Accept: "application/json" };
+    form.append("id", id);
+    form.append("consent", "true");
+    form.append("privacyNoticeVersion", PRIVACY_NOTICE_VERSION);
+    const headers: Record<string, string> = { Accept: "application/json", "Idempotency-Key": id };
     if (process.env.CONTACT_ENDPOINT_TOKEN) headers.Authorization = `Bearer ${process.env.CONTACT_ENDPOINT_TOKEN}`;
     const upstream = await fetch(config.endpoint, {
       method: "POST", body: form, headers, cache: "no-store", redirect: "error", signal: AbortSignal.timeout(15_000),

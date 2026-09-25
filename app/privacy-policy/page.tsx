@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PRIVACY_NOTICE_VERSION } from "@/lib/contact-validation";
 import { LegalPage, type LegalSection } from "@/components/LegalPage";
 import { CookiePreferencesButton } from "@/components/CookieConsent";
 import { pageMetadata } from "@/lib/metadata";
@@ -27,7 +28,8 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          Our contact form asks for your full name, mobile number and email address.
+          Our contact form asks for your name, email address, optional organisation and a message about your enquiry.
+          It also records your consent, the privacy notice version and a submission identifier.
           We use these details to respond to your enquiry, arrange a conversation and discuss whether our services fit your needs.
           Sending an enquiry does not subscribe you to marketing emails.
         </p>
@@ -49,7 +51,7 @@ const sections: LegalSection[] = [
         </p>
         <p>
           The contact form uses a temporary security token and short-lived request counters to help prevent spam and duplicate submissions.
-          These counters use pseudonymous identifiers and submission fingerprints; they do not store your name, mobile number or email address.
+          These counters use pseudonymous identifiers and submission fingerprints; they do not store your name, email address, organisation or message.
           These security records are temporary and are used to protect the contact service, not to build advertising profiles.
         </p>
       </>
@@ -139,5 +141,5 @@ const sections: LegalSection[] = [
 ];
 
 export default function PrivacyPolicyPage() {
-  return <LegalPage title="Privacy policy" lede="What we collect, why we use it, and the choices available to you." sections={sections} />;
+  return <LegalPage title="Privacy policy" lede="What we collect, why we use it, and the choices available to you." sections={sections} updatedDate={PRIVACY_NOTICE_VERSION} updatedLabel="25 September 2026" />;
 }

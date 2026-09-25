@@ -16,7 +16,7 @@ export const site = {
     profileUrl: "https://dunsregistered.dnb.com/PA.aspx?Key1=3203111&PaArea=Email",
     referenceImage: "/credentials/duns-registration-reference.png",
   },
-  ctaHref: `mailto:${contactEmail}`,
+  ctaHref: "/contact",
   principle: "Win Over Yourself",
   tagline: "Empowering leaders. Transforming organizations. Accelerating impact.",
   established: 2015,

@@ -29,10 +29,10 @@ export function Footer() {
             <h2>A clearer direction.<br /><em>Let’s begin.</em></h2>
           </div>
           <div className={styles.contactAction}>
-            <a href={site.ctaHref} className={styles.cta}>
+            <Link href={site.ctaHref} className={styles.cta}>
               <span>{site.cta}</span><ArrowUpRight size={23} weight="regular" aria-hidden="true" />
-            </a>
-            <a href={site.ctaHref} className={styles.email}>{site.email}</a>
+            </Link>
+            <a href={`mailto:${site.email}`} className={styles.email}>{site.email}</a>
           </div>
         </div>
 

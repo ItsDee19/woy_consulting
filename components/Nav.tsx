@@ -44,7 +44,7 @@ export function Nav() {
     }
   }
   return (
-    <div className="recreation">
+    <div className={`recreation ${controls.shell}`}>
       <header className="header-shell">
         <div className="wrap">
           <div className={`site-header ${controls.header}`}>
@@ -53,9 +53,9 @@ export function Nav() {
               {links.map(([href, label]) => (
                 <Link href={href} key={href} aria-current={isActive(href) ? "page" : undefined}>{label}</Link>
               ))}
-              <a className="nav-cta" href="/contact" aria-current={path === "/contact" ? "page" : undefined}>
+              <Link className={`nav-cta ${controls.cta}`} href="/contact" aria-current={path === "/contact" ? "page" : undefined}>
                 Let’s talk <span aria-hidden="true">↗</span>
-              </a>
+              </Link>
             </nav>
             <div className={controls.controls}>
               <button type="button" className={controls.toggle} onClick={toggleTheme}
@@ -70,7 +70,7 @@ export function Nav() {
                       <Menu size={24} /><span>Menu</span>
                     </Button>
                   </SheetTrigger>
-                  <SheetContent className="mobile-sheet" aria-describedby="navigation-description">
+                  <SheetContent className={`mobile-sheet ${controls.mobileSheet}`} aria-describedby="navigation-description">
                     <SheetTitle className="sr-only">WOY navigation</SheetTitle>
                     <SheetDescription id="navigation-description" className="sr-only">Explore WOY Consulting.</SheetDescription>
                     <Logo />
@@ -80,7 +80,7 @@ export function Nav() {
                           <Link href={href} aria-current={isActive(href) ? "page" : undefined}>{label}</Link>
                         </SheetClose>
                       ))}
-                      <SheetClose asChild><a className="red" href="/contact">Let’s talk ↗</a></SheetClose>
+                      <SheetClose asChild><Link className={`red ${controls.mobileCta}`} href="/contact">Let’s talk ↗</Link></SheetClose>
                     </nav>
                     <p className="eyebrow muted">Win Over Yourself.</p>
                   </SheetContent>

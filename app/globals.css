@@ -36,10 +36,10 @@
   color-scheme: light;
 }
 
-@media (max-width: 1023px) { :root { --header-height: 80px; } }
+@media (max-width: 700px) { :root { --header-height: 86px; } }
 
 [data-theme="dark"] {
-  --c-bg:      #08090B;   /* ink canvas: preserve the brand reds without a blue cast */
+  --c-bg:      var(--c-navy); /* retain the approved navy page canvas */
   --c-raised:  #0D0F12;   /* reading surfaces stay deep enough for red display text */
   --c-sunken:  #040506;
   --c-ink:     #F2EEE9;
@@ -360,13 +360,15 @@
   --c-red:   #CD1421;
 }
 
-/* Keep authentic client artwork on one white panel, framed by dark gutters.
- * Both galleries and the homepage marquee share the same responsive inset. */
+/* Keep authentic client artwork on white with dark spacing between sections.
+ * Static galleries retain horizontal gutters; the homepage marquee spans the screen. */
 [data-theme="dark"] .logo-band,
 [data-theme="dark"] .recreation .collective-experience {
   margin-block: clamp(1.5rem, 3vw, 3rem);
   margin-inline: clamp(.75rem, 3vw, 3rem);
 }
+
+[data-theme="dark"] .logo-band.logo-marquee { margin-inline: 0; }
 
 .logo-plate img {
   transition: transform .45s cubic-bezier(.16,1,.3,1);

@@ -11,7 +11,9 @@
     "test": "node --test tests/*.test.cjs",
     "test:browser": "node tests/browser-smoke.mjs",
     "test:logo": "node tests/logo-formation.mjs",
-    "test:performance": "node tests/performance.mjs"
+    "test:performance": "node tests/performance.mjs",
+    "test:contact-browser": "node tests/contact-browser.mjs",
+    "test:theme-navigation": "node tests/theme-navigation.mjs"
   },
   "engines": {
     "node": ">=22.19.0"

@@ -7,11 +7,11 @@ export const CHALLENGE_LIFETIME_MS = 60 * 60 * 1000;
 export const MIN_FORM_TIME_MS = 1500;
 const WINDOW_MS = 15 * 60 * 1000;
 const MAX_ENTRIES = 10_000;
-const MAX_BODY_BYTES = 4096;
+const MAX_BODY_BYTES = 32_768;
 
 type Challenge = { id: string; issued: number };
 type Counter = { count: number; expires: number };
-type Delivery = { state: "pending" | "sent"; expires: number };
+type Delivery = { state: "pending" | "sent" | "retryable"; payload: string; expires: number };
 // Intentionally bounded, process-local state. A multi-instance deployment must
 // also configure its edge/WAF rate limits or replace this with a shared store.
 const counters = new Map<string, Counter>();
@@ -88,18 +88,30 @@ export function consumeRateLimit(key: string, maximum: number, now = Date.now())
   return 0;
 }
 
-export function beginDelivery(key: string, now = Date.now()): "new" | "pending" | "sent" | "full" {
+export function beginDelivery(key: string, payload: string, now = Date.now()): "new" | "pending" | "sent" | "conflict" | "full" {
   prune(deliveries, now);
   const previous = deliveries.get(key);
-  if (previous) return previous.state;
+  if (previous) {
+    if (previous.payload !== payload) return "conflict";
+    if (previous.state !== "retryable") return previous.state;
+    previous.state = "pending";
+    previous.expires = now + WINDOW_MS;
+    return "new";
+  }
   if (deliveries.size >= MAX_ENTRIES) return "full";
-  deliveries.set(key, { state: "pending", expires: now + WINDOW_MS });
+  deliveries.set(key, { state: "pending", payload, expires: now + WINDOW_MS });
   return "new";
 }
 
 export function finishDelivery(key: string, sent: boolean) {
-  if (sent) deliveries.set(key, { state: "sent", expires: Date.now() + WINDOW_MS });
-  else deliveries.delete(key);
+  const delivery = deliveries.get(key);
+  if (delivery) {
+    // Retain the payload binding after failure so retries cannot reuse an ID
+    // for a different enquiry. A shared upstream idempotency key also protects
+    // retries beyond this process-local cache when the provider supports it.
+    delivery.state = sent ? "sent" : "retryable";
+    delivery.expires = Date.now() + WINDOW_MS;
+  }
 }
 
 export function rateLimitIdentity(request: Request, challenge: Challenge, secret: string): string {

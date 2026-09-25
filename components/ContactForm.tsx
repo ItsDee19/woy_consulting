@@ -2,55 +2,49 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CircleNotch } from "@phosphor-icons/react";
+import { ArrowUpRight, Check } from "@phosphor-icons/react";
 import { site } from "@/lib/content";
-import { contactFields, contactRules, validateContact, validateContactField, type ContactErrors, type ContactField, type ContactValues } from "@/lib/contact-validation";
+import { contactFields, contactRules, PRIVACY_NOTICE_VERSION, validateContact, validateContactField, type ContactErrors, type ContactField, type ContactValues } from "@/lib/contact-validation";
+import styles from "./ContactForm.module.css";
 
-const EMPTY_VALUES: ContactValues = { name: "", mobile: "", email: "" };
+const EMPTY_VALUES: ContactValues = { name: "", email: "", organisation: "", message: "" };
+const labels = { name: "Your name", email: "Email address", organisation: "Organisation", message: "What would you like to move forward?" };
+const placeholders = { name: "Full name", email: "you@organisation.com", organisation: "Organisation name", message: "Tell us a little about your business priorities or leadership challenge." };
 type Session = { readyAt: number; error?: string };
 class ContactSubmissionError extends Error {}
 
 async function prepareSession(signal: AbortSignal): Promise<Session> {
-  try {
-    const response = await fetch("/api/contact", { credentials: "same-origin", cache: "no-store", signal });
-    const data = await response.json();
-    if (!response.ok) return { readyAt: 0, error: data.message || "The contact form is temporarily unavailable. Please try again later." };
-    return { readyAt: Date.now() + Math.min(2000, Math.max(0, Number(data.readyAfterMs) || 0)) };
-  } catch {
-    return { readyAt: 0, error: "We could not connect. Check your connection and try again." };
-  }
+  const response = await fetch("/api/contact", { credentials: "same-origin", cache: "no-store", signal });
+  const data = await response.json();
+  if (!response.ok) return { readyAt: 0, error: data.message || "The contact form is temporarily unavailable. Please try again later." };
+  return { readyAt: Date.now() + Math.min(2000, Math.max(0, Number(data.readyAfterMs) || 0)) };
 }
 
 export function ContactForm() {
   const [values, setValues] = useState<ContactValues>(EMPTY_VALUES);
+  const [consent, setConsent] = useState(false);
   const [website, setWebsite] = useState("");
   const [errors, setErrors] = useState<ContactErrors>({});
   const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState<{ kind: "ok" | "bad"; msg: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [complete, setComplete] = useState(false);
   const inFlight = useRef(false);
-  const session = useRef<Promise<Session> | null>(null);
+  const submissionId = useRef<string | null>(null);
   const submission = useRef<AbortController | null>(null);
+  const successPanel = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 10_000);
-    session.current = prepareSession(controller.signal);
-    return () => {
-      window.clearTimeout(timeout);
-      controller.abort();
-      submission.current?.abort();
-    };
-  }, []);
+  useEffect(() => () => submission.current?.abort(), []);
+  useEffect(() => { if (complete) successPanel.current?.focus(); }, [complete]);
 
   function onChange(field: ContactField, value: string) {
-    setValues((previous) => ({ ...previous, [field]: value }));
-    if (errors[field]) setErrors((previous) => ({ ...previous, [field]: validateContactField(field, value) }));
-    if (status?.kind === "ok") setStatus(null);
+    setValues(previous => ({ ...previous, [field]: value }));
+    submissionId.current = null;
+    if (errors[field]) setErrors(previous => ({ ...previous, [field]: validateContactField(field, value) }));
   }
 
   function showFieldErrors(next: ContactErrors) {
     setErrors(next);
-    const firstBad = contactFields.find((field) => next[field]);
+    const firstBad = [...contactFields, "consent" as const].find(field => next[field]);
     if (firstBad) document.getElementById(`f-${firstBad}`)?.focus();
     return Boolean(firstBad);
   }
@@ -58,89 +52,99 @@ export function ContactForm() {
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (inFlight.current) return;
-    setStatus(null);
-    if (showFieldErrors(validateContact(values))) {
-      setStatus({ kind: "bad", msg: "Please correct the highlighted fields." });
-      return;
-    }
+    setError(null);
+    const next = validateContact(values);
+    if (!consent) next.consent = "Please give your consent so we can respond to your enquiry.";
+    if (showFieldErrors(next)) return;
     inFlight.current = true;
     setBusy(true);
     const controller = new AbortController();
     submission.current = controller;
     const timeout = window.setTimeout(() => controller.abort(), 25_000);
     try {
-      const prepared = await (session.current || prepareSession(controller.signal));
+      submissionId.current ||= crypto.randomUUID();
+      const prepared = await prepareSession(controller.signal);
       if (prepared.error) throw new ContactSubmissionError(prepared.error);
       const wait = prepared.readyAt - Date.now();
-      if (wait > 0) await new Promise((resolve) => window.setTimeout(resolve, wait));
+      if (wait > 0) await new Promise(resolve => window.setTimeout(resolve, wait));
+      controller.signal.throwIfAborted();
       const response = await fetch("/api/contact", {
         method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, website }), signal: controller.signal,
+        body: JSON.stringify({ ...values, website, id: submissionId.current, consent: true, privacyNoticeVersion: PRIVACY_NOTICE_VERSION }),
+        signal: controller.signal,
       });
       const data = await response.json();
       if (!response.ok) {
         if (data.errors) showFieldErrors(data.errors);
-        throw new ContactSubmissionError(data.message || "Your request could not be sent. Please try again later.");
+        throw new ContactSubmissionError(data.message || "Your enquiry could not be received. Please try again later.");
       }
-      setValues(EMPTY_VALUES);
       setErrors({});
-      setStatus({ kind: "ok", msg: "Thank you. Your request has been sent to WOY Consulting." });
-    } catch (error) {
-      setStatus({ kind: "bad", msg: error instanceof ContactSubmissionError
-        ? error.message
-        : "We could not confirm delivery. Your details are still here; check your connection before trying again." });
+      setComplete(true);
+    } catch (failure) {
+      if (!controller.signal.aborted || submission.current === controller) {
+        setError(failure instanceof ContactSubmissionError ? failure.message : "We could not confirm receipt. Your details are still here; check your connection before trying again.");
+      }
     } finally {
       window.clearTimeout(timeout);
-      session.current = null;
       inFlight.current = false;
       setBusy(false);
     }
   }
 
+  function reset() {
+    setValues(EMPTY_VALUES);
+    setConsent(false);
+    setWebsite("");
+    setErrors({});
+    setError(null);
+    submissionId.current = null;
+    setComplete(false);
+    requestAnimationFrame(() => document.getElementById("f-name")?.focus());
+  }
+
+  if (complete) return (
+    <div ref={successPanel} role="status" tabIndex={-1} className={styles.success}>
+      <span className={styles.check} aria-hidden="true"><Check size={28} /></span>
+      <p className={styles.eyebrow}>Enquiry received</p>
+      <h2>Thank you for<br />starting the conversation.</h2>
+      <p>Your enquiry has been received by WOY Consulting. We look forward to understanding your priorities.</p>
+      <button type="button" onClick={reset} className={styles.reset}>Send another enquiry</button>
+    </div>
+  );
+
   return (
-    <form onSubmit={onSubmit} noValidate aria-busy={busy} className="grid gap-5">
-      <p className="text-sm text-ink2">All fields are required.</p>
-      {contactFields.map((field) => (
-        <div key={field} className="grid gap-2">
-          <label htmlFor={`f-${field}`} className="text-sm font-medium text-ink">{contactRules[field].label}</label>
-          <input
-            id={`f-${field}`} name={field} required readOnly={busy}
-            type={field === "email" ? "email" : field === "mobile" ? "tel" : "text"}
-            inputMode={field === "mobile" ? "tel" : undefined}
-            autoComplete={field === "email" ? "email" : field === "mobile" ? "tel" : "name"}
-            maxLength={contactRules[field].maxLength}
-            value={values[field]}
-            onChange={(event) => onChange(field, event.target.value)}
-            onBlur={(event) => setErrors((previous) => ({ ...previous, [field]: validateContactField(field, event.target.value) }))}
-            aria-invalid={errors[field] ? true : undefined}
-            aria-describedby={`err-${field}`}
-            className={`w-full rounded-[2px] border bg-raised dark:bg-sunken px-4 py-3 text-base text-ink transition-colors placeholder:text-ink3 focus:outline-none focus:ring-[3px] ${errors[field] ? "border-danger focus:ring-danger/20" : "border-control hover:border-ink3 focus:border-action focus:ring-action/20"}`}
-          />
-          <p id={`err-${field}`} className="min-h-5 text-sm font-medium text-danger">{errors[field] || ""}</p>
-        </div>
-      ))}
-
-      <div className="absolute h-px w-px overflow-hidden opacity-0" aria-hidden="true" inert>
+    <form method="post" action="/api/contact" onSubmit={onSubmit} aria-busy={busy} className={styles.form}>
+      <noscript><p className={styles.error}>Please enable JavaScript to use this form, or email <a href={`mailto:${site.email}`}>{site.email}</a>.</p></noscript>
+      <div className={styles.fields}>
+        {contactFields.map(field => {
+          const common = {
+            id: `f-${field}`, name: field, required: field !== "organisation", readOnly: busy,
+            maxLength: contactRules[field].maxLength, value: values[field],
+            placeholder: placeholders[field], onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange(field, event.target.value),
+            onBlur: (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => setErrors(previous => ({ ...previous, [field]: validateContactField(field, event.target.value) })),
+            "aria-invalid": errors[field] ? true as const : undefined,
+            "aria-describedby": errors[field] ? `err-${field}` : undefined,
+            className: styles.input,
+          };
+          return <div key={field} className={`${styles.field} ${field === "organisation" || field === "message" ? styles.full : ""}`}>
+            <label htmlFor={`f-${field}`}>{labels[field]} {field === "organisation" ? <span className={styles.optional}>(optional)</span> : <span className={styles.required}>*</span>}</label>
+            {field === "message" ? <textarea {...common} minLength={10} rows={5} /> : <input {...common} type={field === "email" ? "email" : "text"} autoComplete={field === "name" ? "name" : field === "email" ? "email" : "organization"} />}
+            {errors[field] && <p id={`err-${field}`} className={styles.fieldError}>{errors[field]}</p>}
+          </div>;
+        })}
+      </div>
+      <div className={styles.honeypot} aria-hidden="true" inert>
         <label htmlFor="f-website">Leave this field empty</label>
-        <input id="f-website" name="website" type="text" tabIndex={-1} autoComplete="off" maxLength={200} value={website} onChange={(event) => setWebsite(event.target.value)} />
+        <input id="f-website" name="website" type="text" tabIndex={-1} autoComplete="off" maxLength={200} value={website} onChange={event => setWebsite(event.target.value)} />
       </div>
-
-      <p className="text-sm leading-relaxed text-ink2">
-        By sending this form, you ask WOY Consulting to contact you about your enquiry. Read our{" "}
-        <Link href="/privacy-policy" className="text-ink underline decoration-line2 underline-offset-4 transition-colors hover:text-red focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-action">Privacy Policy</Link>{" "}
-        to learn how we handle your details.
-      </p>
-
-      <button type="submit" disabled={busy} className="relative mt-1 inline-flex min-h-14 cursor-pointer items-center justify-center rounded-[2px] bg-action px-10 py-4 text-base font-medium text-white transition-[background-color,box-shadow,transform] duration-200 hover:bg-action-hover hover:shadow-[0_10px_26px_-12px_rgba(205,20,33,.7)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-action active:translate-y-px disabled:cursor-wait disabled:opacity-70">
-        {site.cta}
-        <span className="absolute right-4 flex w-5 justify-center" aria-hidden="true">{busy && <CircleNotch size={19} className="animate-spin" />}</span>
-      </button>
-
-      <div role="status" aria-live="polite" aria-atomic="true" className="min-h-12">
-        {busy ? <p className="text-sm text-ink2">Sending your request…</p> : status && (
-          <p className={`rounded-[2px] border px-4 py-3 text-sm font-medium ${status.kind === "ok" ? "border-line2 bg-sunken text-ink" : "border-danger text-danger"}`}>{status.msg}</p>
-        )}
+      <p className={styles.privacy}>Please avoid sensitive personal information or confidential business details. Read our <Link href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy (review draft)<span className="sr-only"> (opens in a new tab)</span></Link>, including the current retention and privacy-contact arrangements.</p>
+      <div className={styles.consent}>
+        <input id="f-consent" name="consent" type="checkbox" required checked={consent} disabled={busy} onChange={event => { setConsent(event.target.checked); submissionId.current = null; setErrors(previous => ({ ...previous, consent: undefined })); }} aria-invalid={errors.consent ? true : undefined} aria-describedby={errors.consent ? "err-consent" : undefined} />
+        <label htmlFor="f-consent">I consent to WOY Consulting using my name, email address, organisation (if provided) and message to respond to this enquiry. <span className={styles.required}>*</span></label>
+        {errors.consent && <p id="err-consent" className={styles.fieldError}>{errors.consent}</p>}
       </div>
+      {error && <p role="alert" className={styles.error}>{error}</p>}
+      <button type="submit" disabled={busy} className={styles.submit}><span>{busy ? "Sending your enquiry…" : "Send enquiry"}</span><ArrowUpRight size={20} aria-hidden="true" /></button>
     </form>
   );
 }

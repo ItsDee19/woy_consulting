@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const ts = require("typescript");
+const { randomUUID } = require("node:crypto");
 
 // Compile the small server surface in isolation; all upstream delivery is mocked.
 // "server-only" is a Next build-time boundary, so only that marker is stubbed here.
@@ -45,24 +46,42 @@ test.after(() => {
   }
 });
 
-const valid = { name: "Test Visitor", mobile: "+91 98765 43210", email: "visitor@example.test", website: "" };
+const valid = {
+  name: "Test Visitor", email: "visitor@example.test", organisation: "Test Organisation",
+  message: "We would like to discuss a leadership development programme.",
+  website: "", consent: true, privacyNoticeVersion: validation.PRIVACY_NOTICE_VERSION,
+};
+function enquiry(overrides = {}) {
+  return { ...valid, id: randomUUID(), ...overrides };
+}
 function cookie(age = 2000) {
   return `${security.CONTACT_COOKIE}=${security.createChallenge(secret, Date.now() - age)}`;
 }
-function request(body = valid, headers = {}, customCookie = cookie()) {
+function request(body = enquiry(), headers = {}, customCookie = cookie()) {
   return new Request("https://woy.test/api/contact", {
     method: "POST",
     headers: { Origin: "https://woy.test", "Content-Type": "application/json", Cookie: customCookie, ...headers },
-    body: typeof body === "string" ? body : JSON.stringify(body),
+    body: typeof body === "string" ? body : JSON.stringify(Array.isArray(body) ? body : { id: randomUUID(), ...body }),
   });
 }
 
-test("shared validation accepts international names and rejects malformed, oversized, and control-character fields", () => {
-  assert.deepEqual(validation.validateContact({ name: "अनन्या शर्मा", mobile: "+44 (20) 1234-5678", email: "name+tag@example.co.uk" }), {});
+test("shared validation accepts international names, optional organisations and multiline messages", () => {
+  assert.deepEqual(validation.contactFields, ["name", "email", "organisation", "message"]);
+  assert.deepEqual(validation.validateContact({
+    name: "अनन्या शर्मा", email: "name+tag@example.co.uk", organisation: "",
+    message: "Our priorities:\r\n\tLeadership development and sustained growth.",
+  }), {});
+  assert.equal(validation.validateContactField("name", "N".repeat(120)), undefined);
+  assert.equal(validation.validateContactField("organisation", "अ".repeat(200)), undefined);
+  assert.equal(validation.validateContactField("message", "अ".repeat(4000)), undefined);
+});
+
+test("shared validation rejects malformed, oversized and disallowed control-character fields", () => {
   for (const [field, values] of Object.entries({
-    name: ["", "A", "123", "a".repeat(101), "Name\nInjected"],
+    name: ["", "A", "123", "a".repeat(121), "Name\nInjected"],
     email: ["", "bad@", "bad@example..com", "a@b", "a".repeat(250) + "@example.com", "bad\r@example.com"],
-    mobile: ["123", "++1234567", "123abc4567", "1".repeat(16), { toString: () => "1234567" }],
+    organisation: [undefined, { toString: () => "Company" }, "a".repeat(201), "Company\nInjected"],
+    message: ["", "too short", "          ", "a".repeat(4001), "A message\u0000with null", "A message\u000bwith control"],
   })) {
     for (const value of values) assert.ok(validation.validateContactField(field, value), `${field} should reject ${String(value)}`);
   }
@@ -113,8 +132,8 @@ test("form reports unavailable rather than success without production delivery c
 
 test("JSON size/type checks, malformed bodies, honeypot and strict schema run before delivery", async () => {
   assert.equal((await route.POST(request(valid, { "Content-Type": "text/plain" }))).status, 415);
-  assert.equal((await route.POST(request(valid, { "Content-Length": "4097" }))).status, 413);
-  assert.equal((await route.POST(request("x".repeat(4097)))).status, 413);
+  assert.equal((await route.POST(request(valid, { "Content-Length": "32769" }))).status, 413);
+  assert.equal((await route.POST(request("x".repeat(32769)))).status, 413);
   assert.equal((await route.POST(request("{invalid"))).status, 400);
   assert.equal((await route.POST(request([]))).status, 400);
   assert.equal((await route.POST(request({ ...valid, website: "https://spam.test" }))).status, 400);
@@ -124,52 +143,116 @@ test("JSON size/type checks, malformed bodies, honeypot and strict schema run be
   assert.ok((await response.json()).errors.email);
 });
 
-test("successful delivery uses server-only authentication, normalized fields, and deduplicates", async () => {
+test("consent, current privacy notice and a valid UUID are required before delivery", async () => {
+  global.fetch = async () => { throw new Error("Invalid metadata must not reach delivery"); };
+  for (const consent of [undefined, false, "true", 1]) {
+    const response = await route.POST(request(enquiry({ consent })));
+    assert.equal(response.status, 422);
+    assert.ok((await response.json()).errors.consent);
+  }
+  for (const id of [undefined, "", "not-a-uuid", "0".repeat(500), "12345678-1234-4234-7234-123456789012"]) {
+    assert.equal((await route.POST(request(enquiry({ id })))).status, 400);
+  }
+  for (const privacyNoticeVersion of [undefined, "2020-01-01", 20260925]) {
+    assert.equal((await route.POST(request(enquiry({ privacyNoticeVersion })))).status, 400);
+  }
+});
+
+test("successful delivery forwards only normalized fields and consent metadata with server-only authentication", async () => {
   const browser = cookie();
+  const body = enquiry({ name: "  Test Visitor  ", organisation: "  Test Organisation  " });
   let calls = 0;
   process.env.CONTACT_ENDPOINT_TOKEN = "server-only-test-token";
   global.fetch = async (url, options) => {
     calls += 1;
     assert.equal(String(url), "https://delivery.test/contact");
     assert.equal(options.headers.Authorization, "Bearer server-only-test-token");
+    assert.equal(options.headers["Idempotency-Key"], body.id);
     assert.equal(options.redirect, "error");
-    assert.deepEqual(Object.fromEntries(options.body.entries()), { name: valid.name, email: valid.email, mobile: valid.mobile });
+    assert.deepEqual(Object.fromEntries(options.body.entries()), {
+      name: valid.name, email: valid.email, organisation: valid.organisation, message: valid.message,
+      id: body.id, consent: "true", privacyNoticeVersion: validation.PRIVACY_NOTICE_VERSION,
+    });
     return new Response("", { status: 202 });
   };
-  const body = { ...valid, name: "  Test Visitor  " };
   const first = await route.POST(request(body, {}, browser));
   assert.equal(first.status, 200);
-  assert.ok(!(await first.text()).includes("server-only-test-token"));
+  const acknowledgement = await first.json();
+  assert.equal(acknowledgement.message, "Your enquiry has been received by WOY Consulting.");
+  assert.ok(!JSON.stringify(acknowledgement).includes("server-only-test-token"));
   assert.equal((await route.POST(request(body, {}, browser))).status, 200);
+  // An unchanged retry keeps its UUID even when the signed browser session changes.
+  assert.equal((await route.POST(request(body))).status, 200);
   assert.equal(calls, 1);
   delete process.env.CONTACT_ENDPOINT_TOKEN;
 });
 
+test("maximum-length Unicode messages are accepted within the bounded JSON body", async () => {
+  const body = enquiry({ message: "अ".repeat(4000), organisation: "" });
+  global.fetch = async (_url, options) => {
+    assert.equal(options.body.get("message"), body.message);
+    assert.equal(options.body.get("organisation"), "");
+    return new Response("", { status: 200 });
+  };
+  assert.ok(Buffer.byteLength(JSON.stringify(body)) > 4096);
+  assert.equal((await route.POST(request(body))).status, 200);
+});
+
 test("concurrent duplicate requests are blocked while delivery is pending", async () => {
   const browser = cookie();
+  const body = enquiry();
+  let calls = 0;
   let started;
   let finish;
   const entered = new Promise((resolve) => { started = resolve; });
-  global.fetch = () => { started(); return new Promise((resolve) => { finish = resolve; }); };
-  const first = route.POST(request(valid, {}, browser));
+  global.fetch = () => { calls += 1; started(); return new Promise((resolve) => { finish = resolve; }); };
+  const first = route.POST(request(body, {}, browser));
   await entered;
-  assert.equal((await route.POST(request(valid, {}, browser))).status, 409);
+  assert.equal((await route.POST(request(body, {}, browser))).status, 409);
   finish(new Response("", { status: 200 }));
   assert.equal((await first).status, 200);
+  assert.equal(calls, 1);
 });
 
-test("upstream failures return honest errors without leaking provider data and allow retry", async () => {
+test("reusing an acknowledged UUID with altered details rejects rather than falsely acknowledging or resending", async () => {
+  const body = enquiry();
+  let calls = 0;
+  global.fetch = async () => { calls += 1; return new Response("", { status: 200 }); };
+  assert.equal((await route.POST(request(body))).status, 200);
+  for (const change of [{ message: "A different business priority to discuss." }, { email: "another@example.test" }, { organisation: "Other organisation" }]) {
+    const conflict = await route.POST(request({ ...body, ...change }));
+    assert.equal(conflict.status, 409);
+    assert.match((await conflict.json()).message, /different details/);
+  }
+  assert.equal(calls, 1);
+});
+
+test("upstream failures return honest errors, retain the payload binding, and reuse the idempotency key on retry", async () => {
   const browser = cookie();
-  global.fetch = async () => new Response("private provider detail", { status: 500 });
-  const response = await route.POST(request(valid, {}, browser));
+  const body = enquiry();
+  const keys = [];
+  global.fetch = async (_url, options) => {
+    keys.push(options.headers["Idempotency-Key"]);
+    return new Response("private provider detail", { status: 500 });
+  };
+  const response = await route.POST(request(body, {}, browser));
   assert.equal(response.status, 502);
   assert.ok(!(await response.text()).includes("private provider detail"));
-  global.fetch = async () => { throw new Error("secret network detail"); };
-  const failure = await route.POST(request(valid, {}, browser));
+  // Changing details after a failed attempt still requires a fresh submission ID.
+  assert.equal((await route.POST(request({ ...body, name: "Another Visitor" }, {}, browser))).status, 409);
+  global.fetch = async (_url, options) => {
+    keys.push(options.headers["Idempotency-Key"]);
+    throw new Error("secret network detail");
+  };
+  const failure = await route.POST(request(body, {}, browser));
   assert.equal(failure.status, 502);
   assert.ok(!(await failure.text()).includes("secret network detail"));
-  global.fetch = async () => new Response("", { status: 200 });
-  assert.equal((await route.POST(request(valid, {}, browser))).status, 200);
+  global.fetch = async (_url, options) => {
+    keys.push(options.headers["Idempotency-Key"]);
+    return new Response("", { status: 200 });
+  };
+  assert.equal((await route.POST(request(body, {}, browser))).status, 200);
+  assert.deepEqual(keys, [body.id, body.id, body.id]);
 });
 
 test("sender rate limits reject the sixth attempt and expire after their window", async () => {

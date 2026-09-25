@@ -7,17 +7,19 @@ export type LegalSection = {
   content: ReactNode;
 };
 
-export function LegalPage({ title, lede, sections }: {
+export function LegalPage({ title, lede, sections, updatedDate = "2026-09-21", updatedLabel = "21 September 2026" }: {
   title: string;
   lede: string;
   sections: LegalSection[];
+  updatedDate?: string;
+  updatedLabel?: string;
 }) {
   return (
     <>
       <PageHero kicker="Website information" title={title} lede={lede} />
       <div className="shell grid gap-12 py-12 md:py-20 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-20">
         <aside>
-          <p className="text-sm text-ink2">Last updated <time dateTime="2026-09-21">21 September 2026</time></p>
+          <p className="text-sm text-ink2">Last updated <time dateTime={updatedDate}>{updatedLabel}</time></p>
           <nav aria-label="On this page" className="mt-7 border-t border-line pt-6">
             <p className="text-sm font-medium">On this page</p>
             <ul className="mt-3 grid gap-1">

@@ -1,5 +1,5 @@
 import { getImageProps } from "next/image";
-import { clientLogos, logoDisclaimer, type ClientLogo } from "@/lib/content";
+import { clientLogos, type ClientLogo } from "@/lib/content";
 
 /* Full colour, no plate, no border. The band behind these is a white surface
    (see .logo-band in globals.css), which is what lets the artwork sit directly
@@ -59,20 +59,19 @@ function Row({
 export function ClientMarquee() {
   const half = Math.ceil(clientLogos.length / 2);
   return (
-    <section className="logo-band border-y border-line py-14 md:py-20">
+    <section className="logo-band logo-marquee border-y border-line py-12 md:py-16" aria-labelledby="client-marquee-heading" aria-describedby="client-marquee-description">
       <div className="shell">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-ink3">Brands supported by WOY</p>
+        <div className="mb-8 grid gap-4 border-b border-line pb-7 md:mb-10 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:gap-12 md:pb-8">
+          <h2 id="client-marquee-heading" className="max-w-[20ch] text-2xl font-bold leading-tight text-ink3 md:text-3xl">Our collective experience</h2>
+          <p id="client-marquee-description" className="max-w-[64ch] text-base leading-relaxed text-ink3">
+            Organisations that WOY and its practitioners have supported through direct assignments and engagements delivered with partner and affiliate platforms.
+          </p>
         </div>
       </div>
 
       <div className="marquee-wrap flex flex-col gap-8">
         <Row items={clientLogos.slice(0, half)} direction="l" />
         <Row items={clientLogos.slice(half)} direction="r" />
-      </div>
-
-      <div className="shell">
-        <p className="mt-10 max-w-[62ch] text-sm text-ink3">{logoDisclaimer}</p>
       </div>
     </section>
   );

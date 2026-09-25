@@ -1,30 +1,33 @@
-export const contactFields = ["name", "mobile", "email"] as const;
+export const PRIVACY_NOTICE_VERSION = "2026-09-25";
+
+export const contactFields = ["name", "email", "organisation", "message"] as const;
 export type ContactField = (typeof contactFields)[number];
 export type ContactValues = Record<ContactField, string>;
-export type ContactErrors = Partial<Record<ContactField, string>>;
+export type ContactErrors = Partial<Record<ContactField | "consent", string>>;
 
 export const contactRules = {
-  name: { label: "Full name", maxLength: 100 },
-  mobile: { label: "Mobile number", maxLength: 32 },
+  name: { label: "Your name", maxLength: 120 },
   email: { label: "Email address", maxLength: 254 },
+  organisation: { label: "Organisation", maxLength: 200 },
+  message: { label: "What would you like to move forward?", maxLength: 4000 },
 } satisfies Record<ContactField, { label: string; maxLength: number }>;
 
 export function validateContactField(field: ContactField, value: unknown): string | undefined {
-  if (typeof value !== "string" || value.length > contactRules[field].maxLength || /[\u0000-\u001f\u007f]/u.test(value)) {
-    return `Please enter a valid ${contactRules[field].label.toLowerCase()} (up to ${contactRules[field].maxLength} characters).`;
+  // A message may contain line breaks and tabs, but single-line fields may not.
+  const controls = field === "message" ? /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/u : /[\u0000-\u001f\u007f]/u;
+  if (typeof value !== "string" || value.length > contactRules[field].maxLength || controls.test(value)) {
+    const label = field === "name" || field === "message" ? field : contactRules[field].label.toLowerCase();
+    return `Please enter a valid ${label} (up to ${contactRules[field].maxLength} characters).`;
   }
   const trimmed = value.trim();
   if (field === "name" && (trimmed.length < 2 || !/\p{L}/u.test(trimmed))) {
     return "Please enter your full name.";
   }
-  if (field === "mobile") {
-    const digits = trimmed.replace(/\D/g, "");
-    if (!/^\+?[\d\s().-]+$/.test(trimmed) || digits.length < 7 || digits.length > 15) {
-      return "Please enter a mobile number with 7 to 15 digits, including your country code.";
-    }
-  }
   if (field === "email" && !/^[^\s@<>]+@[^\s@<>.]+(?:\.[^\s@<>.]+)+$/.test(trimmed)) {
     return "Please enter a valid email address.";
+  }
+  if (field === "message" && trimmed.length < 10) {
+    return "Please enter a message of at least 10 characters.";
   }
 }
 

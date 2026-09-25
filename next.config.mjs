@@ -54,7 +54,7 @@ const nextConfig = {
     const profileDestinations = ["vipin-tuteja", "sandeep-bidani", "kannan-swaminathan"].map(slug => ({
       source: `/people/${slug}`, destination: `/practitioners#${slug}`, permanent: true,
     }));
-    const preservedDestinations = [...sourceDestinations, ...profileDestinations];
+    const preservedDestinations = [...sourceDestinations, ...profileDestinations, { source: "/privacy", destination: "/privacy-policy", permanent: true }];
     if (!isProduction) return preservedDestinations;
     const httpsRedirects = configuredSiteOrigins(process.env)
       .filter((origin) => !isLocalHost(new URL(origin).hostname))
