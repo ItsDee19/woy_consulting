@@ -7,7 +7,7 @@ const browser = await chromium.launch({ headless: true, executablePath: process.
 fs.mkdirSync("reports", { recursive: true });
 const results = [];
 try {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: "no-preference" });
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: "no-preference", colorScheme: "light" });
   await page.goto(base, { waitUntil: "load" });
   await page.getByRole("button", { name: "Essential only", exact: true }).click();
   const logo = page.locator("[data-logo-formation]");
@@ -92,10 +92,11 @@ try {
     }
     assert.ok(bounds.strokes.every(stroke => stroke === bounds.strokes[0]), "Letters retain the ring's stroke weight");
   };
-  for (const width of [320, 390, 768, 1440, 1920]) {
+  for (const width of [320, 390, 768, 1440, 1920, 2560, 3840]) {
     await page.setViewportSize({ width, height: 1000 });
     await logo.scrollIntoViewIfNeeded();
     const before = await logo.boundingBox();
+    assert.ok(Math.abs(before.width / before.height - 254 / 150) < .001, "Animation wrapper and SVG share one aspect ratio");
     // Sample both visible phases and the hidden reset. A fixed outer guide must
     // remain concentric with the star even during nested outline scaling.
     const centerSamples = [];
@@ -108,6 +109,7 @@ try {
       centerSamples.push({ time, guide: state.guide, star: state.star, outline: state.starOutlineCenter, orbit: state.orbit });
     }
     const separated = await sample(2600);
+    assert.ok(Math.abs(separated.star.x - (before.x + before.width / 2)) < .1, "Opening symbols are centred above the tagline");
     assert.ok(separated.circle.x < separated.star.x && separated.star.x < separated.compass.x, "Reference symbols are separate and ordered");
     assert.equal(separated.outline, 1);
     assert.equal(separated.core, 0);
@@ -133,6 +135,33 @@ try {
     assert.equal((await logo.boundingBox()).height, before.height, "The formation does not shift layout");
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth), false);
     if (width === 390 || width === 1440) await logo.screenshot({ path: `reports/logo-complete-${width}.png` });
+    const resolved = await logo.evaluate(element => {
+      const mark = element.querySelector('.mk-final-mark'), caption = element.querySelector('.mk-consulting');
+      // Nested SVG getBoundingClientRect includes the full image beyond its clip.
+      // Measure the painted viewport through the parent SVG transform instead.
+      const viewport = node => {
+        const matrix = node.ownerSVGElement.getScreenCTM();
+        const left = new DOMPoint(node.x.baseVal.value, node.y.baseVal.value).matrixTransform(matrix).x;
+        const right = new DOMPoint(node.x.baseVal.value + node.width.baseVal.value, node.y.baseVal.value).matrixTransform(matrix).x;
+        return { left, width: right - left };
+      };
+      const a = viewport(mark), b = viewport(caption);
+      const tagline = document.querySelector('[data-logo-caption]').getBoundingClientRect();
+      const identity = element.parentElement.getBoundingClientRect();
+      const center = a.left + a.width / 2;
+      return { markOpacity: getComputedStyle(mark).opacity, drawingOpacity: getComputedStyle(element.querySelector('.mk-drawing')).opacity,
+        source: mark.querySelector('image.mk-source-light').getAttribute('href'), captionSource: caption.querySelector('image').getAttribute('href'),
+        widthDifference: Math.abs(a.width - b.width), leftDifference: Math.abs(a.left - b.left),
+        taglineCenterDifference: Math.abs(center - tagline.x - tagline.width / 2),
+        columnCenterDifference: Math.abs(center - identity.x - identity.width / 2) };
+    });
+    assert.equal(resolved.markOpacity, '1', 'Completed logo displays the original navbar artwork');
+    assert.equal(resolved.drawingOpacity, '0', 'Formation drawing does not overlap the completed artwork');
+    assert.equal(resolved.source, await navbarImage.getAttribute('src'));
+    assert.equal(resolved.captionSource, resolved.source, 'Caption retains the original lettering');
+    assert.ok(resolved.widthDifference < .1 && resolved.leftDifference < .1, 'CONSULTING spans and aligns with WOY');
+    assert.ok(resolved.taglineCenterDifference < .1, 'Completed logo and tagline share the same centre');
+    assert.ok(resolved.columnCenterDifference < .6, 'Identity block is centred within its hero column');
     const painted = await paintedBounds();
     assertAlignedLetters(painted);
     const navbarBounds = await navbarLogo.boundingBox();
@@ -142,7 +171,7 @@ try {
     assertAlignedLetters(footerPainted);
     // The supplied reference measures W61px / O45px and Y38px / O45px.
     // Check the optical proportions rather than equating the static W with
-    // the narrower, separately approved animated lettering.
+    // the original artwork shown when the formation is complete.
     assert.ok(Math.abs(footerPainted.w.width / footerPainted.ring.width - 61 / 45) < .025, "Static W has the reference's broader proportions");
     assert.ok(Math.abs(footerPainted.y.width / footerPainted.ring.width - 38 / 45) < .025, "Static Y has the reference's proportions");
     assert.deepEqual(footerPainted.ring, painted.ring, "Static ring preserves the animated symbol geometry");
@@ -155,7 +184,7 @@ try {
       await navbarLogo.screenshot({ path: `reports/navbar-logo-${width}.png` });
       await footerLogo.screenshot({ path: `reports/footer-logo-${width}.png` });
     }
-    results.push({ width, centerSamples, separated, merging, complete, painted, navbarBounds, footerPainted });
+    results.push({ width, centerSamples, separated, merging, complete, resolved, painted, navbarBounds, footerPainted });
   }
   await page.emulateMedia({ reducedMotion: "reduce" });
   assert.equal(await logo.locator(".mk-ring").evaluate(el => getComputedStyle(el).animationName), "none");
@@ -164,6 +193,15 @@ try {
     assert.equal(await logo.locator(selector).first().evaluate(el => getComputedStyle(el).opacity), "1", `Complete reduced-motion mark: ${selector}`);
   }
   assertAlignedLetters(await paintedBounds());
+  assert.equal(await logo.locator('.mk-final-mark').evaluate(el => getComputedStyle(el).opacity), '1');
+  assert.equal(await logo.locator('.mk-drawing').evaluate(el => getComputedStyle(el).opacity), '0');
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.reload({ waitUntil: 'load' });
+  await page.getByRole('button', { name: 'Switch to dark theme', exact: true }).click();
+  await logo.scrollIntoViewIfNeeded();
+  assert.equal(await logo.locator('.mk-source-dark').evaluate(el => getComputedStyle(el).display), 'block');
+  assert.equal(await logo.locator('.mk-source-light').evaluate(el => getComputedStyle(el).display), 'none');
+  await logo.screenshot({ path: 'reports/logo-complete-dark.png' });
   const reducedCenter = await sample(0);
   assert.ok(Math.hypot(reducedCenter.star.x - reducedCenter.guide.x, reducedCenter.star.y - reducedCenter.guide.y) < .02, "Reduced-motion final symbol retains the guide centre");
   await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -175,5 +213,5 @@ try {
   await page.waitForFunction(() => !document.querySelector("[data-logo-formation]").classList.contains("is-paused"));
   assert.ok(await logo.evaluate(el => el.getAnimations({ subtree: true }).every(animation => animation.playState === "running")), "All tracks resume together");
   fs.writeFileSync("reports/logo-formation.json", JSON.stringify({ results, reducedMotion: true, offscreenPause: true, resume: true }, null, 2));
-  console.log("Logo formation: concentric guide and star throughout 21 animation samples at five widths, separate symbols, convergence, complete lockup, aligned letter heights, reference static logo proportions, responsive geometry, reduced motion and off-screen pause passed.");
+  console.log("Logo formation: concentric guide and star throughout 21 animation samples at seven widths, separate symbols, convergence, complete lockup, aligned letter heights, original navbar final artwork, full-width source caption, reference static proportions, responsive geometry, reduced motion and off-screen pause passed.");
 } finally { await browser.close(); }

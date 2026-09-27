@@ -1,8 +1,8 @@
 .section {
   --leadership-canvas: #fcfcfc;
-  --leadership-ink: #252a31;
-  --leadership-muted: #606774;
-  --leadership-red: #bc1830;
+  --leadership-ink: var(--c-ink);
+  --leadership-muted: var(--c-ink2);
+  --leadership-red: var(--c-red);
   --leadership-caption: #edf0f4;
   --leadership-rule: #d6dae0;
   padding-block: 50px 108px;
@@ -13,8 +13,6 @@
 
 :global([data-theme="dark"]) .section {
   --leadership-canvas: var(--c-navy);
-  --leadership-ink: var(--c-ink);
-  --leadership-muted: var(--c-ink2);
   --leadership-caption: #102030;
   --leadership-rule: var(--c-line2);
 }

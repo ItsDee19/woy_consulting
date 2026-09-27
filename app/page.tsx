@@ -33,14 +33,14 @@ export default function Home() {
               <h1 id="home-title" className={styles.title}>
                 <span>Turning strategic intent into</span>{" "}<em>sustained performance.</em>
               </h1>
-              <p className="mt-6 max-w-[34ch] text-lg font-light leading-relaxed text-ink2 md:text-xl">
+              <p className="mt-6 max-w-[34ch] text-lg leading-relaxed text-ink2 md:text-xl">
                 We partner with CEOs, founders and leadership teams to align strategy,
                 strengthen leadership and build organisations that perform.
               </p>
               <div className="mt-9">
                 <Link
                   href={site.ctaHref}
-                  className="group inline-flex items-center gap-2.5 rounded-[2px] bg-action px-7 py-4 font-medium text-white transition-all duration-300 hover:bg-action-hover hover:shadow-[0_10px_26px_-12px_rgba(205,20,33,.7)] active:translate-y-px"
+                  className="group inline-flex items-center gap-2.5 rounded-[2px] bg-action px-7 py-4 font-medium text-white transition-[background-color,box-shadow,transform] duration-300 hover:bg-action-hover hover:shadow-[0_10px_26px_-12px_rgba(205,20,33,.7)] active:translate-y-px"
                 >
                   {site.cta}
                   <ArrowRight

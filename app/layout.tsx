@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   } : { index: false, follow: false },
 };
 
-/* Runs before first paint. Sets the saved theme so there is no flash, and
+/* Runs before first paint. Uses light unless theme memory was explicitly allowed, and
    marks the document as scripted, which is what arms the scroll reveals. If
    this never runs, revealed content simply renders visible. */
 const bootScript = `
@@ -46,9 +46,9 @@ const bootScript = `
     if(valid){d.setAttribute('data-cookie-choice','saved');}
     var t=valid&&c.preferences===true?localStorage.getItem('woy-theme'):null;
     if(t!=='light'&&t!=='dark'){t=null;}
-    if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+    if(!t){t='light';}
     d.setAttribute('data-theme',t);
-  }catch(e){d.setAttribute('data-theme',matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}
+  }catch(e){d.setAttribute('data-theme','light');}
 })();
 `;
 
@@ -56,7 +56,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-theme="light" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>

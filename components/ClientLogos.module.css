@@ -1,7 +1,7 @@
 .section {
-  --experience-ink: #252a31;
-  --experience-muted: #606774;
-  --experience-rule: #d6dae0;
+  --experience-ink: var(--c-ink-on-light);
+  --experience-muted: var(--c-muted-on-light);
+  --experience-rule: var(--c-line-on-light);
   padding-block: 80px 72px;
   border-bottom: 1px solid var(--experience-rule);
   background: #fff;
@@ -68,6 +68,7 @@
 .artwork { display: block; width: auto; height: auto; max-width: min(100%, 200px); max-height: 96px; object-fit: contain; }
 .left { animation: drift-left 70s linear infinite; }
 .right { animation: drift-right 86s linear infinite; }
+.rows[data-motion-paused] .track,
 .rows:is(:hover, :focus-within) .track { animation-play-state: paused; }
 @keyframes drift-left { to { transform: translateX(-50%); } }
 @keyframes drift-right { from { transform: translateX(-50%); } to { transform: translateX(0); } }
@@ -88,7 +89,7 @@
   transition: color .2s;
 }
 .link svg { flex-shrink: 0; }
-.link:hover { color: #bc1830; }
+.link:hover { color: var(--c-red); }
 .link:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
 
 @media (max-width: 1100px) {

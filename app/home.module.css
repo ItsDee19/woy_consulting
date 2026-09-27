@@ -3,6 +3,7 @@
   isolation: isolate;
   overflow: clip;
   background: var(--c-bg);
+  font-family: var(--font-interface);
 }
 .content {
   position: relative;
@@ -12,7 +13,7 @@
   padding-block: clamp(3rem, 5vw, 5rem) clamp(3.5rem, 6vw, 5.5rem);
 }
 .logoCaption { display: grid; justify-items: center; gap: .65rem; text-align: center; }
-.captionTitle { color: var(--c-ink); font-size: clamp(1.15rem, 1.6vw, 1.4rem); line-height: 1.3; font-weight: 500; letter-spacing: -.025em; }
+.captionTitle { font-family: var(--font-editorial); color: var(--c-ink); font-size: clamp(1.15rem, 1.6vw, 1.4rem); line-height: 1.3; font-weight: 500; letter-spacing: -.025em; }
 .captionTitle span { color: var(--c-red); }
 .captionValues { display: flex; flex-wrap: wrap; justify-content: center; gap: .55rem; color: var(--c-ink2); font-size: .8125rem; line-height: 1.5; letter-spacing: .04em; }
 .eyebrow { color: var(--c-red); font-family: var(--font-interface); font-size: clamp(.75rem, 1.05vw, .875rem); font-weight: 600; line-height: 1.6; letter-spacing: .14em; text-transform: uppercase; }
@@ -23,10 +24,10 @@
 
 .heroGrid { display: grid; width: 100%; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: center; gap: clamp(2rem, 4vw, 3.5rem); }
 .heroCopy { min-width: 0; }
-.title { max-width: 14ch; font-size: clamp(4.25rem, 6.3vw, 6.5rem); line-height: 1.03; letter-spacing: -.038em; font-weight: 400; overflow-wrap: normal; }
+.title { font-family: var(--font-editorial); max-width: 14ch; font-size: clamp(4.25rem, 6.3vw, 6.5rem); line-height: 1.03; letter-spacing: -.038em; font-weight: 400; overflow-wrap: normal; }
 .title span, .title em { display: block; }
 .title em { color: var(--c-red); }
-.heroIdentity { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; min-width: 0; border-left: 1px solid var(--c-line2); padding-left: clamp(1.5rem, 3vw, 2.75rem); padding-block: 2rem; }
+.heroIdentity { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; min-width: 0; border-left: 1px solid var(--c-line2); padding-inline: clamp(1rem, 1.65vw, 1.75rem); padding-block: 2rem; }
 @media (min-width: 1024px) {
   .content { min-height: min(900px, calc(100dvh - var(--header-height))); }
 }

@@ -50,8 +50,8 @@ export const MARK = {
 /**
  * The compact static lockup follows the supplied header reference: its W is
  * deliberately wider than the round symbol, while both letters retain the
- * symbol's painted height and four-unit stroke. The animated mark keeps its
- * separately approved geometry above.
+ * symbol's painted height and four-unit stroke. The animated letter drawing
+ * uses the same proportions before resolving into the original navbar artwork.
  */
 export const STATIC_MARK = {
   ...MARK,
@@ -66,4 +66,27 @@ export const STATIC_MARK = {
 export const SOURCE_SYMBOLS = {
   starOutline: "M180 60 L188.2 82.7 L212.3 83.5 L193.3 98.3 L200 121.5 L180 108 L160 121.5 L166.7 98.3 L147.7 83.5 L171.8 82.7 Z",
   compassPoints: "M180 63 L185 82 L199.8 74.2 L192 89 L211 94 L192 99 L199.8 113.8 L185 106 L180 125 L175 106 L160.2 113.8 L168 99 L149 94 L168 89 L160.2 74.2 L175 82 Z",
+} as const;
+
+/** Original navbar artwork, aligned to MARK's ring for the completed animation. */
+export const SOURCE_LOCKUP = {
+  src: "/assets/woy-logo.png",
+  width: 834,
+  height: 490,
+  markViewBox: "216 139 401 155",
+  wordViewBox: "224 328 384 22",
+  x: 48.4615,
+  y: 44.1538,
+  markWidth: 222.0923,
+  markHeight: 85.8462,
+  wordY: 148.8308,
+  wordHeight: 12.1846,
+} as const;
+
+/** Centre the animation and its caption on the complete lockup, not its O. */
+const lockupCenterX = SOURCE_LOCKUP.x + SOURCE_LOCKUP.markWidth / 2;
+export const FORMATION_FRAME = {
+  viewBox: `${lockupCenterX - 127} 30 254 150`,
+  aspectRatio: "254 / 150",
+  introOffsetX: lockupCenterX - MARK.cx,
 } as const;

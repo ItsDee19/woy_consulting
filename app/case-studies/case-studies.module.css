@@ -64,9 +64,9 @@
 .workColumns { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 5rem); }
 .workColumns h3 { font-size: .8rem; font-weight: 600; line-height: 1.5; margin-bottom: 1rem; }
 .roleCopy { display: grid; gap: 1rem; }
-.roleCopy p { color: var(--c-ink2); font-size: .925rem; line-height: 1.75; }
+.roleCopy p { max-width: 60ch; color: var(--c-ink2); font-size: .925rem; line-height: 1.75; }
 .frameworkColumn { border-left: 1px solid var(--c-line2); padding-left: clamp(1.5rem, 3vw, 3rem); }
-.frameworkColumn li { padding-block: .8rem; color: var(--c-ink2); font-size: .875rem; line-height: 1.7; border-bottom: 1px solid var(--c-line); }
+.frameworkColumn li { max-width: 60ch; padding-block: .8rem; color: var(--c-ink2); font-size: .875rem; line-height: 1.7; border-bottom: 1px solid var(--c-line); }
 .frameworkColumn li:first-child { padding-top: 0; }
 .frameworkColumn li:last-child { border-bottom: 0; padding-bottom: 0; }
 .outcomesSection { background: var(--c-navy); color: var(--c-on-navy); padding-block: 3.5rem; }

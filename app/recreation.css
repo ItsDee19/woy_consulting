@@ -1,16 +1,16 @@
 /* Source recreation: selectors are isolated to the four requested pages and navbar.
  * Rule order is retained from the supplied September 2026 snapshot. */
-.recreation{--background:#fcfcfc;--foreground:#252a31;--card:#f1f3f6;--card-foreground:#252a31;--popover:#fcfcfc;--popover-foreground:#252a31;--primary:#bc1830;--primary-foreground:#fff;--secondary:#edf0f4;--secondary-foreground:#252a31;--muted:#edf0f4;--muted-foreground:#606774;--accent:#f5e5e4;--accent-foreground:#9f1429;--destructive:#b81227;--border:#d6dae0;--input:#aeb5c0;--ring:#bc1830;--radius:0rem;--navy:#16324f;--navy-strong:#11283f;--surface-blue:#edf2f7;--sidebar:#fcfcfc;--sidebar-foreground:#252a31;--sidebar-primary:#bc1830;--sidebar-primary-foreground:#fff;--sidebar-accent:#edf0f4;--sidebar-accent-foreground:#252a31;--sidebar-border:#d6dae0;--sidebar-ring:#bc1830}
+.recreation{--background:#fcfcfc;--foreground:var(--c-ink);--card:#f1f3f6;--card-foreground:var(--c-ink);--popover:#fcfcfc;--popover-foreground:var(--c-ink);--primary:var(--c-red);--primary-foreground:#fff;--secondary:#edf0f4;--secondary-foreground:var(--c-ink);--muted:#edf0f4;--muted-foreground:var(--c-ink2);--accent:#f5e5e4;--accent-foreground:#9f1429;--destructive:#b81227;--border:var(--c-line-on-light);--input:#aeb5c0;--ring:var(--c-red);--radius:0rem;--navy:#16324f;--navy-strong:#11283f;--surface-blue:#edf2f7;--sidebar:#fcfcfc;--sidebar-foreground:#252a31;--sidebar-primary:var(--c-red);--sidebar-primary-foreground:#fff;--sidebar-accent:#edf0f4;--sidebar-accent-foreground:#252a31;--sidebar-border:#d6dae0;--sidebar-ring:#bc1830}
 
 :where(.recreation) *{box-sizing:border-box}
-.recreation{margin:0;background:var(--background);color:var(--foreground);font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6}
+.recreation{margin:0;background:var(--background);color:var(--foreground);font-family:var(--font-interface);font-size:16px;line-height:1.6}
 :where(.recreation) a,:where(.recreation) button,:where(.recreation) input,:where(.recreation) textarea{ -webkit-tap-highlight-color:transparent}
 :where(.recreation) a{text-decoration:none;color:inherit}
 :where(.recreation) button,:where(.recreation) a,:where(.recreation) input,:where(.recreation) textarea,:where(.recreation) select{touch-action:manipulation}
 :where(.recreation) button{cursor:pointer}
 :where(.recreation) img{display:block;max-width:100%}
 :where(.recreation) h1,:where(.recreation) h2,:where(.recreation) h3,:where(.recreation) h4,:where(.recreation) p{margin:0}
-:where(.recreation) h1,:where(.recreation) h2,:where(.recreation) h3{font-family:Georgia,'Times New Roman',serif;font-weight:400;line-height:1.08;letter-spacing:-.04em}
+:where(.recreation) h1,:where(.recreation) h2,:where(.recreation) h3{font-family:var(--font-editorial);font-weight:400;line-height:1.08;letter-spacing:-.04em}
 :where(.recreation) h1{font-size:clamp(3.25rem,6.4vw,6.75rem)}
 :where(.recreation) h2{font-size:clamp(2.45rem,4.2vw,4.5rem)}
 :where(.recreation) h3{font-size:2rem}
@@ -41,7 +41,7 @@
 :where(.recreation) .case-card .case-meta{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;margin-top:23px;color:var(--primary)}
 :where(.recreation) .case-cover{background:#e9edf2;min-height:260px;padding:30px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;transition:background .25s}
 :where(.recreation) .case-cover-top{display:flex;justify-content:space-between;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em}
-:where(.recreation) .case-cover-title{font-family:Georgia,serif;font-size:clamp(2.8rem,4.8vw,4.7rem);line-height:1;letter-spacing:-.04em;max-width:440px}
+:where(.recreation) .case-cover-title{font-family:var(--font-editorial);font-size:clamp(2.8rem,4.8vw,4.7rem);line-height:1;letter-spacing:-.04em;max-width:440px}
 :where(.recreation) .case-cover-bottom{font-size:.8125rem;border-top:1px solid currentColor;padding-top:15px;margin-top:25px;opacity:.7}
 :where(.recreation) .case-card:is(:hover, :focus-visible) .case-cover{background:#dee5ed}
 :where(.recreation) .case-card:hover h3{color:var(--primary)}
@@ -72,7 +72,7 @@
 :where(.recreation) .desktop-nav [aria-current=page]{color:var(--primary)}
 :where(.recreation) .mobile-nav{display:none}
 :where(.recreation) .mobile-sheet{padding:40px 28px;width:min(90vw,400px)}
-:where(.recreation) .mobile-sheet nav{display:flex;flex-direction:column;margin:35px 0;gap:22px;font-family:Georgia,serif;font-size:1.65rem}
+:where(.recreation) .mobile-sheet nav{display:flex;flex-direction:column;margin:35px 0;gap:22px;font-family:var(--font-interface);font-size:1.65rem}
 :where(.recreation) .mobile-sheet [data-slot=sheet-close]{min-width:44px;min-height:44px;display:grid;place-items:center}
 :where(.recreation) .menu-button{font-size:.875rem;gap:10px;padding:10px;min-height:44px}
 :where(.recreation) .logo-symbol{background-image:url('/assets/woy-philosophy.png');background-repeat:no-repeat;width:112px;height:116px;mix-blend-mode:multiply}
@@ -92,7 +92,7 @@
 :where(.recreation) .approach-band{background:#f0f3f6}
 :where(.recreation) .steps-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:35px}
 :where(.recreation) .step{border-top:1px solid #aeb5c0;padding-top:22px}
-:where(.recreation) .step-number{font-family:Georgia,serif;color:var(--primary);font-size:1.5rem}
+:where(.recreation) .step-number{font-family:var(--font-editorial);color:var(--primary);font-size:1.5rem}
 :where(.recreation) .step h3{margin:23px 0 18px;font-size:2rem}
 :where(.recreation) .step p{color:var(--muted-foreground);font-size:.9375rem}
 :where(.recreation) .page-intro{padding-block:80px 65px}
@@ -330,7 +330,7 @@
 
 :where(.recreation) .people-overview p+p{margin-top:18px}
 
-:where(.recreation) .people-group-title{font-family:Arial,Helvetica,sans-serif;font-size:.8125rem;letter-spacing:.13em;line-height:1.6;font-weight:600;flex-shrink:0}
+:where(.recreation) .people-group-title{font-family:var(--font-interface);font-size:.8125rem;letter-spacing:.13em;line-height:1.6;font-weight:600;flex-shrink:0}
 
 :where(.recreation) .people-partners{padding-top:64px}
 
@@ -352,7 +352,7 @@
   --card-foreground: var(--c-ink);
   --popover: var(--c-raised);
   --popover-foreground: var(--c-ink);
-  --primary: #bc1830; /* preserve the supplied light-mode brand red */
+  --primary: var(--c-red); /* preserve the supplied light-mode brand red */
   --primary-foreground: #0e1013; /* text colour remains independent of the canvas */
   --secondary: #171a1f;
   --secondary-foreground: var(--c-ink);
@@ -459,9 +459,9 @@
 
 /* Organisation artwork retains its original colours and white canvas. */
 [data-theme="dark"] :where(.recreation) .collective-experience {
-  --foreground: #252a31;
-  --muted-foreground: #606774;
-  --primary: #bc1830;
+  --foreground: var(--c-ink-on-light);
+  --muted-foreground: var(--c-muted-on-light);
+  --primary: var(--c-red);
   --border: #d6dae0;
   color: var(--foreground);
   color-scheme: light;

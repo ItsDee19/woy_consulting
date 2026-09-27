@@ -16,12 +16,15 @@
   --c-bg:      #FBF9F7;   /* warm white */
   --c-raised:  #FFFFFF;
   --c-sunken:  #F3EEE9;
-  --c-ink:     #14171D;   /* charcoal */
-  --c-ink2:    #4B525C;
+  --c-ink-on-light: #252A31;
+  --c-muted-on-light: #606774;
+  --c-line-on-light: #D6DAE0;
+  --c-ink:     var(--c-ink-on-light);   /* shared charcoal text */
+  --c-ink2:    var(--c-muted-on-light);
   --c-ink3:    #626A75;
   --c-line:    #E4DDD5;
   --c-line2:   #D2C8BE;
-  --c-red:     #CD1421;   /* WOY logo red */
+  --c-red:     #BC1830;   /* shared text/action red; original artwork is separate */
   --c-redb:    #FF7466;   /* WOY accent red */
   --c-reddeep: #A50F1A;
   --c-logo-red: #CD1421; /* fixed artwork colors in both themes */
@@ -29,7 +32,7 @@
   --c-navy: #041D41; /* midnight navy from the WOY introduction deck */
   --c-on-navy: #F6F2EE;
   --c-on-navy-muted: #BAC5D6;
-  --c-action: #C81926;
+  --c-action: var(--c-red);
   --c-action-hover: #A50F1A;
   --c-danger: #A50F1A;
   --c-control: #7A7068;
@@ -61,7 +64,7 @@
   --c-ink3:    #99A1AC;
   --c-line:    #24272C;
   --c-line2:   #373C43;
-  --c-red:     #CD1421;   /* keep brand text identical to light mode */
+  --c-red:     #BC1830;   /* keep text red identical to light mode */
   --c-redb:    #FF7466;
   --c-reddeep: #A50F1A;
   --c-danger: #FF9A90;
@@ -242,7 +245,30 @@
   58%, 84% { stroke-dashoffset: 0; opacity: 1; }
   91%, 100% { stroke-dashoffset: 0; opacity: 0; }
 }
-.mk-consulting { font-size: 13px; font-weight: 500; letter-spacing: 6.5px; animation: mkConsultingResolve var(--mk-duration) linear infinite; }
+.mk-drawing { animation: mkDrawingResolve var(--mk-duration) linear infinite, mkSceneAlign var(--mk-duration) var(--mk-travel) infinite; }
+@keyframes mkSceneAlign {
+  0%, 26% { transform: translateX(var(--mk-intro-offset)); }
+  46%, 94% { transform: translateX(0); }
+  100% { transform: translateX(var(--mk-intro-offset)); }
+}
+.mk-final-mark, .mk-consulting { overflow: hidden; }
+.mk-final-mark { opacity: 0; animation: mkFinalMark var(--mk-duration) linear infinite; }
+.mk-consulting { animation: mkConsultingResolve var(--mk-duration) linear infinite; }
+.mk-source-dark { display: none; }
+[data-theme="dark"] .mk-source-light { display: none; }
+[data-theme="dark"] .mk-source-dark { display: block; }
+[data-theme="dark"] .mk-consulting image { filter: invert(1) hue-rotate(180deg) saturate(2); }
+/* A brief handoff avoids a lingering double outline between the two assets. */
+@keyframes mkDrawingResolve {
+  0%, 57% { opacity: 1; }
+  58%, 94% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes mkFinalMark {
+  0%, 57% { opacity: 0; }
+  58%, 84% { opacity: 1; }
+  93%, 100% { opacity: 0; }
+}
 @keyframes mkConsultingResolve {
   0%, 51% { opacity: 0; }
   58%, 84% { opacity: 1; }
@@ -286,7 +312,8 @@
   .logo-formation * { animation: none !important; }
   .mk-ring, .mk-star, .mk-compass { transform: none; }
   .mk-ring, .mk-star-core path, .mk-letters path { stroke-dashoffset: 0; opacity: 1; }
-  .mk-needle, .mk-consulting { opacity: 1; }
+  .mk-needle, .mk-consulting, .mk-final-mark { opacity: 1; }
+  .mk-drawing { opacity: 0; }
   .mk-star-outline, .mk-compass-detail, .mk-guides, .mk-convergence, .mk-lock-pulse { opacity: 0; }
 }
 
@@ -371,12 +398,12 @@
 .logo-band {
   background: #FFFFFF;
   color: var(--c-ink);
-  --c-ink:   #14171D;
-  --c-ink2:  #4B525C;
+  --c-ink:   var(--c-ink-on-light);
+  --c-ink2:  var(--c-muted-on-light);
   --c-ink3:  #626A75;
   --c-line:  #E4DDD5;
   --c-line2: #D2C8BE;
-  --c-red:   #CD1421;
+  --c-red:   #BC1830;
 }
 
 /* Keep authentic client artwork on white with dark spacing between sections.

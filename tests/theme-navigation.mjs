@@ -13,11 +13,40 @@ const scenarios = [
   { name: "dark on a light device", system: "light", chosen: "dark", width: 1440 },
   { name: "mobile light on a dark device", system: "dark", chosen: "light", width: 390 },
   { name: "unavailable browser storage", system: "dark", chosen: "light", width: 1440, blocked: true },
-  { name: "consented theme memory", system: "dark", chosen: "light", width: 1440, remember: true },
+  { name: "consented light theme memory", system: "dark", chosen: "light", width: 1440, remember: true },
+  { name: "consented dark theme memory", system: "dark", chosen: "dark", width: 1440, remember: true },
 ];
-const results = [], errors = [];
+const bootstrapScenarios = [
+  { name: "fresh visit on a dark device", expected: "light" },
+  { name: "remembered dark theme", consent: true, theme: "dark", expected: "dark" },
+  { name: "remembered light theme", consent: true, theme: "light", expected: "light" },
+  { name: "theme without preference consent", theme: "dark", expected: "light" },
+  { name: "theme with preferences refused", consent: false, theme: "dark", expected: "light" },
+  { name: "invalid remembered theme", consent: true, theme: "invalid", expected: "light" },
+  { name: "malformed preference record", malformed: true, theme: "dark", expected: "light" },
+];
+const results = [], bootstrapResults = [], errors = [];
 
 try {
+  for (const scenario of bootstrapScenarios) {
+    const context = await browser.newContext({ colorScheme: "dark", reducedMotion: "reduce" });
+    await context.addInitScript(scenario => {
+      localStorage.removeItem("woy-cookie-preferences");
+      localStorage.removeItem("woy-theme");
+      if (typeof scenario.consent === "boolean") {
+        localStorage.setItem("woy-cookie-preferences", JSON.stringify({ version: 1, preferences: scenario.consent, updatedAt: new Date().toISOString() }));
+      }
+      if (scenario.malformed) localStorage.setItem("woy-cookie-preferences", "invalid JSON");
+      if (scenario.theme) localStorage.setItem("woy-theme", scenario.theme);
+    }, scenario);
+    const page = await context.newPage();
+    page.on("pageerror", error => errors.push({ scenario: scenario.name, message: error.message }));
+    await page.goto(base, { waitUntil: "domcontentloaded" });
+    assert.equal(await page.locator("html").getAttribute("data-theme"), scenario.expected, scenario.name);
+    await page.getByRole("button", { name: `Switch to ${scenario.expected === "light" ? "dark" : "light"} theme`, exact: true }).waitFor();
+    bootstrapResults.push({ scenario: scenario.name, initialTheme: scenario.expected });
+    await context.close();
+  }
   for (const scenario of scenarios) {
     const context = await browser.newContext({
       viewport: { width: scenario.width, height: 1000 },
@@ -34,12 +63,15 @@ try {
     const page = await context.newPage();
     page.on("pageerror", error => errors.push({ scenario: scenario.name, message: error.message }));
     await page.goto(base, { waitUntil: "load" });
+    assert.equal(await page.locator("html").getAttribute("data-theme"), "light", "Fresh visits start light regardless of device preference or storage availability");
     await page.getByRole("button", { name: "Essential only", exact: true }).click();
     if (scenario.remember) {
       await page.getByRole("button", { name: "Cookie preferences", exact: true }).click();
       await page.getByRole("checkbox", { name: "Remember my light or dark theme" }).check();
       await page.getByRole("button", { name: "Save preferences", exact: true }).click();
     }
+    // Exercise an explicit choice even when light is already the default.
+    if (scenario.chosen === "light") await page.getByRole("button", { name: "Switch to dark theme", exact: true }).click();
     await page.getByRole("button", { name: `Switch to ${scenario.chosen} theme`, exact: true }).click();
     const timeOrigin = await page.evaluate(() => performance.timeOrigin);
     const visited = [];
@@ -98,15 +130,15 @@ try {
     await page.getByRole("button", { name: "Send enquiry", exact: true }).waitFor();
     await verify();
     await page.reload({ waitUntil: "load" });
-    assert.equal(await page.locator("html").getAttribute("data-theme"), scenario.remember ? scenario.chosen : scenario.system,
-      "Theme persistence across reload remains subject to preference consent");
+    assert.equal(await page.locator("html").getAttribute("data-theme"), scenario.remember ? scenario.chosen : "light",
+      "Reload uses the consented saved preference, otherwise the light default");
     results.push({ scenario: scenario.name, visited, reloadTheme: await page.locator("html").getAttribute("data-theme") });
     await context.close();
   }
   assert.deepEqual(errors, []);
   fs.mkdirSync("reports", { recursive: true });
-  fs.writeFileSync("reports/theme-navigation.json", JSON.stringify({ results, errors }, null, 2));
-  console.log(JSON.stringify({ scenarios: results.length, navigations: results.reduce((sum, result) => sum + result.visited.length, 0), errors }));
+  fs.writeFileSync("reports/theme-navigation.json", JSON.stringify({ bootstrapResults, results, errors }, null, 2));
+  console.log(JSON.stringify({ bootstrapScenarios: bootstrapResults.length, scenarios: results.length, navigations: results.reduce((sum, result) => sum + result.visited.length, 0), errors }));
 } finally {
   await browser.close();
 }

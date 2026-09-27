@@ -1,121 +1,108 @@
 .section {
-  --philosophy-ink: #252a31;
-  --philosophy-muted: #606774;
+  --philosophy-ink: var(--c-ink);
+  --philosophy-muted: var(--c-ink2);
   --philosophy-rule: #d6dae0;
+  --philosophy-red: var(--c-red);
   background: #fff;
   color: var(--philosophy-ink);
   border-top: 1px solid var(--philosophy-rule);
-  padding-block: 112px 24px;
   font-family: var(--font-interface);
-  scroll-margin-top: var(--header-height);
+  line-height: 1.6;
+  scroll-margin-top: 35px;
 }
 :global([data-theme="dark"]) .section {
-  --philosophy-ink: var(--c-ink);
-  --philosophy-muted: var(--c-ink2);
   --philosophy-rule: var(--c-line2);
   background: var(--c-navy);
 }
 .layout {
-  width: 85.4%;
-  max-width: max(1605px, calc(var(--layout-content-max) - 2 * var(--layout-editorial-gutter)));
+  width: 100%;
+  max-width: 1440px;
   margin-inline: auto;
+  padding: 90px 5.4%;
 }
 .headingRow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.16fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: 8%;
   align-items: start;
-  gap: 78px;
+  margin-bottom: 44px;
 }
 .eyebrow {
-  margin: 0;
-  color: var(--c-red);
-  font-size: 16px;
+  margin: 0 0 22px;
+  color: var(--philosophy-red);
+  font-size: 13px;
   font-weight: 600;
-  line-height: 1.6;
   letter-spacing: .13em;
   text-transform: uppercase;
 }
 .headingRow h2 {
-  margin: 28px 0 0;
+  margin: 0;
+  color: var(--philosophy-ink);
   font-family: var(--font-editorial);
-  font-size: clamp(42px, 3.8vw, 72px);
-  line-height: 1.08;
-  letter-spacing: -.035em;
+  font-size: clamp(2.5rem, 3.8vw, 3.8rem);
   font-weight: 400;
+  font-style: normal;
+  line-height: 1.08;
+  letter-spacing: -.04em;
 }
-.intro { max-width: 740px; color: var(--philosophy-muted); font-size: 21px; line-height: 1.8; }
+.intro { max-width: 62ch; color: var(--philosophy-muted); font-size: 17px; line-height: 1.75; }
 .intro p { margin: 0; }
-.intro p:first-child { max-width: 680px; }
-.intro p + p { margin-top: 22px; }
-.principles {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 45px;
-  margin: 52px 0 0;
-  padding: 0;
-  list-style: none;
+.intro p + p { margin-top: 18px; }
+.principles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px; }
+.principle { min-width: 0; border-top: 1px solid var(--philosophy-rule); padding-top: 24px; }
+.symbolRow { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.symbolWindow { display: block; width: 54px; height: 56px; overflow: hidden; flex-shrink: 0; }
+.symbol {
+  display: block;
+  width: 112px;
+  height: 116px;
+  background-image: url("/assets/woy-philosophy.png");
+  background-repeat: no-repeat;
+  mix-blend-mode: multiply;
+  transform: scale(.48);
+  transform-origin: top left;
 }
-.principle { min-width: 0; border-top: 1px solid var(--philosophy-rule); padding-top: 30px; }
-.symbolRow { display: flex; align-items: center; gap: 24px; margin-bottom: 26px; }
-.symbol { width: 64px; height: 70px; color: var(--c-red); flex-shrink: 0; }
-.symbolName { margin: 0; color: var(--c-red); font-size: 16px; font-weight: 400; line-height: 1.6; letter-spacing: .13em; text-transform: uppercase; }
-.principle h3 { margin: 0; font-family: var(--font-editorial); font-size: 35px; line-height: 1.2; font-weight: 400; letter-spacing: -.04em; }
-.body { margin: 22px 0 0; color: var(--philosophy-muted); font-size: 20px; line-height: 1.75; }
-.next { display: flex; justify-content: flex-end; margin-top: 42px; }
+.circle { background-position: -56px -344px; }
+.star { background-position: -56px -514px; }
+.compass { background-position: -56px -687px; }
+/* Remove the sprite paper on navy while retaining its original red ink. */
+:global([data-theme="dark"]) .symbol { filter: invert(1) hue-rotate(180deg) saturate(20) brightness(.8); mix-blend-mode: screen; }
+.symbolName { min-width: 0; margin: 0; color: var(--philosophy-red); font-size: 13px; font-weight: 400; letter-spacing: .13em; text-transform: uppercase; }
+.principle h3 { max-width: 22ch; margin: 0 0 16px; color: var(--philosophy-ink); font-family: var(--font-editorial); font-size: 28px; font-weight: 400; line-height: 1.2; letter-spacing: -.04em; }
+.body { margin: 0; color: var(--philosophy-muted); font-size: 16px; line-height: 1.75; text-align: left; }
+.next { display: flex; justify-content: flex-end; margin-top: 30px; }
 .link {
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
   max-width: 100%;
   min-height: 44px;
   padding-block: 8px;
   border-bottom: 1px solid currentColor;
   color: var(--philosophy-ink);
-  font-size: 18px;
-  line-height: 1.6;
+  font-size: 14px;
   text-decoration: none;
-  transition: color .2s;
 }
 .link svg { flex-shrink: 0; }
-.link:hover { color: var(--c-red); }
+.link:hover { color: var(--philosophy-red); }
 .link:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
-@media (max-width: 1400px) {
-  .section { padding-block: 80px 48px; }
-  .headingRow { gap: 50px; }
-  .eyebrow { font-size: 14px; }
-  .intro { font-size: 18px; }
-  .principles { gap: 30px; margin-top: 44px; }
-  .principle h3 { font-size: 29px; }
-  .body { font-size: 17px; }
-  .symbolName { font-size: 13px; }
-  .symbolRow { gap: 12px; }
+@media (min-width: 1440px) {
+  .layout { padding-inline: 78px; }
 }
-@media (max-width: 1000px) {
-  .headingRow { grid-template-columns: minmax(0, 1fr); gap: 28px; }
-  .headingRow h2 { font-size: clamp(42px, 6vw, 64px); margin-top: 22px; }
-  .intro { max-width: 740px; }
+@media (max-width: 900px) {
+  .headingRow { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .intro { max-width: 65ch; }
   .principles { gap: 25px; }
-  .symbolRow { align-items: flex-start; flex-direction: column; gap: 14px; margin-bottom: 22px; }
-  .principle h3 { font-size: 28px; }
-  .body { font-size: 16px; }
 }
 @media (max-width: 700px) {
-  .section { padding-block: 55px; }
-  .layout { width: 88%; }
-  .eyebrow { font-size: 13px; }
-  .headingRow h2 { font-size: clamp(36px, 8vw, 50px); }
-  .intro { font-size: 17px; line-height: 1.75; }
-  .principles { grid-template-columns: minmax(0, 1fr); gap: 32px; margin-top: 36px; }
-  .principle { padding-top: 22px; }
-  .symbolRow { align-items: center; flex-direction: row; gap: 20px; margin-bottom: 18px; }
-  .principle h3 { max-width: 27ch; }
-  .body { margin-top: 14px; font-size: 17px; }
-  .next { justify-content: flex-start; margin-top: 30px; }
-  .link { gap: 16px; font-size: 16px; }
+  .layout { padding: 55px 6%; }
+  .headingRow { margin-bottom: 30px; }
+  .principles { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .symbolRow { margin-bottom: 15px; }
+  .principle h3 { max-width: none; }
+  .next { justify-content: flex-start; margin-top: 25px; }
 }
-@media (prefers-reduced-motion: reduce) { .link { transition: none; } }
 @media (forced-colors: active) {
-  .symbol { color: CanvasText; }
+  .symbol { forced-color-adjust: none; }
   .link { border-color: LinkText; }
 }

@@ -33,7 +33,7 @@
 .caseLink h3 { margin-top: 1.25rem; font-size: clamp(1.65rem, 2.3vw, 2.15rem); line-height: 1.18; font-weight: 400; letter-spacing: -.025em; max-width: 25ch; transition: color .2s; }
 .brief { display: grid; gap: 1.5rem; margin-block: 1.4rem 1.75rem; flex: 1; grid-template-rows: 1fr auto; }
 .brief dt { color: var(--c-ink3); font-size: .6875rem; font-weight: 700; line-height: 1.6; letter-spacing: .07em; text-transform: uppercase; }
-.brief dd { color: var(--c-ink2); font-size: 1rem; line-height: 1.7; margin-top: .45rem; }
+.brief dd { max-width: 60ch; color: var(--c-ink2); font-size: 1rem; line-height: 1.7; margin-top: .45rem; }
 .result { padding: 1rem 1.2rem; background: var(--c-sunken); border-left: 2px solid var(--c-red); }
 .result dd { color: var(--c-ink); font-size: 1.05rem; line-height: 1.55; }
 .readCase { display: flex; justify-content: space-between; align-items: center; gap: 1rem; min-height: 44px; margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--c-line); font-size: .9375rem; color: var(--c-ink); }

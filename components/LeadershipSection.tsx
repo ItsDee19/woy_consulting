@@ -38,7 +38,7 @@ export function LeadershipSection() {
 
         <div className={styles.copy}>
           <p>
-            Our people have run P&amp;Ls, built teams and led organisations through change.
+            We have run P&amp;Ls, built teams and led organisations through change.
             That experience shapes the questions we ask and the solutions we build with you.
           </p>
           <p>

@@ -1,17 +1,15 @@
 /* Preserve the supplied light palette; dark mode follows the shared navy surface. */
 .section {
-  --four-d-text: #252a31;
-  --four-d-muted: #606774;
+  --four-d-text: var(--c-ink);
+  --four-d-muted: var(--c-ink2);
   --four-d-rule: #aeb5c0;
   background: #f0f3f6;
   color: var(--four-d-text);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-interface);
   line-height: 1.6;
 }
 
 :global([data-theme="dark"]) .section {
-  --four-d-text: var(--c-ink);
-  --four-d-muted: var(--c-ink2);
   --four-d-rule: var(--c-line2);
   background: var(--c-navy);
 }
@@ -33,7 +31,7 @@
 
 .eyebrow {
   margin: 0 0 22px;
-  color: #bc1830;
+  color: var(--c-red);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: .13em;
@@ -43,7 +41,7 @@
 .heading {
   margin: 0;
   color: var(--four-d-text);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-editorial);
   font-size: clamp(2.45rem, 4.2vw, 4.5rem);
   font-weight: 400;
   line-height: 1.08;
@@ -55,6 +53,7 @@
   flex-shrink: 0;
   align-items: center;
   gap: 16px;
+  min-height: 44px;
   padding-block: 8px;
   border-bottom: 1px solid currentColor;
   color: var(--four-d-text);
@@ -62,8 +61,8 @@
   text-decoration: none;
 }
 .link svg { flex-shrink: 0; }
-.link:hover { color: #bc1830; }
-.link:focus-visible { outline: 2px solid #bc1830; outline-offset: 5px; }
+.link:hover { color: var(--c-red); }
+.link:focus-visible { outline: 2px solid var(--c-red); outline-offset: 5px; }
 
 .steps {
   display: grid;
@@ -81,8 +80,8 @@
 }
 
 .number {
-  color: #bc1830;
-  font-family: Georgia, "Times New Roman", serif;
+  color: var(--c-red);
+  font-family: var(--font-editorial);
   font-size: 24px;
   font-weight: 400;
 }
@@ -90,7 +89,7 @@
 .title {
   margin: 23px 0 18px;
   color: var(--four-d-text);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-editorial);
   font-size: 32px;
   font-weight: 400;
   line-height: 1.08;

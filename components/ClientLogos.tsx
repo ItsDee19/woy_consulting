@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import styles from "./ClientLogos.module.css";
 import { clientLogos, type ClientLogo } from "@/lib/content";
 import { experienceLogos } from "@/lib/recreation-experience-logos";
+import { MotionVisibility } from "./MotionVisibility";
 
 /* Full colour, no plate, no border. The band behind these is a white surface
    (see .logo-band in globals.css), which is what lets the artwork sit directly
@@ -99,10 +100,10 @@ export function ClientMarquee() {
           Organisations that WOY and its practitioners have supported through direct assignments and engagements delivered with partner and affiliate platforms.
         </p>
       </div>
-      <div className={styles.rows}>
+      <MotionVisibility className={styles.rows}>
         <Row items={marqueeRows[0]} direction="l" />
         <Row items={marqueeRows[1]} direction="r" />
-      </div>
+      </MotionVisibility>
       <div className={`${styles.inner} ${styles.footer}`}>
         <Link href="/work#collective-experience" className={styles.link}>
           View all organisations <ArrowUpRight size={18} aria-hidden="true" />
