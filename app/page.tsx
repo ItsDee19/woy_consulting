@@ -3,7 +3,7 @@ import { StructuredData } from "@/components/StructuredData";
 import { webPageSchema, serviceGraph } from "@/lib/structured-data";
 import Link from "next/link";
 import styles from "./home.module.css";
-import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
+import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { LogoFormation } from "@/components/LogoFormation";
 import { Stats } from "@/components/Stats";
 import { ClientMarquee } from "@/components/ClientLogos";
@@ -29,25 +29,23 @@ export default function Home() {
         <div className={`shell ${styles.content}`}>
           <div className={styles.heroGrid}>
             <div className={styles.heroCopy}>
-              <p className={`mb-5 ${styles.eyebrow}`}>Partner-led consulting · Since&nbsp;2015</p>
+              <p className={styles.eyebrow}>Partner-led consulting · Since&nbsp;2015</p>
               <h1 id="home-title" className={styles.title}>
-                <span>Turning strategic intent into</span>{" "}<em>sustained performance.</em>
+                <span>Turning strategic</span>{" "}<span>intent into</span>{" "}
+                <em><span>sustained</span>{" "}<span>performance.</span></em>
               </h1>
-              <p className="mt-6 max-w-[34ch] text-lg leading-relaxed text-ink2 md:text-xl">
+              <p className={styles.intro}>
                 We partner with CEOs, founders and leadership teams to align strategy,
                 strengthen leadership and build organisations that perform.
               </p>
-              <div className="mt-9">
-                <Link
-                  href={site.ctaHref}
-                  className="group inline-flex items-center gap-2.5 rounded-[2px] bg-action px-7 py-4 font-medium text-white transition-[background-color,box-shadow,transform] duration-300 hover:bg-action-hover hover:shadow-[0_10px_26px_-12px_rgba(205,20,33,.7)] active:translate-y-px"
-                >
+              <div className={styles.actions}>
+                <Link href={site.ctaHref} className={styles.primaryAction}>
                   {site.cta}
-                  <ArrowRight
-                    size={18}
-                    weight="bold"
-                    className="transition-transform duration-300 group-hover:translate-x-1"
-                  />
+                  <ArrowUpRight size={18} aria-hidden="true" />
+                </Link>
+                <Link href="/work" className={styles.secondaryAction}>
+                  Explore our work
+                  <ArrowUpRight size={18} aria-hidden="true" />
                 </Link>
               </div>
             </div>

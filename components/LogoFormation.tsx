@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { MARK, STATIC_MARK, SOURCE_LOCKUP, SOURCE_SYMBOLS, FORMATION_FRAME } from "./mark-geometry";
+import { MARK, SOURCE_LOCKUP, SOURCE_SYMBOLS, FORMATION_FRAME } from "./mark-geometry";
 
 // The reference symbols are an introduction to the mark, not replacement artwork.
 // The ring, spokes and north marker retain the shared MARK geometry.
@@ -86,14 +86,9 @@ export function LogoFormation({ className = "" }: { className?: string }) {
             <path className="mk-needle" d={MARK.needle} fill="var(--c-logo-red)" />
           </g>
 
-          <g className="mk-letters" fill="none" stroke="url(#woy-sheen)" strokeWidth={MARK.ringStroke} strokeLinecap="square" strokeLinejoin="miter">
-            <path data-logo-letter="w" d={STATIC_MARK.w} pathLength="1" />
-            <path data-logo-letter="y" d={STATIC_MARK.yFork} pathLength="1" />
-            <path data-logo-letter="y" d={STATIC_MARK.yStem} pathLength="1" />
-          </g>
         </g>
 
-        {/* Resolve onto the exact navbar artwork, rather than a second logo drawing. */}
+        {/* Reveal the original artwork itself, so finished letters never swap shape or colour. */}
         <svg className="mk-final-mark" x={SOURCE_LOCKUP.x} y={SOURCE_LOCKUP.y}
           width={SOURCE_LOCKUP.markWidth} height={SOURCE_LOCKUP.markHeight}
           viewBox={SOURCE_LOCKUP.markViewBox} focusable="false">
@@ -102,11 +97,23 @@ export function LogoFormation({ className = "" }: { className?: string }) {
               maskUnits="userSpaceOnUse" style={{ maskType: "alpha" }}>
               <image href={SOURCE_LOCKUP.src} width={SOURCE_LOCKUP.width} height={SOURCE_LOCKUP.height} />
             </mask>
+            <mask id="woy-source-reveal" x="216" y="139" width="401" height="155"
+              maskUnits="userSpaceOnUse" style={{ maskType: "alpha" }}>
+              <g className="mk-symbol-reveal" fill="white">
+                <circle cx="453.5" cy="229" r="68" />
+                <rect x="443" y="138" width="21" height="19" />
+              </g>
+              <g className="mk-letter-reveal" fill="none" stroke="white" strokeWidth="22" strokeLinecap="square" strokeLinejoin="round">
+                {SOURCE_LOCKUP.letterRevealPaths.map((d, index) => <path key={d} data-logo-reveal={index === 0 ? "w" : "y"} d={d} pathLength="1" />)}
+              </g>
+            </mask>
           </defs>
-          <image className="mk-source-light" href={SOURCE_LOCKUP.src}
-            width={SOURCE_LOCKUP.width} height={SOURCE_LOCKUP.height} />
-          <rect className="mk-source-dark" x="216" y="139" width="401" height="155"
-            fill="var(--c-logo-red)" mask="url(#woy-final-mark-mask)" />
+          <g mask="url(#woy-source-reveal)">
+            <image className="mk-source-light" href={SOURCE_LOCKUP.src}
+              width={SOURCE_LOCKUP.width} height={SOURCE_LOCKUP.height} />
+            <rect className="mk-source-dark" x="216" y="139" width="401" height="155"
+              fill="var(--c-logo-red)" mask="url(#woy-final-mark-mask)" />
+          </g>
         </svg>
         {/* Original sans-serif caption, expanded to the full WOY width. */}
         <svg className="mk-consulting" x={SOURCE_LOCKUP.x} y={SOURCE_LOCKUP.wordY}

@@ -50,8 +50,8 @@ export const MARK = {
 /**
  * The compact static lockup follows the supplied header reference: its W is
  * deliberately wider than the round symbol, while both letters retain the
- * symbol's painted height and four-unit stroke. The animated letter drawing
- * uses the same proportions before resolving into the original navbar artwork.
+ * symbol's painted height and four-unit stroke. The homepage animation reveals
+ * the original navbar artwork directly, instead of replacing this drawing.
  */
 export const STATIC_MARK = {
   ...MARK,
@@ -81,6 +81,12 @@ export const SOURCE_LOCKUP = {
   markHeight: 85.8462,
   wordY: 148.8308,
   wordHeight: 12.1846,
+  /** Generous masks follow the source strokes without redrawing their edges. */
+  letterRevealPaths: [
+    "M221 166 L265 289 L305 166 L344 289 L388 166",
+    "M508 166 L559 237 L611 166",
+    "M559 237 L559 290",
+  ],
 } as const;
 
 /** Centre the animation and its caption on the complete lockup, not its O. */
