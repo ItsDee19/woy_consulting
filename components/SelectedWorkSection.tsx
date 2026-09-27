@@ -2,7 +2,7 @@ import { CaseCard, TextLink } from "@/components/recreation/Site";
 import { cases } from "@/lib/recreation-content";
 import styles from "./SelectedWorkSection.module.css";
 
-const selectedCases = cases.filter((item) => item.featured).slice(0, 2);
+const selectedCases = cases.filter((item) => item.featured).slice(0, 4);
 
 export function SelectedWorkSection() {
   return (

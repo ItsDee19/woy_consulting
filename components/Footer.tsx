@@ -26,7 +26,7 @@ export function Footer() {
         <div className={styles.invitation}>
           <div className={styles.headline}>
             <p className={styles.eyebrow}>What comes next?</p>
-            <h2>A clearer direction.<br /><em>Let’s begin.</em></h2>
+            <h2>A clearer direction.<br />A conversation to begin.</h2>
           </div>
           <div className={styles.contactAction}>
             <Link href={site.ctaHref} className={styles.cta}>

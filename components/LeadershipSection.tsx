@@ -9,7 +9,7 @@ const founder = practitioners.find((person) => person.slug === "vipin-tuteja")!;
 export function LeadershipSection() {
   return (
     <section className={styles.section} aria-labelledby="leadership-title" data-home-leadership>
-      <div className={`shell ${styles.layout}`}>
+      <div className={styles.layout}>
         <header className={styles.heading}>
           <p className={styles.eyebrow}>Experience in the room</p>
           <h2 id="leadership-title">
@@ -25,14 +25,14 @@ export function LeadershipSection() {
               alt={`${founder.name}, founder and managing director of WOY Consulting`}
               width={575}
               height={710}
-              sizes="(max-width: 700px) min(360px, calc(100vw - 40px)), (max-width: 1023px) 40vw, 430px"
+              sizes="(min-width: 1900px) 575px, (min-width: 901px) 31vw, (min-width: 650px) 575px, 91vw"
               className={styles.portrait}
               loading="lazy"
             />
           </div>
           <figcaption className={styles.identity}>
             <span className={styles.name}>{founder.name}</span>
-            <span className={styles.role}>{founder.role}</span>
+            <span className={styles.role}>Founder &amp; Managing Director</span>
           </figcaption>
         </figure>
 
@@ -52,13 +52,10 @@ export function LeadershipSection() {
         </div>
 
         <div className={styles.experience} aria-label="Vipin Tuteja’s leadership experience">
-          <p className={styles.credential}><strong>Business leadership</strong><span>Strategy, execution and P&amp;L ownership</span></p>
-          <div className={styles.career}>
-            <p>Experience across</p>
-            <ul aria-label="Organisations where Vipin has held leadership roles">
-              <li>Xerox</li><li>American Express</li><li>Ricoh</li><li>Samsung</li>
-            </ul>
-          </div>
+          <p className={styles.credential}><strong>35+ years of leadership</strong></p>
+          <ul className={styles.career} aria-label="Organisations where Vipin has held leadership roles">
+            <li>Xerox</li><li>American Express</li><li>Ricoh</li><li>Samsung</li>
+          </ul>
         </div>
       </div>
     </section>

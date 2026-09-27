@@ -10,7 +10,7 @@
 }
 .layout {
   width: 85.4%;
-  max-width: 1605px;
+  max-width: max(1605px, calc(var(--layout-content-max) - 2 * var(--layout-editorial-gutter)));
   margin-inline: auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);

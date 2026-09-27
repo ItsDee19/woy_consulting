@@ -1,5 +1,9 @@
 import { getImageProps } from "next/image";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+import styles from "./ClientLogos.module.css";
 import { clientLogos, type ClientLogo } from "@/lib/content";
+import { experienceLogos } from "@/lib/recreation-experience-logos";
 
 /* Full colour, no plate, no border. The band behind these is a white surface
    (see .logo-band in globals.css), which is what lets the artwork sit directly
@@ -33,45 +37,76 @@ function Plate({ logo, size = "md" }: { logo: ClientLogo; size?: "md" | "sm" }) 
   );
 }
 
-function Row({
-  items,
-  direction,
-}: {
-  items: ClientLogo[];
-  direction: "l" | "r";
-}) {
+const featuredRows = [
+  ["Samsung", "Pramerica Life Insurance", "Reliance Industries", "CGI", "The Shri Ram Academy", "Boston Scientific"],
+  ["Maruti Suzuki", "Siemens Financial Services", "Aditya Birla UltraTech", "American India Foundation", "Tata Management Training Centre", "Valeo"],
+];
+
+// The reference's twelve marks lead the two rows; every existing organisation
+// remains in the continuous sequence after those opening positions.
+const featuredNames = new Set(featuredRows.flat());
+const remainingLogos = clientLogos.filter((logo) => !featuredNames.has(logo.name));
+const marqueeRows = featuredRows.map((names, row) => [
+  ...names.map((name) => clientLogos.find((logo) => logo.name === name)!),
+  ...remainingLogos.filter((_, index) => index % 2 === row),
+]);
+
+function MarqueeLogo({ logo }: { logo: ClientLogo }) {
+  const referenceName = logo.name === "Aditya Birla UltraTech" ? "UltraTech Cement" : logo.name;
+  const reference = experienceLogos.find((item) => item.name === referenceName);
+  const displayWidth = reference ? reference.displayWidth * 1.25 : 200;
+  const { props } = getImageProps({
+    src: logo.file,
+    alt: logo.name,
+    sizes: "(max-width: 600px) 132px, 200px",
+    width: logo.w,
+    height: logo.h,
+    loading: "lazy",
+    decoding: "async",
+    className: styles.artwork,
+    style: { maxWidth: `min(100%, ${displayWidth}px)` },
+  });
   return (
-    <div className="marquee-mask overflow-hidden">
-      <div className={`flex w-max gap-6 ${direction === "l" ? "marquee-l" : "marquee-r"}`}>
-        {[0, 1].map((dup) => (
-          <div key={dup} className="flex gap-6" aria-hidden={dup === 1}>
-            {items.map((l) => (
-              <Plate key={l.name + dup} logo={l} />
-            ))}
-          </div>
+    <li className={styles.logo}>
+      {/* Optimised source sets retain the original, full-colour artwork. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img {...props} alt={props.alt} />
+    </li>
+  );
+}
+
+function Row({ items, direction }: { items: ClientLogo[]; direction: "l" | "r" }) {
+  return (
+    <div className={styles.viewport} tabIndex={0} role="group" aria-label={direction === "l" ? "First row of organisations" : "Second row of organisations"}>
+      <div className={`${styles.track} ${direction === "l" ? styles.left : styles.right}`}>
+        {[0, 1].map((copy) => (
+          <ul key={copy} className={styles.group} aria-hidden={copy === 1}>
+            {items.map((logo) => <MarqueeLogo key={logo.name} logo={logo} />)}
+          </ul>
         ))}
       </div>
     </div>
   );
 }
 
-/** Two rows drifting in opposite directions. Hover anywhere to hold them. */
+/** Two rows drifting in opposite directions. Hover or focus to hold them. */
 export function ClientMarquee() {
-  const half = Math.ceil(clientLogos.length / 2);
   return (
-    <section className="logo-band logo-marquee border-y border-line py-12 md:py-16" aria-labelledby="client-marquee-heading" aria-describedby="client-marquee-description">
-      <div className="shell">
-        <div className="mb-8 grid gap-4 border-b border-line pb-7 md:mb-10 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:gap-12 md:pb-8">
-          <h2 id="client-marquee-heading" className="max-w-[20ch] text-2xl font-bold leading-tight text-ink3 md:text-3xl">Our collective experience</h2>
-          <p id="client-marquee-description" className="max-w-[64ch] text-base leading-relaxed text-ink3">
-            Organisations that WOY and its practitioners have supported through direct assignments and engagements delivered with partner and affiliate platforms.
-          </p>
-        </div>
+    <section className={styles.section} data-client-marquee aria-labelledby="client-marquee-heading" aria-describedby="client-marquee-description">
+      <div className={`${styles.inner} ${styles.header}`}>
+        <h2 id="client-marquee-heading">Our collective<br />experience</h2>
+        <p id="client-marquee-description">
+          Organisations that WOY and its practitioners have supported through direct assignments and engagements delivered with partner and affiliate platforms.
+        </p>
       </div>
-
-      <div className="marquee-wrap flex flex-col gap-8">
-        <Row items={clientLogos.slice(0, half)} direction="l" />
-        <Row items={clientLogos.slice(half)} direction="r" />
+      <div className={styles.rows}>
+        <Row items={marqueeRows[0]} direction="l" />
+        <Row items={marqueeRows[1]} direction="r" />
+      </div>
+      <div className={`${styles.inner} ${styles.footer}`}>
+        <Link href="/work#collective-experience" className={styles.link}>
+          View all organisations <ArrowUpRight size={18} aria-hidden="true" />
+        </Link>
       </div>
     </section>
   );

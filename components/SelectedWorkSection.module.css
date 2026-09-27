@@ -48,7 +48,7 @@
 
 @media (min-width: 1440px) {
   .section .container {
-    padding-inline: 78px;
+    padding-inline: var(--layout-editorial-gutter);
   }
 }
 

@@ -18,7 +18,7 @@
 
 .container {
   width: 100%;
-  max-width: 1440px;
+  max-width: var(--layout-content-max);
   margin-inline: auto;
   padding: 90px 5.4%;
 }
@@ -106,7 +106,7 @@
 }
 
 @media (min-width: 1440px) {
-  .container { padding-inline: 78px; }
+  .container { padding-inline: var(--layout-editorial-gutter); }
 }
 @media (max-width: 1080px) {
   .steps { gap: 25px; }

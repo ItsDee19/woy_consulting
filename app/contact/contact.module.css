@@ -6,7 +6,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: 10%;
-  max-width: 1440px;
+  max-width: var(--layout-content-max);
   margin-inline: auto;
   padding: 80px 5.4% 90px;
 }
@@ -112,7 +112,7 @@
 
 @media (min-width: 1440px) {
   .layout {
-    padding-inline: 78px;
+    padding-inline: var(--layout-editorial-gutter);
   }
 }
 

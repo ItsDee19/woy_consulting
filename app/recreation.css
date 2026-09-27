@@ -18,7 +18,7 @@
 :where(.recreation) a,:where(.recreation) button{transition:color .2s,background .2s,transform .2s}
 :where(.recreation) ::selection{background:#e8bcc1;color:#252a31}
 :where(.recreation) :focus-visible{outline:2px solid var(--ring);outline-offset:6px}
-:where(.recreation) .wrap{max-width:1440px;margin:auto;padding-inline:5.4%}
+:where(.recreation) .wrap{max-width:var(--layout-content-max);margin:auto;padding-inline:5.4%}
 :where(.recreation) .eyebrow{font-size:.8125rem;letter-spacing:.13em;text-transform:uppercase;font-weight:600}
 :where(.recreation) .muted{color:var(--muted-foreground)}
 :where(.recreation) .red{color:var(--primary)}
@@ -156,7 +156,7 @@
 :where(.recreation) .philosophy-grid .text-link{margin-top:10px}
 
 
-@media(min-width:1440px){:where(.recreation) .wrap{padding-inline:78px}
+@media(min-width:1440px){:where(.recreation) .wrap{padding-inline:var(--layout-editorial-gutter)}
 }
 
 @media(max-width:1080px){:where(.recreation) .people-grid{gap:22px}

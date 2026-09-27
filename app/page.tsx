@@ -67,18 +67,18 @@ export default function Home() {
 
       <Stats />
 
-      <ExpertiseSection />
-
       {/* -------------------------------------------------------- clients */}
       <ClientMarquee />
+
+      <ExpertiseSection />
 
       <PhilosophySection />
 
       <SelectedWorkSection />
 
-      <FourDApproach />
-
       <LeadershipSection />
+
+      <FourDApproach />
     </>
   );
 }

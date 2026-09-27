@@ -7,6 +7,10 @@
 /* ---------------------------------------------------------------- tokens --- */
 :root {
   --header-height: 104px;
+  --layout-shell-max: 1320px;
+  --layout-content-max: 1440px;
+  --layout-shell-gutter: clamp(1.25rem, 5vw, 4.5rem);
+  --layout-editorial-gutter: 78px;
   --font-editorial: Georgia, "Times New Roman", Times, serif;
   --font-interface: Arial, Helvetica, sans-serif;
   --c-bg:      #FBF9F7;   /* warm white */
@@ -37,6 +41,16 @@
 }
 
 @media (max-width: 700px) { :root { --header-height: 86px; } }
+
+/* Expand gradually on desktop monitors, then retain comfortable reading widths. */
+@media (min-width: 1600px) {
+  :root {
+    --layout-shell-max: clamp(1320px, calc(90vw - 120px), 1920px);
+    --layout-content-max: clamp(1440px, 90vw, 1920px);
+    --layout-shell-gutter: clamp(72px, calc(3vw + 24px), 96px);
+    --layout-editorial-gutter: clamp(78px, 4.5vw, 96px);
+  }
+}
 
 [data-theme="dark"] {
   --c-bg:      var(--c-navy); /* retain the approved navy page canvas */
@@ -101,12 +115,17 @@
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
   body {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
     background: var(--c-bg);
     color: var(--c-ink);
     font-family: var(--font-editorial);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
+
+  body > main { flex: 1 0 auto; min-width: 0; }
 
   h1, h2, h3, h4 { overflow-wrap: anywhere; letter-spacing: -0.02em; line-height: 1.12; font-weight: 400; }
 
@@ -118,9 +137,9 @@
 /* ------------------------------------------------------------ utilities --- */
 @utility shell {
   width: 100%;
-  max-width: 1320px;
+  max-width: var(--layout-shell-max);
   margin-inline: auto;
-  padding-inline: clamp(1.25rem, 5vw, 4.5rem);
+  padding-inline: var(--layout-shell-gutter);
 }
 
 /* fluid display scale */
