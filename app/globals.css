@@ -172,7 +172,7 @@
    Letters reveal the original artwork directly; the completed logo never swaps assets.
    ============================================================================= */
 .logo-formation { --mk-duration: 12s; --mk-travel: cubic-bezier(.65, 0, .2, 1); }
-.mk-ring, .mk-star, .mk-star-outline, .mk-compass, .mk-compass-rose, .mk-orbit, .mk-lock-pulse {
+.mk-ring, .mk-star, .mk-star-outline, .mk-compass, .mk-orbit, .mk-lock-pulse {
   transform-box: view-box;
   transform-origin: 180px 94px;
 }
@@ -225,13 +225,6 @@
   39% { opacity: .65; }
   45%, 100% { opacity: 0; }
 }
-.mk-compass-rose { animation: mkCompassAlign var(--mk-duration) var(--mk-travel) infinite; }
-@keyframes mkCompassAlign {
-  0%, 7% { transform: rotate(-40deg); }
-  25%, 94% { transform: rotate(0); }
-  100% { transform: rotate(-40deg); }
-}
-.mk-cardinals { font-size: 6.2px; font-weight: 500; letter-spacing: .25px; }
 .mk-needle { animation: mkNeedleResolve var(--mk-duration) linear infinite; }
 @keyframes mkNeedleResolve {
   0%, 29% { opacity: 0; }

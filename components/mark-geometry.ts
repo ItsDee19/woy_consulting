@@ -68,6 +68,16 @@ export const SOURCE_SYMBOLS = {
   compassPoints: "M180 63 L185 82 L199.8 74.2 L192 89 L211 94 L192 99 L199.8 113.8 L185 106 L180 125 L175 106 L160.2 113.8 L168 99 L149 94 L168 89 L160.2 74.2 L175 82 Z",
 } as const;
 
+/** Exact compass artwork used by the homepage and Approach philosophy sections. */
+export const SOURCE_COMPASS = {
+  src: "/assets/woy-philosophy.png",
+  width: 1758,
+  height: 853,
+  crop: { x: 56, y: 687, width: 112, height: 116 },
+  cx: 111.5,
+  cy: 746.5,
+} as const;
+
 /** Original navbar artwork, aligned to MARK's ring for the completed animation. */
 export const SOURCE_LOCKUP = {
   src: "/assets/woy-logo.png",

@@ -169,7 +169,8 @@ try {
     assert.equal(await footer.getByRole("link", { name: "Start a conversation", exact: true }).getAttribute("href"), "/contact");
     assert.equal(await footer.getByRole("link", { name: "hello@woyconsulting.com", exact: true }).getAttribute("href"), "mailto:hello@woyconsulting.com");
     assert.equal(await footer.getByRole("link", { name: "Contact", exact: true }).getAttribute("href"), "/contact");
-    assert.equal(await footer.getByRole("link", { name: /Made by AvlysAI/ }).getAttribute("href"), "https://avlysai.com/");
+    assert.equal(await footer.getByRole("link", { name: /Made by AvlysAI/ }).count(), 0);
+    assert.equal(await footer.getByText("Made by AvlysAI", { exact: true }).count(), 1);
     assert.equal(meta.h1, 1, `Heading: ${route}`);
     assert.equal(meta.missingAlt, 0, `Alt: ${route}`);
     meta.hrefs.forEach(href => hrefs.add(new URL(href, base + route).href));

@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { MARK, SOURCE_LOCKUP, SOURCE_SYMBOLS, FORMATION_FRAME } from "./mark-geometry";
+import { MARK, SOURCE_LOCKUP, SOURCE_SYMBOLS, SOURCE_COMPASS, FORMATION_FRAME } from "./mark-geometry";
 
 // The reference symbols are an introduction to the mark, not replacement artwork.
 // The ring, spokes and north marker retain the shared MARK geometry.
-const { starOutline, compassPoints } = SOURCE_SYMBOLS;
-const dialTicks = Array.from({ length: 48 }, (_, index) => index * 7.5);
+const { starOutline } = SOURCE_SYMBOLS;
+const compassCrop = SOURCE_COMPASS.crop;
 
 /** A synchronized 12-second sequence: reveal, converge, resolve, hold, reset. */
 export function LogoFormation({ className = "" }: { className?: string }) {
@@ -69,20 +69,26 @@ export function LogoFormation({ className = "" }: { className?: string }) {
 
           {/* The compass travels as one symbol; its dial dissolves at convergence. */}
           <g className="mk-compass">
-            <g className="mk-compass-detail" fill="none" stroke="var(--c-logo-red)">
-              <circle cx={MARK.cx} cy={MARK.cy} r="34" strokeWidth="1.25" />
-              <circle cx={MARK.cx} cy={MARK.cy} r="40" strokeWidth=".65" />
-              {dialTicks.map((angle, index) => <path key={angle} d={`M180 ${index % 4 === 0 ? 53 : 55}v${index % 4 === 0 ? 5 : 2.5}`} transform={`rotate(${angle} 180 94)`} strokeWidth={index % 4 === 0 ? .85 : .5} />)}
-              <g className="mk-compass-rose" strokeWidth=".9">
-                <path d={compassPoints} fill="var(--c-logo-red)" fillOpacity=".08" />
-                <path d="M180 63v62M149 94h62M160.2 74.2l39.6 39.6m-39.6 0 39.6-39.6" strokeWidth=".55" />
-                <path d="M180 63v31l5-12Z M211 94h-31l12 5Z M180 125V94l-5 12Z M149 94h31l-12-5Z" fill="var(--c-logo-red)" stroke="none" />
-                <circle cx={MARK.cx} cy={MARK.cy} r="3" fill="var(--c-bg)" />
-              </g>
-              <g className="mk-cardinals" fill="var(--c-logo-red)" stroke="none" textAnchor="middle">
-                <text x="180" y="45">N</text><text x="230" y="96.5">E</text><text x="180" y="149">S</text><text x="130" y="96.5">W</text>
-              </g>
-            </g>
+            <svg className="mk-compass-detail"
+              x={MARK.cx - (SOURCE_COMPASS.cx - compassCrop.x)}
+              y={MARK.cy - (SOURCE_COMPASS.cy - compassCrop.y)}
+              width={compassCrop.width} height={compassCrop.height}
+              viewBox={`${compassCrop.x} ${compassCrop.y} ${compassCrop.width} ${compassCrop.height}`}
+              focusable="false">
+              <defs>
+                {/* Preserve the original compass pixels, removing only the white paper. */}
+                <filter id="woy-compass-ink" filterUnits="userSpaceOnUse"
+                  {...compassCrop} colorInterpolationFilters="sRGB">
+                  <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 -1.085106 0 0 1.085106" />
+                </filter>
+                <mask id="woy-compass-mask" maskUnits="userSpaceOnUse" {...compassCrop}
+                  style={{ maskType: "alpha" }}>
+                  <image href={SOURCE_COMPASS.src} width={SOURCE_COMPASS.width}
+                    height={SOURCE_COMPASS.height} filter="url(#woy-compass-ink)" />
+                </mask>
+              </defs>
+              <rect {...compassCrop} fill="var(--c-logo-red)" mask="url(#woy-compass-mask)" />
+            </svg>
             <path className="mk-needle" d={MARK.needle} fill="var(--c-logo-red)" />
           </g>
 

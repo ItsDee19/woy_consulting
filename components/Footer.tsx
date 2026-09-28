@@ -60,7 +60,7 @@ export function Footer() {
           </nav>
           <a href="#main" className={styles.backToTop}>Back to top <ArrowUp size={15} aria-hidden="true" /></a>
           <p className={styles.copyright}>&copy; {new Date().getFullYear()} {site.name}.</p>
-          <a href="https://avlysai.com/" target="_blank" rel="noopener noreferrer" className={styles.credit}>Made by AvlysAI<ArrowUpRight size={14} aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a>
+          <p className={styles.credit}>Made by AvlysAI</p>
         </div>
       </div>
     </footer>

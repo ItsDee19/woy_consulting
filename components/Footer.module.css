@@ -44,7 +44,7 @@
 .copyright { grid-row: 2; grid-column: 1; line-height: 1.6; }
 .bottom a, .bottom button { min-height: 44px; display: inline-flex; align-items: center; transition: color .2s; }
 .bottom a:hover, .bottom button:hover { color: var(--c-on-navy); }
-.credit { justify-self: end; grid-row: 2; grid-column: 2; gap: .4rem; color: var(--c-on-navy); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--c-on-navy) 35%, transparent); text-underline-offset: 4px; }
+.credit { justify-self: end; grid-row: 2; grid-column: 2; margin: 0; color: var(--c-on-navy); line-height: 1.6; }
 .backToTop { justify-self: end; grid-row: 1; grid-column: 2; gap: .5rem; }
 @media (max-width: 1099px) {
   .directory { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 2rem 3rem; }
