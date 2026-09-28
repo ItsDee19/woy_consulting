@@ -21,9 +21,15 @@ const homeExpertise = [
   { title: "People & performance systems", destination: "/expertise#people", description: "Build business-aligned HR, talent and performance systems that leaders and teams can use. Connect roles, capability, accountability and development to what the organisation is trying to achieve." },
 ];
 page.on("pageerror", error => errors.push({ url: page.url(), message: error.message }));
-const manifest = JSON.parse(fs.readFileSync(".next/prerender-manifest.json", "utf8"));
-const routes = Object.keys(manifest.routes).filter(route => !route.startsWith("/_") &&
-  !/\.[a-z]+$/.test(route) && !route.includes("opengraph-image") && !route.includes("twitter-image"));
+// Cover request-rendered pages too; nonce CSP deliberately disables static HTML.
+const appPaths = JSON.parse(fs.readFileSync(".next/server/app-paths-manifest.json", "utf8"));
+const content = fs.readFileSync("lib/content.ts", "utf8");
+const caseBlock = content.split("export const caseStudies: CaseStudy[] = [")[1].split("export ")[0];
+const caseRoutes = [...caseBlock.matchAll(/slug: "([^"]+)"/g)].map(match => `/case-studies/${match[1]}`);
+const routes = [...new Set([...Object.keys(appPaths)
+  .filter(route => route.endsWith("/page") && !route.startsWith("/_") && !route.includes("["))
+  .map(route => route.replace(/\/page$/, "") || "/"), ...caseRoutes])];
+assert.ok(routes.length >= 10, "Discover all public routes rather than silently skipping dynamic pages");
 
 try {
   const firstVisit = await page.goto(base, { waitUntil: "load" });

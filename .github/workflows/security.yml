@@ -1,0 +1,164 @@
+name: Security and quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '31 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Application checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Install from lockfile
+        run: npm ci
+      - name: Check runtime dependency advisories
+        run: npm audit --omit=dev --audit-level=high
+      - name: Lint
+        run: npm run lint
+      - name: Unit and security regression tests
+        run: npm test
+      # Next generates route types and next-env.d.ts during the build.
+      - name: Production build
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+      - name: Typecheck generated routes and source
+        run: npm run typecheck
+      - name: Scan source and emitted browser bundles
+        run: node scripts/security-check.mjs
+      - name: Install test browser
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Start local production preview
+        shell: bash
+        env:
+          TURNSTILE_SITE_KEY: '1x00000000000000000000AA'
+          NEXT_TELEMETRY_DISABLED: '1'
+        run: |
+          set -euo pipefail
+          node node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 5174 >"$RUNNER_TEMP/woy-preview.log" 2>&1 &
+          printf '%s\n' "$!" >"$RUNNER_TEMP/woy-preview.pid"
+          node --input-type=module <<'JS'
+          import { readFileSync } from 'node:fs';
+          import { join } from 'node:path';
+          import { setTimeout } from 'node:timers/promises';
+          const pid = Number(readFileSync(join(process.env.RUNNER_TEMP, 'woy-preview.pid'), 'utf8').trim());
+          const deadline = Date.now() + 60_000;
+          let ready = false;
+          while (Date.now() < deadline) {
+            try { process.kill(pid, 0); }
+            catch { throw new Error('Production preview exited before becoming ready.'); }
+            try {
+              const response = await fetch('http://127.0.0.1:5174/', { signal: AbortSignal.timeout(2000) });
+              ready = response.status === 200;
+              await response.body?.cancel();
+              if (ready) break;
+            } catch { /* Retry only while the owned preview process is alive. */ }
+            await setTimeout(500);
+          }
+          if (!ready) throw new Error('Production preview did not become ready within 60 seconds.');
+          JS
+      - name: Production browser security and contact checks
+        env:
+          TEST_BASE_URL: http://127.0.0.1:5174
+        run: |
+          node tests/security-browser.mjs
+          node tests/contact-security-browser.mjs
+      - name: Stop local production preview
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f "$RUNNER_TEMP/woy-preview.pid" ]; then
+            pid="$(cat "$RUNNER_TEMP/woy-preview.pid")"
+            if [[ "$pid" =~ ^[0-9]+$ ]] && kill -0 "$pid" 2>/dev/null; then
+              kill "$pid"
+            fi
+          fi
+
+  secrets:
+    name: Full-history secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install checksum-verified Gitleaks CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Official v8.30.1 Linux x64 release. Review version/checksum together when updating.
+          archive="$RUNNER_TEMP/gitleaks.tar.gz"
+          curl --fail --silent --show-error --location --retry 3 \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz \
+            --output "$archive"
+          printf '%s  %s\n' '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb' "$archive" | sha256sum --check --status
+          mkdir -p "$RUNNER_TEMP/gitleaks-bin"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/gitleaks-bin" gitleaks
+      - name: Scan every fetched commit without publishing secret values
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=0
+          "$RUNNER_TEMP/gitleaks-bin/gitleaks" git . --log-opts='--all' \
+            --redact=100 --no-banner --report-format=json \
+            --report-path="$RUNNER_TEMP/gitleaks-report.json" >/dev/null 2>&1 || status=$?
+          if [ "$status" -eq 1 ]; then
+            python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          report = Path(os.environ['RUNNER_TEMP']) / 'gitleaks-report.json'
+          if not report.exists():
+              raise SystemExit('Secret scan failed without a report; inspect scanner configuration.')
+          for finding in json.loads(report.read_text()):
+              print(json.dumps({'file': finding['File'], 'line': finding['StartLine'], 'rule': finding['RuleID']}))
+          print('Potential secrets detected. Values and source excerpts are intentionally withheld.')
+          PY
+          elif [ "$status" -ne 0 ]; then
+            echo "Gitleaks could not complete (exit $status)."
+          else
+            echo 'Full-history secret scan passed.'
+          fi
+          exit "$status"
+
+  codeql:
+    name: JavaScript and TypeScript analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Initialise CodeQL
+        uses: github/codeql-action/init@88585263c0627ee42c0e1c5143a112c8d6f4aa18 # v4.38.2
+        with:
+          languages: javascript-typescript
+          build-mode: none
+          queries: security-extended
+      - name: Analyse
+        uses: github/codeql-action/analyze@88585263c0627ee42c0e1c5143a112c8d6f4aa18 # v4.38.2
+        with:
+          category: '/language:javascript-typescript'

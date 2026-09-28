@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { headers } from "next/headers";
 import { StructuredData } from "@/components/StructuredData";
 import { ContactForm } from "@/components/ContactForm";
 import { contentPageGraph, schemaId } from "@/lib/structured-data";
@@ -12,7 +13,9 @@ export const metadata = pageMetadata(
   "/contact"
 );
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  const turnstileSiteKey = process.env.TURNSTILE_SITE_KEY?.trim();
   return (
     <>
       <StructuredData id="contact-structured-data" nodes={contentPageGraph({
@@ -61,7 +64,7 @@ export default function ContactPage() {
           </div>
 
           <div className={styles.formPanel}>
-            <ContactForm />
+            <ContactForm turnstileSiteKey={turnstileSiteKey} nonce={nonce} />
           </div>
         </div>
       </section>

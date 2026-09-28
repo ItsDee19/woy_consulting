@@ -54,6 +54,12 @@ const sections: LegalSection[] = [
           These counters use pseudonymous identifiers and submission fingerprints; they do not store your name, email address, organisation or message.
           These security records are temporary and are used to protect the contact service, not to build advertising profiles.
         </p>
+        <p>
+          Where enabled, Cloudflare Turnstile checks whether a contact-form visitor is a person rather than an automated bot.
+          Cloudflare processes technical signals, including network and browser information, for this security check.
+          We send the resulting verification token to Cloudflare for validation; we do not include your name, email address, organisation or enquiry message in that request.
+          Learn more in <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Cloudflare’s Privacy Policy<span className="sr-only"> (opens in a new tab)</span></a>.
+        </p>
       </>
     ),
   },
@@ -63,7 +69,7 @@ const sections: LegalSection[] = [
     content: (
       <>
         <p>
-          This website does not include analytics or advertising trackers.
+          We do not use this website for advertising tracking or audience analytics. Security services may process technical information as described above.
           It uses the following cookies and browser storage:
         </p>
         <ul>
@@ -97,6 +103,7 @@ const sections: LegalSection[] = [
         <p>
           Contact details pass through the website server to the enquiry-delivery service configured for WOY Consulting,
           so a partner can respond. Website hosting and enquiry-delivery providers process the information needed to operate those services.
+          Security providers, including Cloudflare for bot protection and the configured shared request-counter service, process technical information to protect the form.
           The form reports an error if delivery is unavailable; it does not treat an unavailable delivery service as a successful enquiry.
         </p>
         <p>
@@ -141,5 +148,5 @@ const sections: LegalSection[] = [
 ];
 
 export default function PrivacyPolicyPage() {
-  return <LegalPage title="Privacy policy" lede="What we collect, why we use it, and the choices available to you." sections={sections} updatedDate={PRIVACY_NOTICE_VERSION} updatedLabel="25 September 2026" />;
+  return <LegalPage title="Privacy policy" lede="What we collect, why we use it, and the choices available to you." sections={sections} updatedDate={PRIVACY_NOTICE_VERSION} updatedLabel="28 September 2026" />;
 }

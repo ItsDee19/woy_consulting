@@ -1,9 +1,9 @@
 import { getImageProps } from "next/image";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { ArrowUpRight } from "lucide-react";
 import styles from "./ClientLogos.module.css";
 import { clientLogos, type ClientLogo } from "@/lib/content";
-import { experienceLogos } from "@/lib/recreation-experience-logos";
 import { MotionVisibility } from "./MotionVisibility";
 
 /* Full colour, no plate, no border. The band behind these is a white surface
@@ -52,26 +52,46 @@ const marqueeRows = featuredRows.map((names, row) => [
   ...remainingLogos.filter((_, index) => index % 2 === row),
 ]);
 
+// Remove only empty source margins so these marks use the same optical scale.
+const marqueeCrops: Record<string, [number, number, number, number]> = {
+  "Magicbricks": [30, 41, 421, 92],
+  "Maruti Suzuki": [0, 12, 334, 42],
+  "The Shri Ram Academy": [0, 0, 300, 273],
+  "Go First": [22, 40, 498, 476],
+};
+
 function MarqueeLogo({ logo }: { logo: ClientLogo }) {
-  const referenceName = logo.name === "Aditya Birla UltraTech" ? "UltraTech Cement" : logo.name;
-  const reference = experienceLogos.find((item) => item.name === referenceName);
-  const displayWidth = reference ? reference.displayWidth * 1.25 : 200;
+  // Panoramic wordmarks need more width to reach a comparable readable height.
+  const crop = marqueeCrops[logo.name];
+  const aspectRatio = crop ? crop[2] / crop[3] : logo.w / logo.h;
+  const isWide = aspectRatio >= 5.5;
   const { props } = getImageProps({
     src: logo.file,
     alt: logo.name,
-    sizes: "(max-width: 600px) 132px, 200px",
+    sizes: isWide ? "300px" : "(max-width: 700px) 240px, 260px",
     width: logo.w,
     height: logo.h,
     loading: "lazy",
     decoding: "async",
-    className: styles.artwork,
-    style: { maxWidth: `min(100%, ${displayWidth}px)` },
+    className: crop ? styles.croppedImage : styles.artwork,
+    ...(crop ? { style: {
+      width: `${logo.w / crop[2] * 100}%`,
+      left: `${-crop[0] / crop[2] * 100}%`,
+      top: `${-crop[1] / crop[3] * 100}%`,
+    } } : {}),
   });
   return (
-    <li className={styles.logo}>
-      {/* Optimised source sets retain the original, full-colour artwork. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img {...props} alt={props.alt} />
+    <li className={styles.logo} data-client-logo={logo.name} data-logo-shape={isWide ? "wide" : undefined} style={{ "--logo-ratio": aspectRatio } as CSSProperties}>
+      {crop ? (
+        <span className={styles.croppedArtwork}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img {...props} alt={props.alt} />
+        </span>
+      ) : (
+        // Optimised source sets retain the original, full-colour artwork.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img {...props} alt={props.alt} />
+      )}
     </li>
   );
 }

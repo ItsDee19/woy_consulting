@@ -41,7 +41,7 @@
   line-height: 1.75;
 }
 
-.rows { display: grid; gap: 60px; width: 100%; min-width: 0; }
+.rows { --logo-gap: 48px; display: grid; gap: 60px; width: 100%; min-width: 0; }
 .viewport {
   container-type: inline-size;
   overflow: hidden;
@@ -52,20 +52,33 @@
   display: flex;
   align-items: center;
   flex: 0 0 auto;
-  gap: 30px;
+  gap: var(--logo-gap);
   margin: 0;
-  padding: 0 30px 0 0;
+  padding: 0 var(--logo-gap) 0 0;
   list-style: none;
 }
 .logo {
+  --logo-height: 112px;
+  --artwork-width: clamp(240px, 20cqw, 260px);
   display: flex;
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  width: min(250px, calc((100cqw - 150px) / 6));
-  height: 96px;
+  /* Fit the artwork, so the shared gap is measured between logo edges. */
+  width: min(var(--artwork-width), calc(var(--logo-height) * var(--logo-ratio)));
+  height: var(--logo-height);
 }
-.artwork { display: block; width: auto; height: auto; max-width: min(100%, 200px); max-height: 96px; object-fit: contain; }
+.artwork { display: block; width: 100%; height: 100%; object-fit: contain; }
+.croppedArtwork {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: var(--logo-ratio);
+}
+.croppedImage { position: absolute; display: block; max-width: none; height: auto; }
+.logo[data-logo-shape="wide"] { --artwork-width: 300px; }
 .left { animation: drift-left 70s linear infinite; }
 .right { animation: drift-right 86s linear infinite; }
 .rows[data-motion-paused] .track,
@@ -94,7 +107,6 @@
 
 @media (max-width: 1100px) {
   .header { gap: 40px; }
-  .logo { width: calc((100cqw - 90px) / 4); }
 }
 
 @media (max-width: 700px) {
@@ -103,17 +115,11 @@
   .header { grid-template-columns: minmax(0, 1fr); gap: 24px; margin-bottom: 40px; }
   .header h2 { font-size: clamp(36px, 7vw, 48px); }
   .header p { font-size: 16px; line-height: 1.75; }
-  .rows { gap: 32px; }
-  .group { gap: 24px; padding-right: 24px; }
-  .logo { width: calc((100cqw - 48px) / 3); height: 80px; }
-  .artwork { max-width: min(100%, 160px); max-height: 80px; }
+  .rows { --logo-gap: 32px; gap: 32px; }
+  .logo { --logo-height: 104px; --artwork-width: clamp(200px, 58cqw, 240px); }
+  .logo[data-logo-shape="wide"] { --artwork-width: clamp(260px, 74cqw, 300px); }
   .footer { margin-top: 32px; }
   .link { font-size: 16px; }
-}
-
-@media (max-width: 460px) {
-  .logo { width: calc((100cqw - 24px) / 2); }
-  .artwork { max-width: min(100%, 132px); max-height: 72px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

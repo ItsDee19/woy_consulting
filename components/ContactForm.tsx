@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { TurnstileCheck } from "./TurnstileCheck";
 import Link from "next/link";
 import { ArrowUpRight, Check } from "@phosphor-icons/react";
 import { site } from "@/lib/content";
@@ -20,7 +21,7 @@ async function prepareSession(signal: AbortSignal): Promise<Session> {
   return { readyAt: Date.now() + Math.min(2000, Math.max(0, Number(data.readyAfterMs) || 0)) };
 }
 
-export function ContactForm() {
+export function ContactForm({ turnstileSiteKey, nonce }: { turnstileSiteKey?: string; nonce?: string }) {
   const [values, setValues] = useState<ContactValues>(EMPTY_VALUES);
   const [consent, setConsent] = useState(false);
   const [website, setWebsite] = useState("");
@@ -28,6 +29,8 @@ export function ContactForm() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [complete, setComplete] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [challengeReset, setChallengeReset] = useState(0);
   const inFlight = useRef(false);
   const submissionId = useRef<string | null>(null);
   const submission = useRef<AbortController | null>(null);
@@ -56,11 +59,16 @@ export function ContactForm() {
     const next = validateContact(values);
     if (!consent) next.consent = "Please give your consent so we can respond to your enquiry.";
     if (showFieldErrors(next)) return;
+    if (!turnstileSiteKey || !turnstileToken) {
+      setError("Please complete the security check before sending your enquiry.");
+      document.getElementById("f-security")?.focus();
+      return;
+    }
     inFlight.current = true;
     setBusy(true);
     const controller = new AbortController();
     submission.current = controller;
-    const timeout = window.setTimeout(() => controller.abort(), 25_000);
+    const timeout = window.setTimeout(() => controller.abort(), 45_000);
     try {
       submissionId.current ||= crypto.randomUUID();
       const prepared = await prepareSession(controller.signal);
@@ -70,7 +78,7 @@ export function ContactForm() {
       controller.signal.throwIfAborted();
       const response = await fetch("/api/contact", {
         method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, website, id: submissionId.current, consent: true, privacyNoticeVersion: PRIVACY_NOTICE_VERSION }),
+        body: JSON.stringify({ ...values, website, id: submissionId.current, consent: true, privacyNoticeVersion: PRIVACY_NOTICE_VERSION, turnstileToken }),
         signal: controller.signal,
       });
       const data = await response.json();
@@ -86,6 +94,8 @@ export function ContactForm() {
       }
     } finally {
       window.clearTimeout(timeout);
+      setTurnstileToken("");
+      setChallengeReset(previous => previous + 1);
       inFlight.current = false;
       setBusy(false);
     }
@@ -97,6 +107,8 @@ export function ContactForm() {
     setWebsite("");
     setErrors({});
     setError(null);
+    setTurnstileToken("");
+    setChallengeReset(previous => previous + 1);
     submissionId.current = null;
     setComplete(false);
     requestAnimationFrame(() => document.getElementById("f-name")?.focus());
@@ -143,8 +155,13 @@ export function ContactForm() {
         <label htmlFor="f-consent">I consent to WOY Consulting using my name, email address, organisation (if provided) and message to respond to this enquiry. <span className={styles.required}>*</span></label>
         {errors.consent && <p id="err-consent" className={styles.fieldError}>{errors.consent}</p>}
       </div>
-      {error && <p role="alert" className={styles.error}>{error}</p>}
-      <button type="submit" disabled={busy} className={styles.submit}><span>{busy ? "Sending your enquiry…" : "Send enquiry"}</span><ArrowUpRight size={20} aria-hidden="true" /></button>
+      {turnstileSiteKey ? (
+        <TurnstileCheck siteKey={turnstileSiteKey} nonce={nonce} resetKey={challengeReset} onToken={setTurnstileToken} />
+      ) : (
+        <p role="status" className={styles.error}>The contact form is temporarily unavailable. Please email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
+      )}
+      {error && <p role="alert" className={styles.error}>{error} You can also email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>}
+      <button type="submit" disabled={busy || !turnstileSiteKey} className={styles.submit}><span>{busy ? "Sending your enquiry…" : "Send enquiry"}</span><ArrowUpRight size={20} aria-hidden="true" /></button>
     </form>
   );
 }

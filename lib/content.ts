@@ -677,6 +677,7 @@ export type ClientLogo = { name: string; file: string; w: number; h: number };
 
 export const clientLogos: ClientLogo[] = [
   { name: "MetLife", file: "/logos/metlife.png", w: 165, h: 200 },
+  { name: "Aviva", file: "/assets/logos/aviva.png", w: 630, h: 198 },
   { name: "Pramerica Life Insurance", file: "/logos/pramerica-life-insurance.png", w: 479, h: 97 },
   { name: "Reliance Industries", file: "/logos/reliance-industries.png", w: 288, h: 200 },
   { name: "Reliance Retail", file: "/logos/reliance-retail.png", w: 400, h: 200 },
@@ -698,6 +699,7 @@ export const clientLogos: ClientLogo[] = [
   { name: "Cvent", file: "/logos/cvent.png", w: 479, h: 95 },
   { name: "CGI", file: "/logos/cgi.png", w: 212, h: 200 },
   { name: "ZS", file: "/logos/zs.png", w: 255, h: 200 },
+  { name: "Go First", file: "/assets/logos/go-first.png", w: 542, h: 542 },
   { name: "GlobalLogic", file: "/logos/globallogic.png", w: 479, h: 89 },
   { name: "Maruti Suzuki", file: "/logos/maruti-suzuki.png", w: 342, h: 54 },
   { name: "Aditya Birla UltraTech", file: "/logos/aditya-birla-ultratech.png", w: 204, h: 200 },

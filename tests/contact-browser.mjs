@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
+import { mockTurnstile } from './helpers/turnstile.mjs';
 const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || (process.platform === 'win32' ? 'C:/Program Files/Google/Chrome/Application/chrome.exe' : undefined), headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce', colorScheme: 'light' });
 const page = await context.newPage();
@@ -9,6 +10,7 @@ const base = process.env.TEST_BASE_URL || 'http://localhost:5174';
 fs.mkdirSync('reports', { recursive: true });
 const errors = [], requests = [], layouts = [], accessibility = [];
 page.on('pageerror', error => errors.push(error.message));
+await mockTurnstile(page, { autoComplete: true });
 let behaviour = 'failure';
 await page.route('**/api/contact', async route => {
   if (route.request().method() === 'GET') return route.fulfill({ json: { readyAfterMs: 0 } });
@@ -21,6 +23,7 @@ await page.route('**/api/contact', async route => {
 });
 try {
   await page.goto(base + '/contact', { waitUntil: 'load' });
+  assert.equal(await page.locator('#f-security').count(), 1, 'Start the local test server with TURNSTILE_SITE_KEY configured; the browser mocks all external checks.');
   await page.getByRole('button', { name: 'Essential only', exact: true }).click();
   assert.equal(await page.title(), 'Start a conversation | WOY Consulting');
   const send = page.getByRole('button', { name: 'Send enquiry', exact: true });
@@ -42,6 +45,7 @@ try {
   await page.locator('#f-consent').focus();
   await page.keyboard.press('Space');
   assert.equal(await page.locator('#f-consent').isChecked(), true);
+  await page.getByText('Security check complete.', { exact: true }).waitFor();
   await send.click();
   await page.getByRole('alert').filter({ hasText: 'enquiry service is unavailable' }).waitFor();
   assert.equal(await page.locator('#f-name').inputValue(), 'Website Test');
@@ -50,12 +54,15 @@ try {
   assert.match(firstId, /^[0-9a-f-]{36}$/);
   assert.equal(requests[0].organisation, '');
   assert.equal(requests[0].consent, true);
-  assert.equal(requests[0].privacyNoticeVersion, '2026-09-25');
+  assert.match(requests[0].turnstileToken, /^mock-token-/);
+  assert.equal(requests[0].privacyNoticeVersion, '2026-09-28');
   behaviour = 'network';
+  await page.getByText('Security check complete.', { exact: true }).waitFor();
   await send.click();
   await page.getByRole('alert').filter({ hasText: 'could not confirm receipt' }).waitFor();
   assert.equal(requests[1].id, firstId, 'Unchanged retry retains UUID');
   behaviour = 'validation';
+  await page.getByText('Security check complete.', { exact: true }).waitFor();
   await send.click();
   await page.getByRole('alert').filter({ hasText: 'check your message' }).waitFor();
   assert.equal(await page.locator('#f-message').getAttribute('aria-invalid'), 'true');
@@ -63,6 +70,7 @@ try {
   assert.equal(await page.evaluate(() => document.activeElement.id), 'f-message');
   await page.locator('#f-message').fill('We would like to discuss leadership alignment and a practical roadmap.');
   behaviour = 'success';
+  await page.getByText('Security check complete.', { exact: true }).waitFor();
   const before = await send.boundingBox();
   await page.locator('form').evaluate(form => { form.requestSubmit(); form.requestSubmit(); });
   const sending = page.getByRole('button', { name: 'Sending your enquiry…', exact: true });
@@ -83,6 +91,7 @@ try {
   await page.locator('#f-email').fill('another@example.test');
   await page.locator('#f-message').fill('Another leadership enquiry for validation.');
   await page.locator('#f-consent').check();
+  await page.getByText('Security check complete.', { exact: true }).waitFor();
   await send.click();
   await page.getByRole('status').filter({ hasText: 'Enquiry received' }).waitFor();
   assert.notEqual(requests[4].id, requests[3].id, 'New enquiry gets a fresh UUID');
@@ -103,7 +112,7 @@ try {
       await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, `No overflow ${mode}/${width}`);
       const footer = page.getByRole('contentinfo');
-      assert.equal(await footer.locator('h2 em').evaluate(el => getComputedStyle(el).color), 'rgb(205, 20, 33)');
+      assert.match(await footer.locator('h2').textContent(), /A clearer direction/);
       assert.equal(await footer.getByRole('link', { name: 'Start a conversation', exact: true }).getAttribute('href'), '/contact');
       assert.equal(await footer.getByRole('link', { name: 'hello@woyconsulting.com', exact: true }).getAttribute('href'), 'mailto:hello@woyconsulting.com');
       layouts.push({ mode, width, footerHeight: (await footer.boundingBox()).height });

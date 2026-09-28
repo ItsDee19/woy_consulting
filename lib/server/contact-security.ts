@@ -1,21 +1,14 @@
 import "server-only";
 import { configuredSiteOrigins } from "../site-origin.mjs";
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+import { isIP } from "node:net";
 
 export const CONTACT_COOKIE = "woy_contact";
 export const CHALLENGE_LIFETIME_MS = 60 * 60 * 1000;
 export const MIN_FORM_TIME_MS = 1500;
-const WINDOW_MS = 15 * 60 * 1000;
-const MAX_ENTRIES = 10_000;
 const MAX_BODY_BYTES = 32_768;
 
 type Challenge = { id: string; issued: number };
-type Counter = { count: number; expires: number };
-type Delivery = { state: "pending" | "sent" | "retryable"; payload: string; expires: number };
-// Intentionally bounded, process-local state. A multi-instance deployment must
-// also configure its edge/WAF rate limits or replace this with a shared store.
-const counters = new Map<string, Counter>();
-const deliveries = new Map<string, Delivery>();
 const developmentSecret = randomBytes(32).toString("hex");
 
 export function getContactSecret(): string | null {
@@ -69,78 +62,71 @@ export function isSameOrigin(request: Request, requireOrigin: boolean): boolean 
   return allowed.includes(origin);
 }
 
-function prune<T extends { expires: number }>(entries: Map<string, T>, now: number) {
-  for (const [key, value] of entries) {
-    if (value.expires <= now) entries.delete(key);
-  }
+/** Vercel overwrites this header at its edge. Never trust it on another host. */
+export function trustedClientIp(request: Request): string | null {
+  if (process.env.VERCEL !== "1") return null;
+  const value = request.headers.get("x-vercel-forwarded-for")?.trim();
+  if (!value || value.length > 45 || value.includes("%") || !isIP(value)) return null;
+  return isIP(value) === 4 ? value : new URL(`http://[${value}]`).hostname.slice(1, -1);
 }
 
-export function consumeRateLimit(key: string, maximum: number, now = Date.now()): number {
-  prune(counters, now);
-  const existing = counters.get(key);
-  if (existing) {
-    if (existing.count >= maximum) return Math.max(1, Math.ceil((existing.expires - now) / 1000));
-    existing.count += 1;
-    return 0;
+export function normaliseRateLimitIp(ip: string): string {
+  if (isIP(ip) === 4) return `v4:${ip}`;
+  if (isIP(ip) !== 6) throw new Error("Invalid client address");
+  const canonical = new URL(`http://[${ip}]`).hostname.slice(1, -1);
+  const [left, right] = canonical.split("::");
+  const start = left ? left.split(":") : [];
+  const end = right ? right.split(":") : [];
+  const groups = right === undefined ? start : [...start, ...Array(8 - start.length - end.length).fill("0"), ...end];
+  const parts = groups.map((group) => parseInt(group, 16));
+  // IPv4-mapped IPv6 must share the IPv4 budget, not acquire a second identity.
+  if (parts.slice(0, 5).every((part) => part === 0) && parts[5] === 0xffff) {
+    return `v4:${parts[6] >> 8}.${parts[6] & 255}.${parts[7] >> 8}.${parts[7] & 255}`;
   }
-  if (counters.size >= MAX_ENTRIES) return Math.ceil(WINDOW_MS / 1000);
-  counters.set(key, { count: 1, expires: now + WINDOW_MS });
-  return 0;
+  // Group privacy addresses within a /64 so rotating interface IDs cannot reset limits.
+  return `v6:${parts.slice(0, 4).map((part) => part.toString(16)).join(":")}/64`;
 }
 
-export function beginDelivery(key: string, payload: string, now = Date.now()): "new" | "pending" | "sent" | "conflict" | "full" {
-  prune(deliveries, now);
-  const previous = deliveries.get(key);
-  if (previous) {
-    if (previous.payload !== payload) return "conflict";
-    if (previous.state !== "retryable") return previous.state;
-    previous.state = "pending";
-    previous.expires = now + WINDOW_MS;
-    return "new";
-  }
-  if (deliveries.size >= MAX_ENTRIES) return "full";
-  deliveries.set(key, { state: "pending", payload, expires: now + WINDOW_MS });
-  return "new";
-}
-
-export function finishDelivery(key: string, sent: boolean) {
-  const delivery = deliveries.get(key);
-  if (delivery) {
-    // Retain the payload binding after failure so retries cannot reuse an ID
-    // for a different enquiry. A shared upstream idempotency key also protects
-    // retries beyond this process-local cache when the provider supports it.
-    delivery.state = sent ? "sent" : "retryable";
-    delivery.expires = Date.now() + WINDOW_MS;
-  }
-}
-
-export function rateLimitIdentity(request: Request, challenge: Challenge, secret: string): string {
-  // Only configure this header when a trusted reverse proxy overwrites it on
-  // every request. Arbitrary client-supplied X-Forwarded-For is not trusted.
-  const header = process.env.CONTACT_RATE_LIMIT_IP_HEADER;
-  const trustedIp = header ? request.headers.get(header)?.trim() : undefined;
-  return fingerprint(trustedIp && trustedIp.length <= 256 ? `ip:${trustedIp}` : `browser:${challenge.id}`, secret);
+export function rateLimitIdentity(request: Request, secret: string): string | null {
+  const ip = trustedClientIp(request);
+  if (ip) return fingerprint(normaliseRateLimitIp(ip), secret);
+  return process.env.NODE_ENV === "production" ? null : fingerprint("development-local", secret);
 }
 
 export class ContactBodyError extends Error {
   constructor(public status: number) { super("Invalid contact request body"); }
 }
 
-export async function readContactBody(request: Request): Promise<Record<string, unknown>> {
+export async function readContactBody(request: Request, timeoutMs = 5000): Promise<Record<string, unknown>> {
   if (!/^application\/json(?:\s*;|$)/i.test(request.headers.get("content-type") || "")) throw new ContactBodyError(415);
   const declaredLength = request.headers.get("content-length");
   if (declaredLength && (!/^\d+$/.test(declaredLength) || Number(declaredLength) > MAX_BODY_BYTES)) throw new ContactBodyError(413);
   if (!request.body) throw new ContactBodyError(400);
+  if (request.signal.aborted) throw new ContactBodyError(408);
   const reader = request.body.getReader();
   const chunks: Uint8Array[] = [];
   let bytes = 0;
+  let interruptedRead = false;
+  let interrupt!: () => void;
+  const interrupted = new Promise<never>((_, reject) => {
+    interrupt = () => {
+      interruptedRead = true;
+      reject(new ContactBodyError(408));
+      // Do not await cancellation: a hostile stream must not hold the response open.
+      void reader.cancel().catch(() => {});
+    };
+  });
+  const deadline = setTimeout(interrupt, timeoutMs);
+  request.signal.addEventListener("abort", interrupt, { once: true });
+  if (request.signal.aborted) interrupt();
   try {
     while (true) {
-      const { value, done } = await reader.read();
+      const { value, done } = await Promise.race([reader.read(), interrupted]);
+      if (interruptedRead) throw new ContactBodyError(408);
       if (done) break;
       bytes += value.byteLength;
       if (bytes > MAX_BODY_BYTES) {
-        await reader.cancel();
+        void reader.cancel().catch(() => {});
         throw new ContactBodyError(413);
       }
       chunks.push(value);
@@ -152,6 +138,8 @@ export async function readContactBody(request: Request): Promise<Record<string, 
     if (error instanceof ContactBodyError) throw error;
     throw new ContactBodyError(400);
   } finally {
+    clearTimeout(deadline);
+    request.signal.removeEventListener("abort", interrupt);
     reader.releaseLock();
   }
 }

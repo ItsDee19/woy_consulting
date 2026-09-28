@@ -1,19 +1,6 @@
 import { configuredSiteOrigins, isLocalHost } from "./lib/site-origin.mjs";
 
 const isProduction = process.env.NODE_ENV === "production";
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isProduction ? "" : " 'unsafe-eval'"}`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
-  "font-src 'self'",
-  `connect-src 'self'${isProduction ? "" : " ws: wss:"}`,
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "frame-ancestors 'none'",
-].join("; ");
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -30,9 +17,12 @@ const nextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
-          { key: "Content-Security-Policy", value: contentSecurityPolicy },
           ...(isProduction ? [{ key: "Strict-Transport-Security", value: "max-age=31536000" }] : []),
         ],
+      },
+      {
+        source: "/api/:path*",
+        headers: [{ key: "Content-Security-Policy", value: "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'" }],
       },
       {
         source: "/:folder(logos|images)/:path*",

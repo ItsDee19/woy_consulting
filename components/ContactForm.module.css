@@ -27,7 +27,8 @@ textarea.input { min-height: 135px; resize: vertical; }
 .submit svg { flex-shrink: 0; }
 .submit:hover { background: var(--c-reddeep); }
 .submit:active { background: var(--c-reddeep); }
-.submit:disabled { opacity: .7; cursor: wait; }
+.submit:disabled { opacity: .7; cursor: not-allowed; }
+.form[aria-busy="true"] .submit { cursor: wait; }
 .honeypot { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
 .success { color: var(--foreground); outline: none; padding-block: 10px; }
 .check { display: grid; place-items: center; width: 62px; height: 62px; margin-bottom: 26px; border: 1px solid var(--primary); border-radius: 50%; color: var(--primary); }
@@ -45,3 +46,12 @@ textarea.input { min-height: 135px; resize: vertical; }
   .submit { border-color: ButtonText; }
   .input:focus { outline: 2px solid Highlight; outline-offset: 2px; }
 }
+
+.security { margin-bottom: 24px; min-width: 0; }
+.security:focus-visible, .securityRetry:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+.securityWidget { min-height: 65px; width: 100%; }
+.securityStatus { margin-top: 10px; color: var(--muted-foreground); font-size: 14px; line-height: 1.6; }
+.securityNotice { margin-top: 8px; color: var(--muted-foreground); font-size: 12px; line-height: 1.6; }
+.security a, .error a { text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.securityRetry { margin-top: 10px; min-height: 44px; padding: 8px 14px; border: 1px solid var(--primary); color: var(--primary); font: 14px/1.6 var(--font-interface); cursor: pointer; }
+.securityRetry:hover { background: color-mix(in srgb, var(--primary) 8%, transparent); }

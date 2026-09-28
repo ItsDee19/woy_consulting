@@ -49,9 +49,9 @@ With that production server running, use `npm run test:browser` for the route, a
 Vercel auto-detects Next.js, so there is nothing to configure in the build
 settings. Import `ItsDee19/woy_consulting`, accept the defaults, and deploy.
 
-Set server-only variables from `.env.example`: `SITE_URL`, `CONTACT_ENDPOINT`, `CONTACT_FORM_SECRET` and optional `CONTACT_ENDPOINT_TOKEN`. Rebuild after changing the public origin. Without delivery configuration the form reports unavailable and retains entered details.
+Follow [the Vercel security setup](docs/security-deployment.md) and `.env.example` for delivery credentials, shared Redis limits and Turnstile verification. Production contact submissions fail closed without these controls. Rebuild after changing the public origin. Never commit populated environment files.
 
-HTTPS redirects, HSTS, CSP and other headers are in `next.config.mjs`. Hosting must supply TLS and trustworthy proxy headers. Preview/local builds block indexing. See [the checklist](docs/launch-checklist.md) for shared spam-limit requirements.
+HTTPS redirects, HSTS and standard headers are in `next.config.mjs`; `proxy.ts` supplies a fresh nonce-based CSP for request-rendered HTML. Versioned scripts and image assets remain cacheable. Hosting must supply TLS and trustworthy proxy headers. Preview/local builds block indexing. Use `npm run security:check` after building to scan source and browser bundles. GitHub security checks and dependency updates are defined in `.github/`.
 
 **Note on the repository:** `.gitignore` excludes `*.pdf` and `*.mp4`. The
 introduction deck names clients that the site itself anonymises under

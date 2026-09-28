@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
 import "./recreation.css";
 import { Nav } from "@/components/Nav";
@@ -52,13 +53,17 @@ const bootScript = `
 })();
 `;
 
-export default function RootLayout({
+// A fresh script nonce requires request-time HTML; assets remain cacheable.
+export const dynamic = "force-dynamic";
+
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <html lang="en" data-theme="light" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: bootScript }} />
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>
       <body>
         <a

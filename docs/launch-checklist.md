@@ -74,9 +74,9 @@ The 22 September hero and practitioner refinement passed production build, TypeS
 
 1. Use Node.js 22.19+; Node 24 used for verification.
 2. Set `SITE_URL` to the verified public HTTPS origin and rebuild. Vercel domains are fallback origins. Local/preview indexing is deliberately blocked.
-3. Set server-only `CONTACT_ENDPOINT`, a random `CONTACT_FORM_SECRET` (32+ characters), and optional `CONTACT_ENDPOINT_TOKEN`. See `.env.example`. Never prefix secrets with `NEXT_PUBLIC_`. Missing delivery configuration produces an honest unavailable message.
+3. Set the delivery, signing, Redis and Turnstile values documented in `.env.example` and [security deployment](security-deployment.md). Never prefix secrets with `NEXT_PUBLIC_`. Missing production configuration produces an honest unavailable message.
 4. Configure valid TLS at the host. With another reverse proxy, overwrite `X-Forwarded-Proto` and block public access to the plain HTTP origin. The application does not provision certificates.
-5. Contact limits/duplicate counters use bounded process memory. Multi-instance/serverless deployments require shared edge/WAF limits for `/api/contact` or a shared store. Only configure `CONTACT_RATE_LIMIT_IP_HEADER` if the host guarantees it cannot be spoofed.
+5. Configure shared Upstash Redis counters and delivery state, Cloudflare Turnstile, Vercel trusted visitor IPs and an outer `/api/contact` firewall rule. Production fails closed if required controls are missing. See [security deployment](security-deployment.md) for current environment, operations and verification steps.
 6. Add WOY's privacy email when provided. Confirm policy wording against the chosen delivery provider and business retention arrangements before publishing.
 
 No live deployment or contact-delivery destination is configured by this change. Remaining stock images on other pages are decorative placeholders; `docs/image-sources.json` records source URLs and optimized sizes.

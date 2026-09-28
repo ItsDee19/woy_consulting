@@ -4,7 +4,6 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const ts = require("typescript");
-const React = require("react");
 const { renderToStaticMarkup } = require("react-dom/server");
 
 const root = path.resolve(__dirname, "..");
@@ -24,13 +23,14 @@ const schema = loadSource("lib/structured-data.ts", {
   "@/lib/content": content,
   "@/lib/site-url": { siteUrl: "https://www.woy.test" },
 });
-const { StructuredData } = loadSource("components/StructuredData.tsx", { "@/lib/structured-data": schema });
+const { StructuredData } = loadSource("components/StructuredData.tsx", { "@/lib/structured-data": schema, "next/headers": { headers: async () => new Map([["x-nonce", "test-nonce-for-structured-data"]]) } });
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
-test("structured data cannot escape the script element and preserves its original text", () => {
+test("structured data cannot escape the script element and preserves its original text", async () => {
   const hostile = '</script><script>alert("unexpected")</script><!-- & > \u2028\u2029';
   const nodes = [{ "@type": "WebPage", name: hostile }];
-  const html = renderToStaticMarkup(React.createElement(StructuredData, { nodes, id: "page-data" }));
+  const html = renderToStaticMarkup(await StructuredData({ nodes, id: "page-data" }));
+  assert.ok(html.includes('nonce="test-nonce-for-structured-data"'));
   assert.equal((html.match(/<script/g) || []).length, 1);
   assert.equal((html.match(/<\/script>/g) || []).length, 1);
   assert.ok(!html.includes("<!--"));

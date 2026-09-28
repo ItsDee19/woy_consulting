@@ -1,4 +1,4 @@
-export const PRIVACY_NOTICE_VERSION = "2026-09-25";
+export const PRIVACY_NOTICE_VERSION = "2026-09-28";
 
 export const contactFields = ["name", "email", "organisation", "message"] as const;
 export type ContactField = (typeof contactFields)[number];
