@@ -76,6 +76,14 @@ export const SOURCE_COMPASS = {
   crop: { x: 56, y: 687, width: 112, height: 116 },
   cx: 111.5,
   cy: 746.5,
+  /** Broad tracing masks expose the source pixels without redrawing their edges. */
+  roseRevealPath: "M111.5 746.5 V718.5 V746.5 H139.5 H111.5 V774.5 V746.5 H83.5 H111.5 L131.5 726.5 L111.5 746.5 L131.5 766.5 L111.5 746.5 L91.5 766.5 L111.5 746.5 L91.5 726.5",
+  cardinalRevealPaths: [
+    "M111.5 702.5 V687",
+    "M155.5 746.5 H168",
+    "M111.5 790.5 V803",
+    "M67.5 746.5 H56",
+  ],
 } as const;
 
 /** Original navbar artwork, aligned to MARK's ring for the completed animation. */

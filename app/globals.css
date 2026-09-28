@@ -220,10 +220,27 @@
 }
 .mk-compass-detail { opacity: 0; animation: mkCompassDetail var(--mk-duration) linear infinite; }
 @keyframes mkCompassDetail {
-  0%, 6% { opacity: 0; }
-  14%, 34% { opacity: 1; }
+  0%, 5% { opacity: 0; }
+  6%, 34% { opacity: 1; }
   39% { opacity: .65; }
   45%, 100% { opacity: 0; }
+}
+/* Tracing masks reveal the original dial, inner points and cardinal lettering. */
+.mk-compass-dial-draw, .mk-compass-rose-draw, .mk-compass-cardinal-draw { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.mk-compass-dial-draw { animation: mkCompassDialDraw var(--mk-duration) linear infinite; }
+@keyframes mkCompassDialDraw {
+  0%, 6% { stroke-dashoffset: 1; }
+  16%, 100% { stroke-dashoffset: 0; }
+}
+.mk-compass-rose-draw { animation: mkCompassRoseDraw var(--mk-duration) linear infinite; }
+@keyframes mkCompassRoseDraw {
+  0%, 9% { stroke-dashoffset: 1; }
+  20%, 100% { stroke-dashoffset: 0; }
+}
+.mk-compass-cardinal-draw { animation: mkCompassCardinalDraw var(--mk-duration) linear infinite; }
+@keyframes mkCompassCardinalDraw {
+  0%, 14% { stroke-dashoffset: 1; }
+  21.5%, 100% { stroke-dashoffset: 0; }
 }
 .mk-needle { animation: mkNeedleResolve var(--mk-duration) linear infinite; }
 @keyframes mkNeedleResolve {
@@ -254,7 +271,10 @@
 .mk-source-dark { display: none; }
 [data-theme="dark"] .mk-source-light { display: none; }
 [data-theme="dark"] .mk-source-dark { display: block; }
-[data-theme="dark"] .mk-consulting image { filter: invert(1) hue-rotate(180deg) saturate(2); }
+/* Paint the original caption silhouette in the readable on-navy colour. */
+.mk-caption-dark { display: none; }
+[data-theme="dark"] .mk-caption-light { display: none; }
+[data-theme="dark"] .mk-caption-dark { display: block; }
 /* Resolve the central symbol before letters appear, then hold one unchanged asset. */
 @keyframes mkDrawingResolve {
   0%, 42% { opacity: 1; }

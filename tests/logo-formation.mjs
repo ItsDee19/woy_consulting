@@ -127,6 +127,50 @@ try {
     }
     return { theme, width, times: [6960, 7800, 9000, 10000], pixelIdentical: true };
   };
+  const compassChecks = [];
+  const assertCompassFormation = async (theme, width) => {
+    // Freeze everything except the new traces, so pixel changes prove that
+    // the compass itself draws rather than relying on a fade or other symbols.
+    await sample(2600);
+    const snapshots = [];
+    for (const time of [840, 1320, 1800, 2280, 2600]) {
+      await logo.evaluate((element, time) => {
+        for (const animation of element.getAnimations({ subtree: true })) {
+          if (['mkCompassDialDraw', 'mkCompassRoseDraw', 'mkCompassCardinalDraw'].includes(animation.animationName)) {
+            animation.currentTime = time;
+          }
+        }
+      }, time);
+      const pixels = await logo.screenshot({ animations: 'allow', path: `reports/compass-drawing-${theme}-${width}-${time}.png` });
+      if (snapshots.length) assert.ok(!pixels.equals(snapshots.at(-1)), `Compass gains visible detail at ${time}ms (${theme}, ${width}px)`);
+      snapshots.push(pixels);
+    }
+    const reveal = logo.locator('#woy-compass-mask > image');
+    const mask = await reveal.getAttribute('mask');
+    try {
+      await reveal.evaluate(element => element.removeAttribute('mask'));
+      const unmasked = await logo.screenshot({ animations: 'allow', path: `reports/compass-unmasked-${theme}-${width}.png` });
+      // An additional alpha-mask layer can round premultiplied channels by
+      // 1-3/255 in Chromium. Compare decoded pixels rather than PNG bytes;
+      // a clipped stroke or incomplete reveal produces much larger changes.
+      const maxChannelDifference = await page.evaluate(async sources => {
+        const pixels = await Promise.all(sources.map(async source => {
+          const image = new Image(); image.src = source; await image.decode();
+          const canvas = document.createElement('canvas');
+          canvas.width = image.width; canvas.height = image.height;
+          const context = canvas.getContext('2d'); context.drawImage(image, 0, 0);
+          return context.getImageData(0, 0, image.width, image.height).data;
+        }));
+        let largest = 0;
+        for (let i = 0; i < pixels[0].length; i++) largest = Math.max(largest, Math.abs(pixels[0][i] - pixels[1][i]));
+        return largest;
+      }, [snapshots.at(-1), unmasked].map(buffer => `data:image/png;base64,${buffer.toString('base64')}`));
+      assert.ok(maxChannelDifference <= 3, `Completed tracing preserves source compass detail within compositing precision (${theme}, ${width}px; max ${maxChannelDifference}/255)`);
+    } finally {
+      await reveal.evaluate((element, value) => element.setAttribute('mask', value), mask);
+    }
+    compassChecks.push({ theme, width, progressiveDrawing: true, sourceArtworkPreserved: true });
+  };
   const holdChecks = [];
   const assertAlignedLetters = bounds => {
     for (const letter of ["w", "y"]) {
@@ -164,6 +208,7 @@ try {
     const merging = await sample(4500);
     assert.ok(merging.compass.x - merging.circle.x < separated.compass.x - separated.circle.x, "Symbols travel toward one center");
     if (width === 1440) await logo.screenshot({ path: "reports/logo-merging-1440.png" });
+    if (width === 390 || width === 1440) await assertCompassFormation('light', width);
     const revealSamples = await assertContinuousReveal('light', width);
     if (width === 390 || width === 1440) holdChecks.push(await assertUnchangedHold('light', width));
     const complete = await sample(7800);
@@ -250,9 +295,11 @@ try {
   assert.ok(Math.hypot(reducedCenter.star.x - reducedCenter.guide.x, reducedCenter.star.y - reducedCenter.guide.y) < .02, "Reduced-motion final symbol retains the guide centre");
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.reload({ waitUntil: "load" });
+  await page.getByRole('button', { name: 'Switch to dark theme', exact: true }).click();
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await logo.scrollIntoViewIfNeeded();
+    await assertCompassFormation('dark', width);
     await assertContinuousReveal('dark', width);
     holdChecks.push(await assertUnchangedHold('dark', width));
   }
@@ -270,6 +317,6 @@ try {
   const resumeTime = await logo.evaluate(el => el.getAnimations({ subtree: true })[0].currentTime);
   await page.waitForTimeout(120);
   assert.ok(await logo.evaluate((el, previous) => el.getAnimations({ subtree: true })[0].currentTime > previous, resumeTime), 'Animation clock advances after returning on screen');
-  fs.writeFileSync("reports/logo-formation.json", JSON.stringify({ results, holdChecks, reducedMotion: true, offscreenPause: true, resume: true }, null, 2));
-  console.log("Logo formation: concentric guide and star throughout 21 animation samples at seven widths, separate symbols, convergence, complete lockup, monotonic source-artwork reveal without an asset switch, pixel-identical completed hold in both themes, full-width source caption, reference static proportions, responsive geometry, reduced motion and off-screen pause passed.");
+  fs.writeFileSync("reports/logo-formation.json", JSON.stringify({ results, holdChecks, compassChecks, reducedMotion: true, offscreenPause: true, resume: true }, null, 2));
+  console.log("Logo formation: concentric guide and star throughout 21 animation samples at seven widths, progressively drawn source compass preserving the original artwork in both themes, separate symbols, convergence, complete lockup, monotonic source-artwork reveal without an asset switch, pixel-identical completed hold in both themes, full-width source caption, reference static proportions, responsive geometry, reduced motion and off-screen pause passed.");
 } finally { await browser.close(); }

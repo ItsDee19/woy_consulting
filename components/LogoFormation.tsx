@@ -84,7 +84,27 @@ export function LogoFormation({ className = "" }: { className?: string }) {
                 <mask id="woy-compass-mask" maskUnits="userSpaceOnUse" {...compassCrop}
                   style={{ maskType: "alpha" }}>
                   <image href={SOURCE_COMPASS.src} width={SOURCE_COMPASS.width}
-                    height={SOURCE_COMPASS.height} filter="url(#woy-compass-ink)" />
+                    height={SOURCE_COMPASS.height} filter="url(#woy-compass-ink)" mask="url(#woy-compass-reveal)" />
+                </mask>
+                {/* Draw through the source artwork instead of fading in a finished compass. */}
+                <clipPath id="woy-compass-face">
+                  <circle cx={SOURCE_COMPASS.cx} cy={SOURCE_COMPASS.cy} r="24" />
+                </clipPath>
+                <mask id="woy-compass-reveal" maskUnits="userSpaceOnUse" {...compassCrop}
+                  style={{ maskType: "alpha" }}>
+                  <g fill="none" stroke="white">
+                    <circle className="mk-compass-dial-draw" cx={SOURCE_COMPASS.cx} cy={SOURCE_COMPASS.cy}
+                      r="34" strokeWidth="22" strokeLinecap="round" pathLength="1"
+                      transform={`rotate(-90 ${SOURCE_COMPASS.cx} ${SOURCE_COMPASS.cy})`} />
+                    <g clipPath="url(#woy-compass-face)">
+                      <path className="mk-compass-rose-draw" d={SOURCE_COMPASS.roseRevealPath}
+                        strokeWidth="20" strokeLinecap="round" strokeLinejoin="round" pathLength="1" />
+                    </g>
+                    {SOURCE_COMPASS.cardinalRevealPaths.map(d => (
+                      <path key={d} className="mk-compass-cardinal-draw" d={d}
+                        strokeWidth="20" pathLength="1" />
+                    ))}
+                  </g>
                 </mask>
               </defs>
               <rect {...compassCrop} fill="var(--c-logo-red)" mask="url(#woy-compass-mask)" />
@@ -125,7 +145,16 @@ export function LogoFormation({ className = "" }: { className?: string }) {
         <svg className="mk-consulting" x={SOURCE_LOCKUP.x} y={SOURCE_LOCKUP.wordY}
           width={SOURCE_LOCKUP.markWidth} height={SOURCE_LOCKUP.wordHeight}
           viewBox={SOURCE_LOCKUP.wordViewBox} preserveAspectRatio="none" focusable="false">
-          <image href={SOURCE_LOCKUP.src} width={SOURCE_LOCKUP.width} height={SOURCE_LOCKUP.height} />
+          <defs>
+            <mask id="woy-caption-mask" x="224" y="328" width="384" height="22"
+              maskUnits="userSpaceOnUse" style={{ maskType: "alpha" }}>
+              <image href={SOURCE_LOCKUP.src} width={SOURCE_LOCKUP.width} height={SOURCE_LOCKUP.height} />
+            </mask>
+          </defs>
+          <image className="mk-caption-light" href={SOURCE_LOCKUP.src}
+            width={SOURCE_LOCKUP.width} height={SOURCE_LOCKUP.height} />
+          <rect className="mk-caption-dark" x="224" y="328" width="384" height="22"
+            fill="var(--c-on-navy)" mask="url(#woy-caption-mask)" />
         </svg>
       </svg>
     </div>
