@@ -65,7 +65,7 @@ export default async function RootLayout({
       <head>
         <script nonce={nonce} dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>
-      <body>
+      <body id="top">
         <a
           href="#main"
           className="fixed left-6 top-[-100px] z-[100] rounded-[2px] bg-action px-4 py-3 text-sm font-medium text-white transition-all focus:top-4"

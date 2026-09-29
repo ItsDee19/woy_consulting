@@ -1,0 +1,161 @@
+.page {
+  --profile-rule: var(--c-line-on-light);
+  --profile-action-hover: #981329;
+  font-family: var(--font-interface);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: 45px 5.4% 90px;
+}
+
+.returnLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding-block: 8px;
+  border-bottom: 1px solid currentColor;
+  color: var(--c-ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.returnLink:hover { color: var(--c-red); }
+.returnLink svg, .contact svg { flex-shrink: 0; }
+.returnLink:focus-visible, .contact:focus-visible {
+  outline: 2px solid var(--c-ink);
+  outline-offset: 5px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, .85fr) minmax(0, 1.25fr);
+  gap: 9%;
+  align-items: start;
+  margin-top: 45px;
+}
+
+.portrait {
+  position: relative;
+  width: 100%;
+  aspect-ratio: .78;
+  margin: 0;
+  overflow: hidden;
+  background: var(--c-line-on-light);
+}
+
+.image {
+  object-fit: cover;
+  filter: grayscale(1);
+  transition: filter .3s ease;
+}
+
+/* The owner's opening note requests colour on hover, with no portrait zoom. */
+@media (hover: hover) {
+  .portrait:hover .image { filter: grayscale(0); }
+}
+
+.biography { min-width: 0; }
+.biography .eyebrow {
+  color: var(--c-red);
+  font-family: var(--font-interface);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.biography .name {
+  margin-block: 25px;
+  color: var(--c-ink);
+  font-family: var(--font-editorial);
+  font-size: 72px;
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -.04em;
+  overflow-wrap: break-word;
+}
+
+.biography .introduction {
+  margin-bottom: 26px;
+  color: var(--c-ink);
+  font-family: var(--font-editorial);
+  font-size: 25.6px;
+  line-height: 1.4;
+  letter-spacing: -.015em;
+}
+
+.paragraphs p {
+  margin: 0 0 21px;
+  color: var(--c-ink2);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.experience {
+  margin-block: 35px;
+  padding-block: 25px;
+  border-block: 1px solid var(--profile-rule);
+}
+
+.organisations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 22px;
+  margin: 15px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--c-ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.biography .contact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  min-height: 52px;
+  padding: 15px 23px;
+  border-radius: 0;
+  background: var(--c-red);
+  color: #fff;
+  font-family: var(--font-interface);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.contact:hover { background: var(--profile-action-hover); }
+.contact:active { background: var(--profile-action-hover); }
+
+:global([data-theme="dark"]) .page { --profile-rule: var(--c-line2); }
+
+@media (min-width: 1440px) {
+  .container { padding-inline: 78px; }
+}
+
+@media (max-width: 850px) {
+  .layout { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 6%; }
+  .biography .name { font-size: 48px; }
+}
+
+@media (max-width: 700px) {
+  .container { padding: 25px 6% 55px; }
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 35px; margin-top: 30px; }
+  .portrait { aspect-ratio: .95; max-height: 480px; }
+  .biography .name { font-size: 49.6px; }
+  .biography .introduction { font-size: 24px; }
+  .experience { margin-block: 28px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page .image, .page a { transition: none; }
+}
+
+@media (forced-colors: active) {
+  .contact { border: 1px solid ButtonText; }
+}

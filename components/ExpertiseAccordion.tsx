@@ -19,7 +19,7 @@ function ExpertiseDetail({ area }: { area: ExpertiseArea }) {
 }
 
 export function ExpertiseAccordion({ areas }: { areas: ExpertiseArea[] }) {
-  const [openSlug, setOpenSlug] = useState<string | null>(areas[0]?.slug ?? null);
+  const [openSlug, setOpenSlug] = useState<string | null>(null);
   const [anchorNavigation, setAnchorNavigation] = useState(false);
   const openLinkedArea = useCallback((slug: string) => {
     setAnchorNavigation(true);
@@ -60,7 +60,7 @@ export function ExpertiseAccordion({ areas }: { areas: ExpertiseArea[] }) {
       <noscript>
         <div className={styles.fallback}>
           {areas.map((area, index) => (
-            <details key={area.slug} className={styles.area} name="woy-expertise-fallback" open={index === 0}>
+            <details key={area.slug} className={styles.area} name="woy-expertise-fallback">
               <summary className={styles.trigger}>
                 <span className={styles.number} aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
                 <span className={styles.title}>{area.title}</span>

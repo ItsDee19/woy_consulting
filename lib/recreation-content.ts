@@ -1,3 +1,5 @@
+import { peopleProfiles } from "./people-profiles";
+
 export const expertise = [
   { id: 'strategy', number: '01', title: 'Strategy, growth & execution', question: 'Where do we go next — and how do we get there?', description: 'Translate ambition into clear choices, practical roadmaps and disciplined execution. We help leadership teams connect growth priorities with the capabilities, decisions and operating rhythms they need.', services: ['Business strategy & execution roadmaps', 'Consultative selling & sales capability', 'Sales management & performance systems', 'Leadership ownership & business reviews'], caseSlug: 'education-transformation' },
   { id: 'leadership', number: '02', title: 'Leadership & executive coaching', question: 'What does the next chapter demand of our leaders?', description: 'Develop the judgement, alignment and adaptability to lead through complexity. Executive coaching complements our advisory work, helping leaders turn insight into sustained changes in how they lead.', services: ['CEO, CXO & executive coaching', 'Leadership team alignment', 'New leader assimilation', 'Future-ready leadership capability'], caseSlug: 'insurance-leadership' },
@@ -15,11 +17,33 @@ export const cases:CaseStudy[] = [
   {slug:'medical-technology-leadership',industry:'Medical technology',title:'Expanding the lens from functional expertise to enterprise impact.',cover:'A wider lens.\nA bigger contribution.',strap:'Strategic thinking · Women in leadership',theme:'mist',summary:'A strategic-thinking module within a six-month women’s leadership journey.',context:'As part of a broader women’s leadership development journey, participants needed an opportunity to step beyond their functional roles and examine business priorities with a wider, global perspective.',focus:['Enterprise perspective','Strategic thinking','Stakeholder influence','Personal application'],work:[{title:'Look beyond the functional boundary',text:'Designed and delivered a one-day module focused on seeing the organisation as a whole and connecting functional contribution with broader strategic priorities.'},{title:'Explore through simulation',text:'Used simulations and discussion to examine business choices, global perspectives and the influence needed to contribute across boundaries.'},{title:'Make a personal commitment',text:'Helped participants translate the session into strategic action commitments relevant to their own roles and leadership development.'}],resultTitle:'What the module delivered',results:['A structured opportunity to practise enterprise-level thinking.','Exploration of stakeholder influence and a global business perspective.','Individual strategic action commitments to carry into the wider leadership journey.'],takeaway:'Leadership contribution grows when the field of view expands.'},
 ];
 
-export const people = [
-  {slug:'vipin-tuteja',category:'leadership',name:'Vipin Tuteja',role:'Founder & Managing Director',image:'vipin-tuteja.jpeg',focus:'Strategy, leadership & organisational effectiveness',intro:'Helping leadership teams align strategy, people, culture and execution through growth and transformation.',bio:['Vipin partners with CEOs, founders, CHROs, Boards and senior leadership teams to bring strategic clarity, organisational alignment and disciplined execution to growth, transformation and change.','He brings more than 35 years of leadership experience across Xerox, American Express, Ricoh and Samsung, including significant P&L responsibilities, business building and transformation across India, Southeast Asia, the US and the UK.','Since founding WOY Consulting in 2015, he has focused on translating strategic intent into operating rhythms, leadership behaviours, governance mechanisms and people systems. His consulting practice is complemented by ICF-credentialed executive coaching and more than 2,000 coaching hours.'],experience:['Xerox','American Express','Ricoh','Samsung']},
-  {slug:'sandeep-bidani',category:'leadership',name:'Sandeep Bidani',role:'Director & Partner',image:'sandeep-bidani.jpeg',focus:'Leadership, HR transformation & inclusion',intro:'Bringing a business-focused perspective to leadership, culture and organisation transformation.',bio:['Sandeep combines experience as a management consultant and change leader with senior HR leadership across large, complex organisations.','His background includes KPMG consulting work in India and the Middle East and CHRO and regional HR responsibilities at KPMG, American Express and IBM. He has worked across organisation transformation, talent strategy, HR capability and leadership alignment.','His advisory and coaching work helps leaders connect business priorities with leadership capability and execution. Inclusion is a central part of his work, including his role as co-founder of the disability-inclusion platform Saarathee.'],experience:['KPMG','American Express','IBM']},
-  {slug:'kannan-swaminathan',category:'leadership',name:'Kannan Swaminathan',role:'Director & Partner',image:'kannan-swaminathan.jpg',focus:'Leadership, transitions & financial services',intro:'Connecting leadership development with the realities of operations, transitions and change.',bio:['Kannan brings 29 years of corporate experience in banking and financial services, including 15 years in leadership roles.','His experience spans transitions, operations, business development, relationship management and strategy, with organisations including the Royal Bank of Scotland Group, Tata Consultancy Services, ABN AMRO, Standard Chartered, ICICI Bank and ANZ Grindlays.','He brings this operating perspective to leadership and executive coaching, helping leaders examine their context, strengthen their effectiveness and navigate change.'],experience:['RBS','TCS','ABN AMRO','Standard Chartered','ICICI Bank','ANZ Grindlays']},
-];
+const peopleListingDetails: Record<string, { category: string; image: string; focus: string }> = {
+  "vipin-tuteja": {
+    category: "leadership",
+    image: "vipin-tuteja.jpeg",
+    focus: "Strategy, leadership & organisational effectiveness",
+  },
+  "sandeep-bidani": {
+    category: "leadership",
+    image: "sandeep-bidani.jpeg",
+    focus: "Leadership, HR transformation & inclusion",
+  },
+  "kannan-swaminathan": {
+    category: "leadership",
+    image: "kannan-swaminathan.jpg",
+    focus: "Leadership, transitions & financial services",
+  },
+};
+
+export const people = peopleProfiles.map((profile) => ({
+  ...peopleListingDetails[profile.slug],
+  slug: profile.slug,
+  name: profile.name,
+  role: profile.role,
+  intro: profile.introduction,
+  bio: profile.biography,
+  experience: profile.experience,
+}));
 
 export const steps = [
   {name:'Discover',text:'Build a shared, fact-based view of your context, priorities and underlying challenges.'},

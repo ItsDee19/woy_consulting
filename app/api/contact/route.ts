@@ -1,9 +1,10 @@
-import { contactFields, PRIVACY_NOTICE_VERSION, validateContact } from "../../../lib/contact-validation";
+import { contactFields, PRIVACY_NOTICE_VERSION, validateContact, type ContactValues } from "../../../lib/contact-validation";
 import {
   CHALLENGE_LIFETIME_MS, CONTACT_COOKIE, ContactBodyError, createChallenge, fingerprint,
   getContactSecret, isSameOrigin, MIN_FORM_TIME_MS, rateLimitIdentity,
   readChallengeCookie, readContactBody, verifyChallenge,
 } from "../../../lib/server/contact-security";
+import { getContactDeliveryConfiguration, sendContactEnquiry } from "../../../lib/server/contact-delivery";
 import { getContactStore } from "../../../lib/server/contact-store";
 import { hasTurnstileConfiguration, verifyTurnstile } from "../../../lib/server/contact-turnstile";
 import { contactResponder } from "../../../lib/server/contact-telemetry";
@@ -18,13 +19,10 @@ const SUCCESS = "Your enquiry has been received by WOY Consulting.";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function configuration() {
-  const secret = getContactSecret(), store = getContactStore();
-  try {
-    const endpoint = new URL(process.env.CONTACT_ENDPOINT || "");
-    if (!secret || !store || endpoint.protocol !== "https:" || endpoint.username || endpoint.password || endpoint.hash ||
-        (process.env.NODE_ENV === "production" && !hasTurnstileConfiguration())) return null;
-    return { secret, endpoint, store };
-  } catch { return null; }
+  const secret = getContactSecret(), store = getContactStore(), email = getContactDeliveryConfiguration();
+  if (!secret || !store || !email ||
+      (process.env.NODE_ENV === "production" && !hasTurnstileConfiguration())) return null;
+  return { secret, email, store };
 }
 
 export async function GET(request: Request) {
@@ -99,19 +97,7 @@ export async function POST(request: Request) {
     }
     let sent = false;
     try {
-      const form = new FormData();
-      for (const [key, value] of values) form.append(key, value);
-      form.append("id", id);
-      form.append("consent", "true");
-      form.append("privacyNoticeVersion", PRIVACY_NOTICE_VERSION);
-      const headers: Record<string, string> = { Accept: "application/json", "Idempotency-Key": id };
-      if (process.env.CONTACT_ENDPOINT_TOKEN) headers.Authorization = `Bearer ${process.env.CONTACT_ENDPOINT_TOKEN}`;
-      const upstream = await fetch(config.endpoint, {
-        method: "POST", body: form, headers, cache: "no-store", redirect: "error",
-        signal: AbortSignal.any([request.signal, AbortSignal.timeout(15_000)]),
-      });
-      sent = upstream.ok;
-      void upstream.body?.cancel().catch(() => {});
+      sent = await sendContactEnquiry(config.email, Object.fromEntries(values) as ContactValues, id, request.signal);
     } catch {
       try { await config.store.finishDelivery(deliveryKey, delivery.lease, false); }
       catch { return respond("storage_unavailable", { message: UNCONFIRMED }, 503); }

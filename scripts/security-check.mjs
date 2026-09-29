@@ -12,10 +12,11 @@ const rules = [
   ["slack-token", /\bxox[baprs]-[A-Za-z0-9-]{20,}\b/g],
   ["stripe-secret", /\bsk_(?:live|test)_[A-Za-z0-9]{20,}\b/g],
   ["google-api-key", /\bAIza[A-Za-z0-9_-]{35}\b/g],
+  ["resend-api-key", /\bre_[A-Za-z0-9_-]{20,}\b/g],
   ["openai-project-key", /\bsk-(?:proj|svcacct)-[A-Za-z0-9_-]{40,}\b/g],
 ];
 const credentialAssignment = /\b(?:api[_-]?key|secret|password|token)\b\s*[:=]\s*["']([^"'\s]{24,})["']/gi;
-const browserServerConfig = /\b(?:CONTACT_(?:ENDPOINT(?:_TOKEN)?|FORM_SECRET|RATE_LIMIT_IP_HEADER)|UPSTASH_REDIS_REST_(?:URL|TOKEN)|TURNSTILE_SECRET_KEY)\b/g;
+const browserServerConfig = /\b(?:RESEND_API_KEY|CONTACT_(?:FROM_EMAIL|TO_EMAIL|ENDPOINT(?:_TOKEN)?|FORM_SECRET|RATE_LIMIT_IP_HEADER)|UPSTASH_REDIS_REST_(?:URL|TOKEN)|TURNSTILE_SECRET_KEY)\b/g;
 const examples = /^(?:docs|tests|fixtures|__fixtures__)\/|\/(?:fixtures|__fixtures__)\/|\.(?:md|mdx)$/i;
 const generated = /^(?:node_modules|\.git|\.next|reports|out|build)\//;
 

@@ -45,7 +45,7 @@ export function LeadershipSection() {
             The partners you meet stay involved through delivery, bringing senior judgement,
             continuity and a practical commitment to adoption.
           </p>
-          <Link href="/practitioners" className={styles.link}>
+          <Link href="/people" className={styles.link}>
             <span>Meet our Leadership &amp; Partners</span>
             <ArrowUpRight size={22} aria-hidden="true" />
           </Link>

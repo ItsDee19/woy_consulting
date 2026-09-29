@@ -113,7 +113,7 @@ try {
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, `No overflow ${mode}/${width}`);
       const footer = page.getByRole('contentinfo');
       assert.match(await footer.locator('h2').textContent(), /A clearer direction/);
-      assert.equal(await footer.getByRole('link', { name: 'Start a conversation', exact: true }).getAttribute('href'), '/contact');
+      assert.equal(await footer.getByRole('link', { name: 'Start a conversation', exact: true }).getAttribute('href'), '/contact#top');
       assert.equal(await footer.getByRole('link', { name: 'hello@woyconsulting.com', exact: true }).getAttribute('href'), 'mailto:hello@woyconsulting.com');
       layouts.push({ mode, width, footerHeight: (await footer.boundingBox()).height });
       if (width === 390 || width === 1440) {

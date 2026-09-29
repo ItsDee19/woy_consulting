@@ -41,10 +41,7 @@ const nextConfig = {
       ["entrepreneurial-mindset", "financial-services-entrepreneurial-mindset"],
       ["medical-technology-leadership", "medical-technology-strategic-thinking"],
     ].map(([source, destination]) => ({ source: `/work/${source}`, destination: `/case-studies/${destination}`, permanent: true }));
-    const profileDestinations = ["vipin-tuteja", "sandeep-bidani", "kannan-swaminathan"].map(slug => ({
-      source: `/people/${slug}`, destination: `/practitioners#${slug}`, permanent: true,
-    }));
-    const preservedDestinations = [...sourceDestinations, ...profileDestinations, { source: "/privacy", destination: "/privacy-policy", permanent: true }];
+    const preservedDestinations = [...sourceDestinations, { source: "/privacy", destination: "/privacy-policy", permanent: true }];
     if (!isProduction) return preservedDestinations;
     const httpsRedirects = configuredSiteOrigins(process.env)
       .filter((origin) => !isLocalHost(new URL(origin).hostname))

@@ -49,7 +49,7 @@ With that production server running, use `npm run test:browser` for the route, a
 Vercel auto-detects Next.js, so there is nothing to configure in the build
 settings. Import `ItsDee19/woy_consulting`, accept the defaults, and deploy.
 
-Follow [the Vercel security setup](docs/security-deployment.md) and `.env.example` for delivery credentials, shared Redis limits and Turnstile verification. Production contact submissions fail closed without these controls. Rebuild after changing the public origin. Never commit populated environment files.
+Follow [the Vercel security setup](docs/security-deployment.md) and `.env.example` for direct Resend delivery (`RESEND_API_KEY`, `CONTACT_FROM_EMAIL`, `CONTACT_TO_EMAIL`), the signed-form secret, shared Redis limits and Turnstile verification. Verify the sender domain in Resend and redeploy after setting the environment variables. Production contact submissions fail closed without these controls. Rebuild after changing the public origin. Never commit populated environment files.
 
 HTTPS redirects, HSTS and standard headers are in `next.config.mjs`; `proxy.ts` supplies a fresh nonce-based CSP for request-rendered HTML. Versioned scripts and image assets remain cacheable. Hosting must supply TLS and trustworthy proxy headers. Preview/local builds block indexing. Use `npm run security:check` after building to scan source and browser bundles. GitHub security checks and dependency updates are defined in `.github/`.
 
@@ -181,7 +181,7 @@ file was cropped to remove a baked-in award badge.
 
 The following details require WOY’s production information.
 
-1. **Contact delivery.** Configure the server-only handler and signing secret from `.env.example`. Add the privacy email when provided.
+1. **Contact delivery.** Configure Resend, the verified sender and recipient mailboxes, the signing secret, Redis and Turnstile from `.env.example`. Follow [the current setup instructions](docs/security-deployment.md); no separate contact-delivery handler is required. Add the privacy email when provided.
 
 2. **LinkedIn URLs.** `linkedin` is `null` for all three practitioners in
    `lib/content.ts`, and the card shows a placeholder line. These were not
@@ -201,7 +201,7 @@ The following details require WOY’s production information.
   the NDA constraint. Names in the source deck were stripped.
 - **No awards or press section.** WOY positions through work and engagement.
 - **The Approach page is an interactive 4D journey**, with keyboard-accessible stage tabs, connected planes, stable detail panels and a readable no-JavaScript fallback.
-- **Conversation CTAs open an email to hello@woyconsulting.com.** The footer combines the closing invitation, company information, navigation and legal links. The Contact page remains available; its separate form asks for name, mobile and email only and still requires server delivery configuration.
+- **Conversation CTAs open the Contact page.** Its form asks for name, email, optional organisation and a message, with required consent. The API sends enquiries through Resend after validation and anti-abuse checks. Direct email links remain available. The footer combines the closing invitation, company information, navigation and legal links.
 
 ## Accessibility and performance
 

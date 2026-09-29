@@ -27,7 +27,7 @@ export function CookiePreferencesButton({ className = "" }: { className?: string
         window.dispatchEvent(new CustomEvent(OPEN_EVENT, { detail: event.currentTarget }));
       }}
     >
-      Cookie preferences
+      Cookie Policy
     </button>
   );
 }

@@ -191,6 +191,12 @@ export const recreationLogoAssets = {
       476
     ]
   },
+  "hdfc-bank": {
+    "src": "/logos/hdfc-bank.svg",
+    "width": 178,
+    "height": 35,
+    "crop": [0, 0, 178, 35]
+  },
   "hindustan-petroleum": {
     "src": "/logos/hindustan-petroleum.png",
     "width": 157,

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PageTopLink } from "./PageTopLink";
 import { usePathname } from "next/navigation";
 import { Menu, Moon, Sun } from "lucide-react";
 import { useState, useSyncExternalStore } from "react";
@@ -48,14 +49,15 @@ export function Nav() {
       <header className="header-shell">
         <div className="wrap">
           <div className={`site-header ${controls.header}`}>
-            <Link href="/" aria-label="WOY Consulting home"><Logo /></Link>
+            <PageTopLink href="/#top" aria-label="WOY Consulting home"><Logo /></PageTopLink>
             <nav className={`desktop-nav ${controls.navigation}`} aria-label="Main navigation">
-              {links.map(([href, label]) => (
-                <Link href={href} key={href} aria-current={isActive(href) ? "page" : undefined}>{label}</Link>
-              ))}
-              <Link className={`nav-cta ${controls.cta}`} href="/contact" aria-current={path === "/contact" ? "page" : undefined}>
+              {links.map(([href, label]) => {
+                const NavigationLink = href === "/" ? PageTopLink : Link;
+                return <NavigationLink href={href === "/" ? "/#top" : href} key={href} aria-current={isActive(href) ? "page" : undefined}>{label}</NavigationLink>;
+              })}
+              <PageTopLink className={`nav-cta ${controls.cta}`} href="/contact#top" aria-current={path === "/contact" ? "page" : undefined}>
                 Let’s talk <span aria-hidden="true">↗</span>
-              </Link>
+              </PageTopLink>
             </nav>
             <div className={controls.controls}>
               <button type="button" className={controls.toggle} onClick={toggleTheme}
@@ -75,12 +77,15 @@ export function Nav() {
                     <SheetDescription id="navigation-description" className="sr-only">Explore WOY Consulting.</SheetDescription>
                     <Logo />
                     <nav aria-label="Mobile navigation">
-                      {links.map(([href, label]) => (
-                        <SheetClose asChild key={href}>
-                          <Link href={href} aria-current={isActive(href) ? "page" : undefined}>{label}</Link>
-                        </SheetClose>
-                      ))}
-                      <SheetClose asChild><Link className={`red ${controls.mobileCta}`} href="/contact">Let’s talk ↗</Link></SheetClose>
+                      {links.map(([href, label]) => {
+                        const NavigationLink = href === "/" ? PageTopLink : Link;
+                        return (
+                          <SheetClose asChild key={href}>
+                            <NavigationLink href={href === "/" ? "/#top" : href} aria-current={isActive(href) ? "page" : undefined}>{label}</NavigationLink>
+                          </SheetClose>
+                        );
+                      })}
+                      <SheetClose asChild><PageTopLink className={`red ${controls.mobileCta}`} href="/contact#top">Let’s talk ↗</PageTopLink></SheetClose>
                     </nav>
                     <p className="eyebrow muted">Win Over Yourself.</p>
                   </SheetContent>

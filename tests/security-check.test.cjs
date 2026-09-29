@@ -10,6 +10,7 @@ const script = resolve(__dirname, "../scripts/security-check.mjs");
 const scanner = import(pathToFileURL(script).href);
 // Synthetic values are assembled so a full-history scanner does not mistake a fixture for a leaked credential.
 const fakeGithubToken = () => ["ghp", "aB9".repeat(13)].join("_");
+const fakeResendToken = () => ["re", "aB9".repeat(4), "xY7".repeat(5)].join("_");
 
 function repository(t) {
   const root = mkdtempSync(join(tmpdir(), "woy-security-check-"));
@@ -33,9 +34,22 @@ test("known credentials are reported without returning their value", async () =>
   assert.ok(!formatFinding({ path: "app/example.ts", ...result[0] }).includes(secret));
 });
 
+test("Resend API credentials are detected without disclosing values or flagging short examples", async () => {
+  const { scanText, formatFinding } = await scanner;
+  const secret = fakeResendToken();
+  for (const browser of [false, true]) {
+    const result = scanText(`const mailToken = '${secret}';`, { browser });
+    assert.equal(result[0].category, "resend-api-key");
+    assert.equal(result[0].line, 1);
+    assert.ok(!JSON.stringify(result).includes(secret));
+    assert.ok(!formatFinding({ path: "app/example.ts", ...result[0] }).includes(secret));
+  }
+  assert.deepEqual(scanText("const placeholders = ['re_example', 'ordinary_configuration_name'];"), []);
+});
+
 test("browser server-only configuration is blocked but legitimate server references are allowed", async () => {
   const { scanText } = await scanner;
-  for (const name of ["CONTACT_ENDPOINT_TOKEN", "CONTACT_FORM_SECRET", "UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN", "TURNSTILE_SECRET_KEY"]) {
+  for (const name of ["RESEND_API_KEY", "CONTACT_FROM_EMAIL", "CONTACT_TO_EMAIL", "CONTACT_ENDPOINT_TOKEN", "CONTACT_FORM_SECRET", "UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN", "TURNSTILE_SECRET_KEY"]) {
     const code = `const value = process.env.${name};`;
     assert.deepEqual(scanText(code), []);
     assert.equal(scanText(code, { browser: true })[0].category, "server-config-in-browser");

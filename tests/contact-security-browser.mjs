@@ -96,11 +96,11 @@ try {
   await page.getByRole('button', { name: 'Complete security check', exact: true }).waitFor();
   const loadsBeforeNavigation = mock.scriptRequests();
   await page.getByRole('navigation', { name: 'Main navigation', exact: true }).getByRole('link', { name: 'Home', exact: true }).click();
-  await page.waitForURL(base + '/');
+  await page.waitForURL(base + '/#top');
   await page.waitForFunction(() => window.__turnstileTest.active() === 0);
   assert.equal(await page.evaluate(() => window.__turnstileTest.active()), 0, 'Widget removed on route change');
   await page.getByRole('navigation', { name: 'Main navigation', exact: true }).getByRole('link', { name: /Let.*talk/ }).click();
-  await page.waitForURL(base + '/contact');
+  await page.waitForURL(base + '/contact#top');
   await page.getByRole('button', { name: 'Complete security check', exact: true }).waitFor();
   assert.equal(mock.scriptRequests(), loadsBeforeNavigation, 'Client navigation reuses the script');
   assert.equal(await page.evaluate(() => window.__turnstileTest.maxActive), 1, 'No duplicate widgets');

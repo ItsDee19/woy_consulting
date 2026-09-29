@@ -66,7 +66,7 @@ try {
     assert.equal(await page.locator("html").getAttribute("data-theme"), "light", "Fresh visits start light regardless of device preference or storage availability");
     await page.getByRole("button", { name: "Essential only", exact: true }).click();
     if (scenario.remember) {
-      await page.getByRole("button", { name: "Cookie preferences", exact: true }).click();
+      await page.getByRole("button", { name: "Cookie Policy", exact: true }).click();
       await page.getByRole("checkbox", { name: "Remember my light or dark theme" }).check();
       await page.getByRole("button", { name: "Save preferences", exact: true }).click();
     }
@@ -74,7 +74,7 @@ try {
     if (scenario.chosen === "light") await page.getByRole("button", { name: "Switch to dark theme", exact: true }).click();
     await page.getByRole("button", { name: `Switch to ${scenario.chosen} theme`, exact: true }).click();
     const timeOrigin = await page.evaluate(() => performance.timeOrigin);
-    const visited = [];
+    const visited = [], scrollChecks = [];
     const verify = async () => {
       assert.equal(await page.locator("html").getAttribute("data-theme"), scenario.chosen, scenario.name);
       assert.equal(await page.evaluate(() => performance.timeOrigin), timeOrigin, "Internal navigation must not reload the document");
@@ -88,6 +88,23 @@ try {
       if (mobile) await page.getByRole("button", { name: "Open navigation menu", exact: true }).click();
       const navigation = page.getByRole("navigation", { name: mobile ? "Mobile navigation" : "Main navigation", exact: true });
       await navigation.getByRole("link", { name: label, exact: true }).click();
+      if (mobile) {
+        await page.getByRole("dialog", { name: "WOY navigation", exact: true }).waitFor({ state: "hidden" });
+        // Let Radix finish restoring focus after the sheet unmounts.
+        await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      }
+    };
+    const verifyTop = async label => {
+      await page.waitForFunction(() => window.scrollY <= 1);
+      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      const scrollY = await page.evaluate(() => window.scrollY);
+      assert.ok(scrollY <= 1, `${scenario.name}: ${label} must leave the page at the top, got ${scrollY}`);
+      scrollChecks.push({ label, scrollY });
+      await verify();
+    };
+    const scrollAwayFromTop = async () => {
+      await page.evaluate(() => window.scrollTo({ top: 600, behavior: "instant" }));
+      await page.waitForFunction(() => window.scrollY > 100);
     };
 
     await page.locator("#selected-work").getByRole("link", { name: "View all selected work", exact: true }).click();
@@ -110,29 +127,86 @@ try {
       await page.waitForURL(base + "/work");
       await verify();
       await navigate("Home");
-      await page.waitForURL(base + "/");
+      await page.waitForURL(base + "/#top");
+      await verifyTop("Home from selected work");
       await page.locator("#selected-work .case-card").nth(1).click();
       await page.waitForURL(base + "/case-studies/insurance-senior-sales-leadership");
       await verify();
       await navigate("Leadership & Partners");
       await page.waitForURL(base + "/people");
       await page.locator(".person-card").first().click();
-      await page.waitForURL(base + "/practitioners#vipin-tuteja");
+      await page.waitForURL(base + "/people/vipin-tuteja");
       await verify();
     }
 
     await navigate("Home");
-    await page.waitForURL(base + "/");
+    await page.waitForURL(base + "/#top");
     await page.locator("#selected-work").waitFor();
-    await verify();
-    await navigate(scenario.width <= 850 ? "Let’s talk ↗" : "Let’s talk");
-    await page.waitForURL(base + "/contact");
+    await verifyTop("Home from another page");
+    const contactLabel = scenario.width <= 850 ? "Let’s talk ↗" : "Let’s talk";
+    await navigate(contactLabel);
+    await page.waitForURL(base + "/contact#top");
     await page.getByRole("button", { name: "Send enquiry", exact: true }).waitFor();
+    await verifyTop("Contact from Home");
+
+    const contactDraft = {
+      name: "Navigation check",
+      email: "navigation-check@example.test",
+      organisation: "Navigation test organisation",
+      message: "Keep this unsent enquiry while returning to the top.",
+    };
+    for (const [field, value] of Object.entries(contactDraft)) {
+      await page.locator(`#f-${field}`).fill(value);
+    }
+    await page.locator("#f-consent").check();
+    const verifyContactDraft = async () => {
+      for (const [field, value] of Object.entries(contactDraft)) {
+        assert.equal(await page.locator(`#f-${field}`).inputValue(), value, `Same-page navigation must preserve ${field}`);
+      }
+      assert.equal(await page.locator("#f-consent").isChecked(), true, "Same-page navigation must preserve consent");
+    };
+
+    await scrollAwayFromTop();
+    await navigate(contactLabel);
+    await page.waitForURL(base + "/contact#top");
+    await verifyTop("Contact navbar CTA on the same URL");
+    await verifyContactDraft();
+    const footerContact = page.locator("#footer").getByRole("link", { name: "Start a conversation", exact: true });
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      await footerContact.scrollIntoViewIfNeeded();
+      assert.ok(await page.evaluate(() => window.scrollY > 100), "Footer CTA check must start away from the top");
+      if (attempt === 2) {
+        await footerContact.focus();
+        await page.keyboard.press("Enter");
+      } else {
+        await footerContact.click();
+      }
+      await page.waitForURL(base + "/contact#top");
+      await verifyTop(`Contact footer CTA repeat ${attempt}`);
+      await verifyContactDraft();
+    }
+
+    await scrollAwayFromTop();
+    await navigate("Home");
+    await page.waitForURL(base + "/#top");
+    await verifyTop("Navbar Home from scrolled contact");
+    await navigate("Selected work");
+    await page.waitForURL(base + "/work");
+    await page.locator(".work-library .case-card").first().waitFor();
     await verify();
+    const footerHome = page.getByRole("contentinfo").getByRole("link", { name: "WOY Consulting home", exact: true });
+    await footerHome.scrollIntoViewIfNeeded();
+    assert.ok(await page.evaluate(() => window.scrollY > 100), "Footer brand Home check must start away from the top");
+    await footerHome.click();
+    await page.waitForURL(base + "/#top");
+    await verifyTop("Footer brand Home from selected work");
+    await navigate(contactLabel);
+    await page.waitForURL(base + "/contact#top");
+    await verifyTop("Contact before reload");
     await page.reload({ waitUntil: "load" });
     assert.equal(await page.locator("html").getAttribute("data-theme"), scenario.remember ? scenario.chosen : "light",
       "Reload uses the consented saved preference, otherwise the light default");
-    results.push({ scenario: scenario.name, visited, reloadTheme: await page.locator("html").getAttribute("data-theme") });
+    results.push({ scenario: scenario.name, visited, scrollChecks, reloadTheme: await page.locator("html").getAttribute("data-theme") });
     await context.close();
   }
   assert.deepEqual(errors, []);

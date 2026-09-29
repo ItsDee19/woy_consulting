@@ -672,7 +672,7 @@ export const symbols = [
 ];
 
 /* ---------------------------------------------------------------- client logos */
-/* Extracted from the WOY introduction deck. Indicative, not exhaustive. */
+/* Original deck roster plus owner-requested additions. Indicative, not exhaustive. */
 export type ClientLogo = { name: string; file: string; w: number; h: number };
 
 export const clientLogos: ClientLogo[] = [
@@ -684,6 +684,7 @@ export const clientLogos: ClientLogo[] = [
   { name: "Hindustan Petroleum", file: "/logos/hindustan-petroleum.png", w: 157, h: 200 },
   { name: "Siemens Financial Services", file: "/logos/siemens-financial-services.png", w: 480, h: 120 },
   { name: "Union Bank of India", file: "/logos/union-bank-of-india-source.png", w: 1059, h: 158 },
+  { name: "HDFC Bank", file: "/logos/hdfc-bank.svg", w: 178, h: 35 },
   { name: "NatWest Group", file: "/logos/natwest-group.png", w: 138, h: 200 },
   { name: "National Fertilizers Limited", file: "/logos/national-fertilizers-limited.png", w: 178, h: 200 },
   { name: "SAIL", file: "/logos/sail-source.png", w: 393, h: 393 },

@@ -34,7 +34,7 @@
 .address { margin-top: 1rem; font-style: normal; }
 .legalName { max-width: 27ch; color: var(--c-on-navy); font-size: .9375rem; line-height: 1.65; }
 .address > p + p { margin-top: .4rem; max-width: 29ch; color: var(--c-on-navy-muted); font-size: .875rem; line-height: 1.7; }
-.navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding-top: .15rem; }
+.navigation { padding-top: .15rem; }
 .directoryLabel { margin-bottom: .85rem; color: var(--c-on-navy-muted); font-size: .6875rem; font-weight: 400; text-transform: uppercase; letter-spacing: .11em; line-height: 1.5; }
 .navigation ul { padding: 0; margin: 0; list-style: none; }
 .navigation li a { display: inline-flex; align-items: center; min-height: 40px; color: var(--c-on-navy); font-size: .9375rem; transition: color .2s; }

@@ -130,7 +130,7 @@ test("recreated top-level pages are served directly in every environment", async
 
 test("recreated pages still upgrade configured public HTTP requests", async () => {
   const rules = await redirectRules({ SITE_URL: "https://example.com" });
-  for (const pathname of ["/expertise", "/work", "/people", "/approach"]) {
+  for (const pathname of ["/expertise", "/work", "/people", "/approach", "/people/vipin-tuteja", "/people/sandeep-bidani", "/people/kannan-swaminathan"]) {
     const first = redirect(rules, { host: "example.com", pathname });
     assert.equal(first.parsedDestination.protocol, "https:");
     assert.equal(first.parsedDestination.hostname, "example.com");
@@ -161,18 +161,13 @@ test("source case links retain published case destinations and query parameters"
   }
 });
 
-test("source profile links land on the matching established practitioner", async () => {
+test("individual profile routes and unknown slugs are not redirected to practitioner anchors", async () => {
   for (const NODE_ENV of ["development", "production"]) {
     const rules = await redirectRules({ NODE_ENV });
-    for (const slug of ["vipin-tuteja", "sandeep-bidani", "kannan-swaminathan"]) {
-      const result = redirect(rules, { host: "localhost:5173", pathname: `/people/${slug}`, query: { source: "people" } });
-      assert.ok(result);
-      assert.equal(result.permanent, true);
-      assert.equal(result.parsedDestination.pathname, "/practitioners");
-      assert.equal(result.parsedDestination.hash, `#${slug}`);
-      assert.deepEqual(result.parsedDestination.query, { source: "people" });
+    for (const slug of ["vipin-tuteja", "sandeep-bidani", "kannan-swaminathan", "unknown-person"]) {
+      assert.equal(redirect(rules, { host: "localhost:5173", pathname: `/people/${slug}`, query: { source: "people" } }), null);
     }
-    assert.equal(redirect(rules, { host: "localhost:5173", pathname: "/people/unknown-person" }), null);
+    assert.equal(redirect(rules, { host: "localhost:5173", pathname: "/practitioners" }), null, "The legacy practitioner page remains available directly");
   }
 });
 

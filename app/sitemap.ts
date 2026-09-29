@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 import { caseStudies } from "@/lib/content";
+import { peopleProfiles } from "@/lib/people-profiles";
 import { siteUrl } from "@/lib/site-url";
 
-/** Generated from the route list and lib/content.ts, so new cases appear here. */
+/** Keep public routes, individual profiles, and published cases discoverable. */
 export default function sitemap(): MetadataRoute.Sitemap {
   const pages = [
     { path: "", priority: 1 },
@@ -24,6 +25,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${siteUrl}${p.path}`,
       changeFrequency: "monthly" as const,
       priority: p.priority,
+    })),
+    ...peopleProfiles.map((profile) => ({
+      url: `${siteUrl}/people/${profile.slug}`,
+      changeFrequency: "yearly" as const,
+      priority: 0.6,
     })),
     ...caseStudies.map((c) => ({
       url: `${siteUrl}/case-studies/${c.slug}`,

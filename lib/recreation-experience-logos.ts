@@ -2,6 +2,7 @@
  * The user confirmed that each represents work delivered by WOY or its practitioners,
  * including through partner platforms. Original artwork and colours are preserved.
  * Lumina is a faithful PNG render of the source EMF. Crop values are display-only.
+ * HDFC Bank was added at the owner's request using its official website SVG.
  */
 export type ExperienceLogo = {
   id: string;
@@ -251,6 +252,15 @@ export const experienceLogos: ExperienceLogo[] = [
       476
     ],
     "displayWidth": 73
+  },
+  {
+    "id": "hdfc-bank",
+    "name": "HDFC Bank",
+    "src": "/logos/hdfc-bank.svg",
+    "width": 178,
+    "height": 35,
+    "crop": [0, 0, 178, 35],
+    "displayWidth": 178
   },
   {
     "id": "hindustan-petroleum",

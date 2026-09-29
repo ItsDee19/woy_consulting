@@ -20,6 +20,11 @@ const homeExpertise = [
   { title: "Organisation, culture & change", destination: "/expertise#culture", description: "Align structure, decision rights and everyday behaviour with business priorities. We work with leaders to diagnose friction, build shared ownership and make change practical." },
   { title: "People & performance systems", destination: "/expertise#people", description: "Build business-aligned HR, talent and performance systems that leaders and teams can use. Connect roles, capability, accountability and development to what the organisation is trying to achieve." },
 ];
+const profilePages = [
+  { slug: "vipin-tuteja", name: "Vipin Tuteja", description: "Helping leadership teams align strategy, people, culture and execution through growth and transformation." },
+  { slug: "sandeep-bidani", name: "Sandeep Bidani", description: "Bringing a business-focused perspective to leadership, culture and organisation transformation." },
+  { slug: "kannan-swaminathan", name: "Kannan Swaminathan", description: "Connecting leadership development with the realities of operations, transitions and change." },
+];
 page.on("pageerror", error => errors.push({ url: page.url(), message: error.message }));
 // Cover request-rendered pages too; nonce CSP deliberately disables static HTML.
 const appPaths = JSON.parse(fs.readFileSync(".next/server/app-paths-manifest.json", "utf8"));
@@ -28,7 +33,7 @@ const caseBlock = content.split("export const caseStudies: CaseStudy[] = [")[1].
 const caseRoutes = [...caseBlock.matchAll(/slug: "([^"]+)"/g)].map(match => `/case-studies/${match[1]}`);
 const routes = [...new Set([...Object.keys(appPaths)
   .filter(route => route.endsWith("/page") && !route.startsWith("/_") && !route.includes("["))
-  .map(route => route.replace(/\/page$/, "") || "/"), ...caseRoutes])];
+  .map(route => route.replace(/\/page$/, "") || "/"), ...caseRoutes, ...profilePages.map(profile => `/people/${profile.slug}`)])];
 assert.ok(routes.length >= 10, "Discover all public routes rather than silently skipping dynamic pages");
 
 try {
@@ -40,14 +45,14 @@ try {
   await page.reload({ waitUntil: "load" });
   assert.equal(await page.locator("html").getAttribute("data-theme"), "light");
   assert.equal(await page.locator("#cookie-preferences").isVisible(), false, "Saved choice stays hidden on reload");
-  await page.getByRole("button", { name: "Cookie preferences", exact: true }).click();
+  await page.getByRole("button", { name: "Cookie Policy", exact: true }).click();
   await page.getByRole("checkbox", { name: "Remember my light or dark theme" }).check();
   await page.getByRole("button", { name: "Switch to dark theme", exact: true }).click();
   await page.getByRole("button", { name: "Save preferences", exact: true }).click();
   await page.reload({ waitUntil: "load" });
   assert.equal(await page.locator("html").getAttribute("data-theme"), "dark");
   if (await page.locator("html").getAttribute("data-theme") !== "light") await page.getByRole("button", { name: "Switch to light theme", exact: true }).click();
-  await page.getByRole("button", { name: "Cookie preferences", exact: true }).click();
+  await page.getByRole("button", { name: "Cookie Policy", exact: true }).click();
   await page.getByRole("button", { name: "Save preferences", exact: true }).click();
 
   for (const route of routes) {
@@ -69,8 +74,8 @@ try {
       assets: [...document.images].map(image => image.currentSrc || image.src),
     }));
     const typefaces = await page.evaluate(() => ["body", "main h1", "main input", "main textarea", "main .recreation p", ".header-shell nav a", ".header-shell button", "footer h2", "footer a", "footer button"]
-      .flatMap(selector => { const element = document.querySelector(selector); return element ? [{ selector, family: getComputedStyle(element).fontFamily, sans: selector.startsWith(".header-shell") || selector.startsWith("footer") || selector === "main .recreation p" }] : []; }));
-    for (const { selector, family, sans } of typefaces) assert.match(family, (sans || (route === "/contact" && selector === "main input")) ? /^Arial/ : /^Georgia/, `Reference typography on ${selector}: ${route}`);
+      .flatMap(selector => { const element = document.querySelector(selector); return element ? [{ selector, family: getComputedStyle(element).fontFamily, sans: selector.startsWith(".header-shell") || (selector === "footer a" || selector === "footer button") || selector === "main .recreation p" }] : []; }));
+    for (const { selector, family, sans } of typefaces) assert.match(family, (sans || (route === "/contact" && (selector === "main input" || selector === "main textarea"))) ? /^Arial/ : /^Georgia/, `Reference typography on ${selector}: ${route}`);
     assert.ok(meta.title && meta.description && meta.canonical && meta.og, `Metadata: ${route}`);
     assert.match(meta.title, /WOY Consulting/, `Branded title: ${route}`);
     assert.equal(meta.title.split("WOY Consulting").length - 1, 1, `Brand appears once: ${route}`);
@@ -110,7 +115,8 @@ try {
       }
       assert.equal(await page.locator("#collective-experience").getByRole("heading", { level: 2 }).count(), 1);
       assert.equal((await page.locator("#collective-experience-title").textContent()).replace(/\s+/g, " ").trim(), "Our collective experience.", "Heading words remain separated when the desktop line break is hidden");
-      assert.equal(await page.locator("#collective-experience img").count(), 47, "Full supplied logo roster is visible without a disclosure");
+      assert.equal(await page.locator("#collective-experience img").count(), 50, "Full supplied logo roster is visible without a disclosure");
+      assert.equal(await page.locator("#collective-experience").getByRole("img", { name: "HDFC Bank logo", exact: true }).count(), 1);
     }
     if (route === "/about") {
       assert.equal(await page.getByRole("heading", { name: "Experience across industries.", exact: true }).count(), 0);
@@ -137,7 +143,8 @@ try {
       assert.equal(await page.getByRole("combobox", { name: "Explore by industry" }).count(), 1);
       assert.equal(await page.locator("#collective-experience h2").textContent(), "Our collective experience");
       assert.match(await page.locator("#collective-experience").innerText(), /partner and affiliate platforms/);
-      assert.equal(await page.locator("#collective-experience .experience-logo").count(), 49, "The full source organisation roster is present");
+      assert.equal(await page.locator("#collective-experience .experience-logo").count(), 50, "The full source organisation roster is present");
+      assert.equal(await page.locator("#collective-experience").getByRole("img", { name: "HDFC Bank", exact: true }).count(), 1);
     }
     if (route === "/people") {
       assert.equal(await page.locator("#leadership .person-card").count(), 3);
@@ -145,6 +152,20 @@ try {
         assert.equal(await page.locator(`.person-card[href="/people/${slug}"]`).count(), 1);
       }
       assert.equal(await page.locator(".people-principle").getByRole("link", { name: "Start a conversation", exact: true }).getAttribute("href"), "/contact");
+    }
+    const profile = profilePages.find(person => route === `/people/${person.slug}`);
+    if (profile) {
+      assert.equal(new URL(page.url()).pathname, route, "Individual profiles retain their own route");
+      assert.equal(meta.title, `${profile.name} | WOY Consulting`);
+      assert.equal(meta.description, profile.description, "Profile metadata uses the supplied introductory statement");
+      assert.equal(await page.getByRole("heading", { level: 1 }).textContent(), profile.name);
+      assert.equal(await page.locator("main").count(), 1, "Profiles use the shared main landmark");
+      assert.equal(await page.locator("#main").count(), 1, "The main anchor remains unique");
+      const profileMain = page.locator("main");
+      assert.equal(await profileMain.getByRole("article").count(), 1, "The biography column is an article");
+      assert.equal(await profileMain.getByRole("img", { name: profile.name, exact: true }).count(), 1);
+      assert.equal(await profileMain.getByRole("link", { name: "Leadership & Partners", exact: true }).getAttribute("href"), "/people");
+      assert.equal(await profileMain.getByRole("link", { name: "Start a conversation", exact: true }).getAttribute("href"), "/contact");
     }
     if (route === "/faq") {
       const faq = meta.schema.find(node => node["@type"] === "FAQPage");
@@ -156,19 +177,32 @@ try {
     }
     const mainNavigation = page.getByRole("navigation", { name: "Main navigation", exact: true });
     assert.equal(await mainNavigation.getByRole("link", { name: "Home", exact: true }).count(), 1, "The requested Home link is preserved");
-    for (const [href, label] of [["/", "Home"], ["/expertise", "Expertise"], ["/work", "Selected work"], ["/people", "Leadership & Partners"], ["/approach", "Our approach"], ["/contact", "Let’s talk"]]) {
+    for (const [href, label] of [["/#top", "Home"], ["/expertise", "Expertise"], ["/work", "Selected work"], ["/people", "Leadership & Partners"], ["/approach", "Our approach"], ["/contact#top", "Let’s talk"]]) {
       const link = mainNavigation.getByRole("link", { name: label, exact: true });
       assert.equal(await link.getAttribute("href"), href);
-      assert.equal(await link.getAttribute("aria-current"), (href === "/" ? route === "/" : route.startsWith(href)) ? "page" : null);
+      const pathname = new URL(href, base).pathname;
+      assert.equal(await link.getAttribute("aria-current"), (pathname === "/" ? route === "/" : route.startsWith(pathname)) ? "page" : null);
     }
     const navbarLogo = page.locator(".header-shell").getByRole("img", { name: "WOY Consulting", exact: true });
     assert.equal(await navbarLogo.getAttribute("src"), "/assets/woy-logo.png", "Navbar retains the original logo artwork");
     assert.equal(await navbarLogo.evaluate(element => element.tagName), "IMG");
     assert.equal(await page.locator(".header-shell").getByRole("button", { name: /Switch to .* theme/ }).count(), 1);
     const footer = page.getByRole("contentinfo");
-    assert.equal(await footer.getByRole("link", { name: "Start a conversation", exact: true }).getAttribute("href"), "/contact");
+    const footerNavigation = footer.getByRole("navigation", { name: "Footer", exact: true });
+    assert.equal(await footerNavigation.count(), 1, "Footer keeps one page navigation group");
+    assert.equal(await footerNavigation.getByText("Explore", { exact: true }).count(), 1);
+    assert.equal(await footerNavigation.getByRole("list").count(), 1, "All footer page links share the Explore list");
+    assert.deepEqual(await footerNavigation.getByRole("link").evaluateAll(links => links.map(link => [link.textContent.trim(), link.getAttribute("href")])), [
+      ["Expertise", "/expertise"],
+      ["Selected work", "/work"],
+      ["Leadership & Partners", "/people"],
+      ["Our approach", "/approach"],
+    ], "Explore links use the current page destinations");
+    assert.equal(await footer.locator('a[href="/terms-and-conditions"]').count(), 0, "Footer omits Terms and Conditions");
+    assert.equal(await footer.getByRole("button", { name: "Cookie Policy", exact: true }).count(), 1);
+    assert.equal(await footer.getByRole("link", { name: "Start a conversation", exact: true }).getAttribute("href"), "/contact#top");
     assert.equal(await footer.getByRole("link", { name: "hello@woyconsulting.com", exact: true }).getAttribute("href"), "mailto:hello@woyconsulting.com");
-    assert.equal(await footer.getByRole("link", { name: "Contact", exact: true }).getAttribute("href"), "/contact");
+    assert.equal(await footer.getByRole("link", { name: "Contact", exact: true }).count(), 0);
     assert.equal(await footer.getByRole("link", { name: /Made by AvlysAI/ }).count(), 0);
     assert.equal(await footer.getByText("Made by AvlysAI", { exact: true }).count(), 1);
     assert.equal(meta.h1, 1, `Heading: ${route}`);
@@ -215,7 +249,7 @@ try {
   assert.equal(new Set(pages.map(page => page.description)).size, pages.length, "Unique page descriptions");
   const sitemap = await (await context.request.get(base + "/sitemap.xml")).text();
   for (const page of pages) assert.ok(sitemap.includes(page.route === "/" ? "<loc>" : page.route + "</loc>"), `Sitemap route: ${page.route}`);
-  for (const route of ["/expertise", "/work", "/people", "/approach"]) {
+  for (const route of ["/expertise", "/work", "/people", "/approach", ...profilePages.map(profile => `/people/${profile.slug}`)]) {
     assert.ok(sitemap.includes(route + "</loc>"), `Recreated route is included in sitemap: ${route}`);
     const response = await context.request.get(base + route, { maxRedirects: 0 });
     assert.equal(response.status(), 200, `Recreated route is served directly: ${route}`);
@@ -240,10 +274,12 @@ try {
     const response = await context.request.get(base + url);
     assert.equal(response.status(), 200, url);
   }
-  const missing = await page.goto(base + "/missing-page-smoke-test", { waitUntil: "load" });
-  assert.equal(missing.status(), 404);
-  assert.match(await page.title(), /not found/i);
-  assert.match(await page.locator('meta[name="robots"]').last().getAttribute("content"), /noindex/);
+  for (const missingPath of ["/missing-page-smoke-test", "/people/unknown-person"]) {
+    const missing = await page.goto(base + missingPath, { waitUntil: "load" });
+    assert.equal(missing.status(), 404, missingPath);
+    assert.match(await page.title(), /not found/i);
+    assert.match(await page.locator('meta[name="robots"]').last().getAttribute("content"), /noindex/);
+  }
 
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 900 });
@@ -287,7 +323,7 @@ try {
   await mobileNavigation.waitFor({ state: "hidden" });
   assert.equal(new URL(page.url()).pathname, "/", "Home closes the mobile navigation on the current route");
   await navigationTrigger.click();
-  assert.equal(await mobileNavigation.getByRole("link", { name: /Let’s talk/ }).getAttribute("href"), "/contact");
+  assert.equal(await mobileNavigation.getByRole("link", { name: /Let’s talk/ }).getAttribute("href"), "/contact#top");
   await mobileNavigation.getByRole("link", { name: "Expertise", exact: true }).click();
   await page.waitForURL(base + "/expertise");
   assert.equal(await page.locator(".expertise-detail").count(), 4);
@@ -307,7 +343,7 @@ try {
   await staticPage.goto(base, { waitUntil: "load" });
   const staticExpertise = staticPage.locator("#expertise details");
   assert.equal(await staticExpertise.count(), 4, "All expertise areas have a native no-JavaScript fallback");
-  assert.equal(await staticExpertise.first().getAttribute("open"), "", "Expertise is server-rendered with the first area expanded");
+  assert.equal(await staticPage.locator("#expertise details[open]").count(), 0, "Expertise starts with every area closed without JavaScript");
   for (let index = 0; index < homeExpertise.length; index++) {
     const area = staticExpertise.nth(index), expected = homeExpertise[index];
     assert.ok((await area.locator("summary").textContent()).includes(expected.title), "Fallback keeps the exact expertise title");
@@ -342,12 +378,12 @@ try {
   assert.equal((await context.request.get(base + sourceCaseHref, { maxRedirects: 0 })).status(), 308, "Source case links preserve the established detailed case pages");
   await page.goto(base + "/people", { waitUntil: "load" });
   await page.locator('.person-card[href="/people/vipin-tuteja"]').click();
-  await page.waitForURL(base + "/practitioners#vipin-tuteja");
-  assert.equal(await page.locator("#vipin-tuteja").isVisible(), true);
+  await page.waitForURL(base + "/people/vipin-tuteja");
+  assert.equal(await page.getByRole("heading", { level: 1, name: "Vipin Tuteja", exact: true }).isVisible(), true);
   await page.getByRole("contentinfo").getByRole("link", { name: "Back to top", exact: true }).click();
   await page.waitForFunction(() => document.getElementById("main").getBoundingClientRect().top >= 0);
-  await page.getByRole("contentinfo").getByRole("link", { name: "Contact", exact: true }).click();
-  await page.waitForURL(base + "/contact");
+  await page.getByRole("contentinfo").getByRole("link", { name: "Start a conversation", exact: true }).click();
+  await page.waitForURL(base + "/contact#top");
   assert.equal(await page.locator("main").getByRole("link", { name: "hello@woyconsulting.com", exact: true }).getAttribute("href"), "mailto:hello@woyconsulting.com");
   await page.locator('form button[type="submit"]').click();
   assert.equal(await page.evaluate(() => document.activeElement.id), "f-name");
@@ -387,8 +423,8 @@ try {
   const howWeWork = fourD.getByRole("link", { name: "How we work", exact: true });
   assert.equal(await howWeWork.getAttribute("href"), "/approach");
   assert.equal(await fourD.getByRole("link").count(), 1);
-  await page.locator(".logo-band").scrollIntoViewIfNeeded();
-  await page.waitForFunction(() => [...document.querySelectorAll(".logo-band img")].filter(i => { const r=i.getBoundingClientRect(); return r.left < innerWidth && r.right > 0; }).every(i => i.complete && i.naturalWidth > 0));
+  await page.locator("[data-client-marquee]").scrollIntoViewIfNeeded();
+  await page.waitForFunction(() => [...document.querySelectorAll("[data-client-marquee] img")].filter(i => { const r=i.getBoundingClientRect(); return r.left < innerWidth && r.right > 0; }).every(i => i.complete && i.naturalWidth > 0));
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: path.join(reportDir, "home-mobile.png"), fullPage: true });
   await page.setViewportSize({ width: 1440, height: 1000 });
@@ -396,10 +432,13 @@ try {
   await page.goto(base + "/about", { waitUntil: "load" });
   const homeLink = page.getByRole("navigation", { name: "Main navigation", exact: true }).getByRole("link", { name: "Home", exact: true });
   await homeLink.click();
-  await page.waitForURL(base + "/");
+  await page.waitForURL(base + "/#top");
   assert.equal(await page.getByRole("navigation", { name: "Main navigation", exact: true }).locator('[aria-current="page"]').count(), 1, "Only Home is marked active after returning through the desktop link");
   await page.getByRole("contentinfo").getByRole("link", { name: "Expertise", exact: true }).click();
-  await page.waitForURL(base + "/#expertise");
+  await page.waitForURL(base + "/expertise");
+  assert.equal(await page.locator(".expertise-detail").count(), 4, "Footer Expertise opens the dedicated page");
+  await page.getByRole("contentinfo").getByRole("link", { name: "WOY Consulting home", exact: true }).click();
+  await page.waitForURL(base + "/#top");
   const expertise = page.locator("#expertise [data-expertise-area]");
   assert.equal(await expertise.count(), 4);
   for (let index = 0; index < homeExpertise.length; index++) {
@@ -429,12 +468,14 @@ try {
     assert.equal(await page.locator('#expertise [data-expertise-area] h3 button[aria-expanded="true"]').count(), openIndex < 0 ? 0 : 1, message);
     assert.equal(await page.locator("#expertise").getByRole("link", { name: "Explore this expertise", exact: true }).count(), openIndex < 0 ? 0 : 1, "Only the expanded area's link is exposed");
   };
-  await assertExpertiseOpen(0, "Strategy is initially expanded");
+  await assertExpertiseOpen(-1, "Every expertise area is initially closed");
   await expertise.first().locator("h3 button").focus();
   await page.keyboard.press("Enter");
-  await assertExpertiseOpen(-1, "Enter closes the expanded area and allows all items to be collapsed");
+  await assertExpertiseOpen(0, "Enter opens the focused expertise area");
   await page.keyboard.press("Space");
-  await assertExpertiseOpen(0, "Space opens the focused expertise area");
+  await assertExpertiseOpen(-1, "Space closes the expanded area and allows all items to be collapsed");
+  await expertise.first().locator("h3 button").click();
+  await assertExpertiseOpen(0, "Click opens the selected expertise area");
   for (let index = 1; index < homeExpertise.length; index++) {
     await expertise.nth(index).locator("h3 button").click();
     await assertExpertiseOpen(index, "Opening another area closes the previous one");
@@ -506,7 +547,8 @@ try {
   await page.getByRole("link", { name: "Our collective experience", exact: true }).click();
   await page.waitForURL(base + "/case-studies#collective-experience");
   const logoWall = page.locator("#collective-experience");
-  assert.equal(await logoWall.locator("img").count(), 47);
+  assert.equal(await logoWall.locator("img").count(), 50);
+  assert.equal(await logoWall.getByRole("img", { name: "HDFC Bank logo", exact: true }).count(), 1);
   assert.match(await logoWall.innerText(), /partner and affiliate platforms/);
   assert.match(await logoWall.innerText(), /do not identify the organisations in the anonymised case studies/);
   await page.locator("[data-case-card] a").first().focus();
@@ -516,13 +558,13 @@ try {
   const firstCaseHref = await page.locator("[data-case-card] a").first().getAttribute("href");
   await page.keyboard.press("Enter");
   await page.waitForURL(base + firstCaseHref);
-  await page.getByRole("button", { name: "Cookie preferences", exact: true }).click();
+  await page.getByRole("button", { name: "Cookie Policy", exact: true }).click();
   await page.setViewportSize({ width: 320, height: 568 });
   await page.getByRole("button", { name: "Save preferences", exact: true }).scrollIntoViewIfNeeded();
   const saveBounds = await page.getByRole("button", { name: "Save preferences", exact: true }).boundingBox();
   assert.ok(saveBounds && saveBounds.y >= 0 && saveBounds.y + saveBounds.height <= 569, "Cookie action reachable on a small screen");
   await page.screenshot({ path: path.join(reportDir, "cookie-mobile.png") });
-  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "desktop/mobile Home links, visible consent-aware light/dark toggle, source navigation links, original logo image, contact CTA and active-page states; mobile modal focus trap, Escape, overlay, Close and same-route Home; source Expertise content and no-JS services; static 4D stages and detailed philosophy; Work industry filter with keyboard reset and case aliases; People profile aliases; retained plain light/dark hero and caption, footer email CTAs, cookie choices/theme persistence, homepage static 4D overview and labelled expertise accordion panels, Enter/Space operation, all-closed/one-open states, no-JS fallback and legacy capability anchors, Our approach philosophy anchor, practitioner portraits/disclosures/motion, legacy case cards and collective experience, form validation and mocked success/duplicate prevention passed" };
+  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "desktop/mobile Home links, visible consent-aware light/dark toggle, source navigation links, original logo image, contact CTA and active-page states; mobile modal focus trap, Escape, overlay, Close and same-route Home; source Expertise content and no-JS services; static 4D stages and detailed philosophy; Work industry filter with keyboard reset and case aliases; individual People profile routes; retained plain light/dark hero and caption, footer email CTAs, cookie choices/theme persistence, homepage static 4D overview and labelled expertise accordion panels, Enter/Space operation, all-closed/one-open states, no-JS fallback and legacy capability anchors, Our approach philosophy anchor, practitioner portraits/disclosures/motion, legacy case cards and collective experience, form validation and mocked success/duplicate prevention passed" };
   fs.writeFileSync(path.join(reportDir, "browser-check.json"), JSON.stringify(report, null, 2));
   console.log(JSON.stringify({ pages: pages.length, jsErrors: errors.length, accessibility: accessibility.length, overflow: overflow.length, brokenLinks: brokenLinks.length }));
   assert.equal(errors.length, 0, "Browser JS errors");

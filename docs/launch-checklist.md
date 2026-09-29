@@ -8,7 +8,7 @@ Reviewed and implemented on 21 September 2026. The requested application feature
 | 2 | Footer credit | Made by AvlysAI links to https://avlysai.com/. |
 | 3 | Terms & conditions | `/terms-and-conditions`; website use, enquiries, content and separate consulting engagements. |
 | 4 | Load speed | Measured and improved: compressed local WebP photos, responsive images, self-hosted fonts, immediate consent content, fewer logo hydrations and batched layout reads. Historical local scores with the previous generated hero background: 92 mobile / 100 desktop; confirm on the hosted site. |
-| 5 | Frontend secrets | Server-only endpoint/token/signing key, import boundary, no CONTACT_* configuration in browser bundles. |
+| 5 | Frontend secrets | Server-only Resend API key, sender/recipient configuration and signing key, import boundary, and credential/configuration checks on browser bundles. |
 | 6 | Contrast | Accessible light/dark text, separate action/error colors, visible input borders and focus. |
 | 7 | HTTPS | Production 308 redirects for configured origins, HSTS/security headers; loopback exempt. Host supplies TLS. |
 | 8 | Responsive screens | Phone through wide desktop, landscape navigation, bounded cookie panel; fixed logo overflow. |

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageTopLink } from "./PageTopLink";
 import { ArrowUpRight, ArrowUp } from "@phosphor-icons/react/dist/ssr";
 import { Mark } from "./Mark";
 import { DunsRegistration } from "./DunsRegistration";
@@ -7,16 +8,10 @@ import { site } from "@/lib/content";
 import styles from "./Footer.module.css";
 
 const explore = [
-  { label: "Home", href: "/" },
-  { label: "Expertise", href: "/#expertise" },
-  { label: "Approach", href: "/approach" },
-  { label: "Case Studies", href: "/case-studies" },
-];
-const company = [
-  { label: "About", href: "/about" },
-  { label: "Practitioners", href: "/practitioners" },
-  { label: "FAQs", href: "/faq" },
-  { label: "Contact", href: "/contact" },
+  { label: "Expertise", href: "/expertise" },
+  { label: "Selected work", href: "/work" },
+  { label: "Leadership & Partners", href: "/people" },
+  { label: "Our approach", href: "/approach" },
 ];
 
 export function Footer() {
@@ -29,16 +24,16 @@ export function Footer() {
             <h2>A clearer direction.<br />A conversation to begin.</h2>
           </div>
           <div className={styles.contactAction}>
-            <Link href={site.ctaHref} className={styles.cta}>
+            <PageTopLink href={`${site.ctaHref}#top`} className={styles.cta}>
               <span>{site.cta}</span><ArrowUpRight size={23} weight="regular" aria-hidden="true" />
-            </Link>
+            </PageTopLink>
             <a href={`mailto:${site.email}`} className={styles.email}>{site.email}</a>
           </div>
         </div>
 
         <div className={styles.directory}>
           <div className={styles.identity}>
-            <Link href="/" aria-label="WOY Consulting home" className={styles.brandLink}><Mark className={styles.brand} /></Link>
+            <PageTopLink href="/#top" aria-label="WOY Consulting home" className={styles.brandLink}><Mark className={styles.brand} /></PageTopLink>
             <p className={styles.principle}>{site.principle}<span aria-hidden="true">.</span></p>
             <address className={styles.address}>
               <p className={styles.legalName}>{site.legalName}</p>
@@ -46,16 +41,16 @@ export function Footer() {
             </address>
           </div>
           <nav aria-label="Footer" className={styles.navigation}>
-            <div><p className={styles.directoryLabel}>Explore</p><ul>{explore.map(item => <li key={item.href}><Link href={item.href}>{item.label}</Link></li>)}</ul></div>
-            <div><p className={styles.directoryLabel}>WOY Consulting</p><ul>{company.map(item => <li key={item.href}><Link href={item.href}>{item.label}</Link></li>)}</ul></div>
+            <div><p className={styles.directoryLabel}>Explore</p><ul>{explore.map(item => (
+              <li key={item.href}><Link href={item.href}>{item.label}</Link></li>
+            ))}</ul></div>
           </nav>
           <DunsRegistration />
         </div>
 
         <div className={styles.bottom}>
           <nav aria-label="Legal and privacy" className={styles.legal}>
-            <Link href="/privacy-policy">Privacy policy</Link>
-            <Link href="/terms-and-conditions">Terms and conditions</Link>
+            <Link href="/privacy-policy">Privacy Policy</Link>
             <CookiePreferencesButton />
           </nav>
           <a href="#main" className={styles.backToTop}>Back to top <ArrowUp size={15} aria-hidden="true" /></a>
