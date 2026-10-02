@@ -10,8 +10,8 @@ const browser = await chromium.launch({
 });
 const scenarios = [
   { name: "light on a dark device", system: "dark", chosen: "light", width: 1440, extended: true },
-  { name: "dark on a light device", system: "light", chosen: "dark", width: 1440 },
-  { name: "mobile light on a dark device", system: "dark", chosen: "light", width: 390 },
+  { name: "dark on a light device", system: "light", chosen: "dark", width: 1440, extended: true },
+  { name: "mobile light on a dark device", system: "dark", chosen: "light", width: 390, extended: true },
   { name: "unavailable browser storage", system: "dark", chosen: "light", width: 1440, blocked: true },
   { name: "consented light theme memory", system: "dark", chosen: "light", width: 1440, remember: true },
   { name: "consented dark theme memory", system: "dark", chosen: "dark", width: 1440, remember: true },
@@ -121,7 +121,7 @@ try {
     if (scenario.extended) {
       await page.locator(".work-library .case-card").first().focus();
       await page.keyboard.press("Enter");
-      await page.waitForURL(base + "/case-studies/education-institution-transformation");
+      await page.waitForURL(base + "/work/education-transformation");
       await verify();
       await page.goBack();
       await page.waitForURL(base + "/work");
@@ -130,7 +130,7 @@ try {
       await page.waitForURL(base + "/#top");
       await verifyTop("Home from selected work");
       await page.locator("#selected-work .case-card").nth(1).click();
-      await page.waitForURL(base + "/case-studies/insurance-senior-sales-leadership");
+      await page.waitForURL(base + "/work/insurance-leadership");
       await verify();
       await navigate("Leadership & Partners");
       await page.waitForURL(base + "/people");

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { caseStudies } from "@/lib/content";
+import { cases } from "@/lib/recreation-content";
 import { peopleProfiles } from "@/lib/people-profiles";
 import { siteUrl } from "@/lib/site-url";
 
@@ -28,6 +29,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     ...peopleProfiles.map((profile) => ({
       url: `${siteUrl}/people/${profile.slug}`,
+      changeFrequency: "yearly" as const,
+      priority: 0.6,
+    })),
+    ...cases.map((engagement) => ({
+      url: `${siteUrl}/work/${engagement.slug}`,
       changeFrequency: "yearly" as const,
       priority: 0.6,
     })),

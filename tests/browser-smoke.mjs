@@ -25,6 +25,137 @@ const profilePages = [
   { slug: "sandeep-bidani", name: "Sandeep Bidani", description: "Bringing a business-focused perspective to leadership, culture and organisation transformation." },
   { slug: "kannan-swaminathan", name: "Kannan Swaminathan", description: "Connecting leadership development with the realities of operations, transitions and change." },
 ];
+// Public engagement content and result labels supplied in the six-page brief.
+const workPages = [
+  {
+    "slug": "education-transformation",
+    "industry": "Education",
+    "title": "Building the foundations for an institution\u2019s next chapter.",
+    "summary": "An integrated engagement connecting strategic ambition with governance, culture and people systems.",
+    "cover": "One institution.\nShared direction.",
+    "strap": "Strategy \u00b7 Governance \u00b7 Culture \u00b7 Performance",
+    "theme": "mist",
+    "workTitles": [
+      "A shared strategic roadmap",
+      "Governance that supports execution",
+      "Culture made practical",
+      "People and performance architecture"
+    ],
+    "resultTitle": "What the engagement delivered",
+    "results": [
+      "An integrated roadmap connecting institutional ambition with near-term priorities.",
+      "Explicit ownership, decision rights and governance tools.",
+      "Practical frameworks for values, role clarity and performance conversations."
+    ],
+    "takeaway": "Transformation becomes actionable when strategy, governance, culture and performance reinforce one another."
+  },
+  {
+    "slug": "insurance-leadership",
+    "industry": "Insurance",
+    "title": "Helping senior sales leaders lead as one.",
+    "summary": "A tailored leadership journey for ten senior sales leaders, combining individual growth with collective responsibility.",
+    "cover": "From individual\nto collective.",
+    "strap": "Leadership alignment \u00b7 Executive coaching",
+    "theme": "navy",
+    "workTitles": [
+      "Start with the leadership context",
+      "Connect individual and team learning",
+      "Return to feedback and application"
+    ],
+    "resultTitle": "Reported changes",
+    "results": [
+      "Greater ownership of personal development.",
+      "Stronger camaraderie and connection across the leadership cohort.",
+      "Feedback describing a sharper strategic focus and improved cross-functional alignment."
+    ],
+    "takeaway": "Individual insight becomes more valuable when it strengthens the way a leadership team works together."
+  },
+  {
+    "slug": "consultative-selling",
+    "industry": "IT consulting",
+    "title": "Moving from selling services to understanding business needs.",
+    "summary": "Building a shared consulting mindset through discovery, contracting and practical client dialogue.",
+    "cover": "Better questions.\nDeeper value.",
+    "strap": "Consultative selling \u00b7 Client conversations",
+    "theme": "navy",
+    "workTitles": [
+      "A common consulting foundation",
+      "Practise the conversations that matter",
+      "Make the language shared"
+    ],
+    "resultTitle": "Reported changes",
+    "results": [
+      "Stronger listening and discovery in client conversations.",
+      "A shared language for consultative engagement.",
+      "Greater awareness of the shift from providing answers to exploring client needs."
+    ],
+    "takeaway": "The quality of a solution begins with the quality of the conversation."
+  },
+  {
+    "slug": "automotive-alignment",
+    "industry": "Automotive",
+    "title": "Creating a shared leadership identity across teams.",
+    "summary": "Helping leaders across functions build common expectations, stronger relationships and clearer ways of working.",
+    "cover": "Many teams.\nOne direction.",
+    "strap": "Leadership alignment \u00b7 Culture \u00b7 Governance",
+    "theme": "charcoal",
+    "workTitles": [
+      "Build understanding across boundaries",
+      "Define the leadership commitment",
+      "Connect behaviour with systems"
+    ],
+    "resultTitle": "What the engagement established",
+    "results": [
+      "A shared leadership charter and common expectations.",
+      "Practical foundations for clearer decisions and governance.",
+      "Structured dialogue across functions and generations."
+    ],
+    "takeaway": "A common identity takes shape through shared commitments and the daily choices that follow."
+  },
+  {
+    "slug": "entrepreneurial-mindset",
+    "industry": "Financial services",
+    "title": "Bringing an entrepreneurial perspective to business decisions.",
+    "summary": "A bespoke programme connecting customer empathy, commercial judgement and practical experimentation.",
+    "cover": "See possibilities.\nTake ownership.",
+    "strap": "Entrepreneurial mindset \u00b7 Business acumen",
+    "theme": "silver",
+    "workTitles": [
+      "Connect mindset to business reality",
+      "Work through real decisions",
+      "Turn ideas into practical experiments"
+    ],
+    "resultTitle": "What the programme focused on",
+    "results": [
+      "Applying business acumen to decisions and opportunities.",
+      "Exploring customer needs before committing to a solution.",
+      "Building confidence in experimentation and taking ownership."
+    ],
+    "takeaway": "Entrepreneurial thinking connects initiative with commercial judgement and customer understanding."
+  },
+  {
+    "slug": "medical-technology-leadership",
+    "industry": "Medical technology",
+    "title": "Expanding the lens from functional expertise to enterprise impact.",
+    "summary": "A strategic-thinking module within a six-month women\u2019s leadership journey.",
+    "cover": "A wider lens.\nA bigger contribution.",
+    "strap": "Strategic thinking \u00b7 Women in leadership",
+    "theme": "mist",
+    "workTitles": [
+      "Look beyond the functional boundary",
+      "Explore through simulation",
+      "Make a personal commitment"
+    ],
+    "resultTitle": "What the module delivered",
+    "results": [
+      "A structured opportunity to practise enterprise-level thinking.",
+      "Exploration of stakeholder influence and a global business perspective.",
+      "Individual strategic action commitments to carry into the wider leadership journey."
+    ],
+    "takeaway": "Leadership contribution grows when the field of view expands."
+  }
+];
+
 page.on("pageerror", error => errors.push({ url: page.url(), message: error.message }));
 // Cover request-rendered pages too; nonce CSP deliberately disables static HTML.
 const appPaths = JSON.parse(fs.readFileSync(".next/server/app-paths-manifest.json", "utf8"));
@@ -33,7 +164,7 @@ const caseBlock = content.split("export const caseStudies: CaseStudy[] = [")[1].
 const caseRoutes = [...caseBlock.matchAll(/slug: "([^"]+)"/g)].map(match => `/case-studies/${match[1]}`);
 const routes = [...new Set([...Object.keys(appPaths)
   .filter(route => route.endsWith("/page") && !route.startsWith("/_") && !route.includes("["))
-  .map(route => route.replace(/\/page$/, "") || "/"), ...caseRoutes, ...profilePages.map(profile => `/people/${profile.slug}`)])];
+  .map(route => route.replace(/\/page$/, "") || "/"), ...caseRoutes, ...profilePages.map(profile => `/people/${profile.slug}`), ...workPages.map(item => `/work/${item.slug}`)])];
 assert.ok(routes.length >= 10, "Discover all public routes rather than silently skipping dynamic pages");
 
 try {
@@ -140,6 +271,7 @@ try {
     }
     if (route === "/work") {
       assert.equal(await page.locator(".work-grid .case-card").count(), 6);
+      assert.deepEqual(await page.locator(".work-grid .case-card").evaluateAll(cards => cards.map(card => card.getAttribute("href"))), workPages.map(item => `/work/${item.slug}`), "Each selected-work card has its own direct engagement route");
       assert.equal(await page.getByRole("combobox", { name: "Explore by industry" }).count(), 1);
       assert.equal(await page.locator("#collective-experience h2").textContent(), "Our collective experience");
       assert.match(await page.locator("#collective-experience").innerText(), /partner and affiliate platforms/);
@@ -152,6 +284,61 @@ try {
         assert.equal(await page.locator(`.person-card[href="/people/${slug}"]`).count(), 1);
       }
       assert.equal(await page.locator(".people-principle").getByRole("link", { name: "Start a conversation", exact: true }).getAttribute("href"), "/contact");
+    }
+    const engagement = workPages.find(item => route === `/work/${item.slug}`);
+    if (engagement) {
+      assert.equal(new URL(page.url()).pathname, route, "Engagements retain their direct public URL");
+      assert.equal(meta.title, `${engagement.title} | WOY Consulting`);
+      assert.equal(meta.description, engagement.summary, "Engagement metadata preserves the exact summary");
+      assert.equal(await page.locator("main").count(), 1);
+      assert.equal(await page.locator("main#main").count(), 1, "The shared main landmark and anchor stay unique");
+      const detail = page.locator(`[data-engagement-detail="${engagement.slug}"]`);
+      assert.equal(await detail.getByRole("heading", { level: 1 }).textContent(), engagement.title);
+      assert.equal(await detail.getByText(engagement.summary, { exact: true }).count(), 1);
+      assert.equal(await detail.getByText(`${engagement.industry} / Engagement story`, { exact: true }).count(), 1);
+      const returnLinks = detail.getByRole("link", { name: "All selected work", exact: true });
+      assert.deepEqual(await returnLinks.evaluateAll(links => links.map(link => link.getAttribute("href"))), ["/work", "/work"]);
+      const cover = detail.locator("[data-engagement-cover]");
+      assert.equal(await cover.locator("p").nth(0).textContent(), engagement.industry);
+      assert.equal(await cover.locator("p").nth(1).innerText(), engagement.cover);
+      assert.equal(await cover.locator("p").nth(2).textContent(), engagement.strap);
+      assert.equal(await cover.locator("br").count(), 1, "The typographic cover keeps its explicit line break");
+      assert.equal(await cover.locator("a, button, img, svg").count(), 0, "The banner is static text without a link, index arrow, or illustration");
+      assert.equal(await detail.getByRole("complementary", { name: "Engagement focus", exact: true }).getByRole("listitem").count(), 4);
+      assert.equal(await detail.getByText("Client identity kept confidential.", { exact: true }).count(), 1);
+      for (const [id, heading] of [
+        ["engagement-context", "A business priority.\nA starting point."],
+        ["engagement-work", "A response shaped\naround the context."],
+        ["related-engagements", "More perspectives.\nMore possibilities."],
+      ]) {
+        assert.equal(await detail.locator(`#${id}`).innerText(), heading);
+        assert.equal(await detail.locator(`#${id} br`).count(), 1);
+      }
+      for (const label of ["01 / The context", "02 / The work", "03 / The contribution", "The perspective"]) {
+        assert.equal(await detail.getByText(label, { exact: true }).count(), 1);
+      }
+      const work = detail.locator('section[aria-labelledby="engagement-work"]');
+      assert.deepEqual(await work.getByRole("heading", { level: 3 }).allTextContents(), engagement.workTitles, "Workstreams preserve the supplied order");
+      assert.deepEqual(await work.locator("ol > li > span").allTextContents(), engagement.workTitles.map((_title, index) => String(index + 1).padStart(2, "0")));
+      const contribution = detail.locator('section[aria-labelledby="engagement-contribution"]');
+      assert.equal(await contribution.getByRole("heading", { level: 2 }).textContent(), engagement.resultTitle, "Delivered outputs and reported changes retain their distinct labels");
+      assert.deepEqual(await contribution.getByRole("listitem").allTextContents(), engagement.results);
+      assert.equal(await detail.locator("#engagement-perspective").textContent(), engagement.takeaway);
+      assert.equal(await detail.getByRole("link", { name: "Discuss a similar challenge", exact: true }).getAttribute("href"), "/contact");
+      const related = detail.locator('section[aria-labelledby="related-engagements"] .case-card');
+      const relatedSlugs = engagement.slug === "education-transformation"
+        ? ["insurance-leadership", "consultative-selling"]
+        : engagement.slug === "insurance-leadership"
+          ? ["education-transformation", "consultative-selling"]
+          : ["education-transformation", "insurance-leadership"];
+      assert.deepEqual(await related.evaluateAll(cards => cards.map(card => card.getAttribute("href"))), relatedSlugs.map(slug => `/work/${slug}`));
+      assert.deepEqual(await related.locator(".case-cover-top span:last-child").allTextContents(), ["01 /", "02 /"], "Related card numbering resets within each detail page");
+      for (let index = 0; index < relatedSlugs.length; index++) {
+        const item = workPages.find(candidate => candidate.slug === relatedSlugs[index]);
+        assert.equal(await related.nth(index).getByRole("heading", { level: 3 }).textContent(), item.title);
+        assert.equal(await related.nth(index).locator(".case-cover-title").innerText(), item.cover);
+        assert.equal(await related.nth(index).locator(`.case-cover.${item.theme}`).count(), 1);
+      }
     }
     const profile = profilePages.find(person => route === `/people/${person.slug}`);
     if (profile) {
@@ -220,7 +407,7 @@ try {
       const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
       if (result.violations.length) accessibility.push({ route, theme, violations: result.violations.map(v => ({ id: v.id, impact: v.impact, description: v.description, nodes: v.nodes.map(n => ({ target: n.target, summary: n.failureSummary })) })) });
     }
-    for (const width of [320, 375, 390, 414, 768, 1024, 1440, 1920]) {
+    for (const width of [320, 375, 390, 414, 768, 1024, 1440, 1920, ...(engagement ? [2560] : [])]) {
       await page.setViewportSize({ width, height: 900 });
       // Wait for responsive navigation to reflow after the browser viewport changes.
       // A persistent overflow still fails this assertion instead of being hidden.
@@ -249,7 +436,7 @@ try {
   assert.equal(new Set(pages.map(page => page.description)).size, pages.length, "Unique page descriptions");
   const sitemap = await (await context.request.get(base + "/sitemap.xml")).text();
   for (const page of pages) assert.ok(sitemap.includes(page.route === "/" ? "<loc>" : page.route + "</loc>"), `Sitemap route: ${page.route}`);
-  for (const route of ["/expertise", "/work", "/people", "/approach", ...profilePages.map(profile => `/people/${profile.slug}`)]) {
+  for (const route of ["/expertise", "/work", "/people", "/approach", ...profilePages.map(profile => `/people/${profile.slug}`), ...workPages.map(item => `/work/${item.slug}`)]) {
     assert.ok(sitemap.includes(route + "</loc>"), `Recreated route is included in sitemap: ${route}`);
     const response = await context.request.get(base + route, { maxRedirects: 0 });
     assert.equal(response.status(), 200, `Recreated route is served directly: ${route}`);
@@ -274,7 +461,7 @@ try {
     const response = await context.request.get(base + url);
     assert.equal(response.status(), 200, url);
   }
-  for (const missingPath of ["/missing-page-smoke-test", "/people/unknown-person"]) {
+  for (const missingPath of ["/missing-page-smoke-test", "/people/unknown-person", "/work/unknown-engagement"]) {
     const missing = await page.goto(base + missingPath, { waitUntil: "load" });
     assert.equal(missing.status(), 404, missingPath);
     assert.match(await page.title(), /not found/i);
@@ -360,6 +547,7 @@ try {
   const industryFilter = page.getByRole("combobox", { name: "Explore by industry" });
   await industryFilter.click();
   await page.getByRole("option", { name: "Education", exact: true }).click();
+  assert.equal(new URL(page.url()).pathname, "/work", "Industry selection filters the listing without navigating");
   assert.equal(await page.locator(".work-grid .case-card").count(), 1, "Industry selection narrows the engagement list");
   assert.equal(await page.locator(".work-grid .case-meta").textContent(), "Education");
   assert.equal(await page.locator(".filter-bar [aria-live]").textContent(), "1 engagement");
@@ -374,8 +562,8 @@ try {
   assert.equal(await page.locator(".work-grid .case-card").count(), 6, "The keyboard can restore all industries");
   const sourceCaseHref = await page.locator(".work-grid .case-card").first().getAttribute("href");
   await page.locator(".work-grid .case-card").first().click();
-  await page.waitForURL(/\/case-studies\//);
-  assert.equal((await context.request.get(base + sourceCaseHref, { maxRedirects: 0 })).status(), 308, "Source case links preserve the established detailed case pages");
+  await page.waitForURL(base + sourceCaseHref);
+  assert.equal((await context.request.get(base + sourceCaseHref, { maxRedirects: 0 })).status(), 200, "Work cards open direct engagement pages without a compatibility redirect");
   await page.goto(base + "/people", { waitUntil: "load" });
   await page.locator('.person-card[href="/people/vipin-tuteja"]').click();
   await page.waitForURL(base + "/people/vipin-tuteja");
@@ -384,9 +572,16 @@ try {
   await page.waitForFunction(() => document.getElementById("main").getBoundingClientRect().top >= 0);
   await page.getByRole("contentinfo").getByRole("link", { name: "Start a conversation", exact: true }).click();
   await page.waitForURL(base + "/contact#top");
-  assert.equal(await page.locator("main").getByRole("link", { name: "hello@woyconsulting.com", exact: true }).getAttribute("href"), "mailto:hello@woyconsulting.com");
-  await page.locator('form button[type="submit"]').click();
-  assert.equal(await page.evaluate(() => document.activeElement.id), "f-name");
+  const contactEmailLinks = await page.locator("main").getByRole("link", { name: "hello@woyconsulting.com", exact: true }).evaluateAll(links => links.map(link => link.getAttribute("href")));
+  assert.deepEqual([...new Set(contactEmailLinks)], ["mailto:hello@woyconsulting.com"], "Both the contact introduction and any unavailable-form fallback use the correct email destination");
+  const enquirySubmit = page.locator('form button[type="submit"]');
+  if (await enquirySubmit.isEnabled()) {
+    await enquirySubmit.click();
+    assert.equal(await page.evaluate(() => document.activeElement.id), "f-name");
+  } else {
+    assert.equal(await enquirySubmit.isDisabled(), true, "An unconfigured production form cannot be submitted");
+    assert.match(await page.locator("form").getByRole("status").innerText(), /contact form is temporarily unavailable/i);
+  }
   assert.equal(await page.locator("#f-name").evaluate(el => el.validity.valueMissing), true);
   // Detailed mocked success/failure and retry checks live in contact-browser.mjs.
   assert.equal(await page.locator("#f-organisation").getAttribute("required"), null);
@@ -564,7 +759,7 @@ try {
   const saveBounds = await page.getByRole("button", { name: "Save preferences", exact: true }).boundingBox();
   assert.ok(saveBounds && saveBounds.y >= 0 && saveBounds.y + saveBounds.height <= 569, "Cookie action reachable on a small screen");
   await page.screenshot({ path: path.join(reportDir, "cookie-mobile.png") });
-  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "desktop/mobile Home links, visible consent-aware light/dark toggle, source navigation links, original logo image, contact CTA and active-page states; mobile modal focus trap, Escape, overlay, Close and same-route Home; source Expertise content and no-JS services; static 4D stages and detailed philosophy; Work industry filter with keyboard reset and case aliases; individual People profile routes; retained plain light/dark hero and caption, footer email CTAs, cookie choices/theme persistence, homepage static 4D overview and labelled expertise accordion panels, Enter/Space operation, all-closed/one-open states, no-JS fallback and legacy capability anchors, Our approach philosophy anchor, practitioner portraits/disclosures/motion, legacy case cards and collective experience, form validation and mocked success/duplicate prevention passed" };
+  const report = { pages, jsErrors: errors, accessibility, overflow, brokenLinks, checkedLinks: hrefs.size, checkedAssets: assets.size, interactions: "desktop/mobile Home links, visible consent-aware light/dark toggle, source navigation links, original logo image, contact CTA and active-page states; mobile modal focus trap, Escape, overlay, Close and same-route Home; source Expertise content and no-JS services; static 4D stages and detailed philosophy; Work industry filter with keyboard reset, six direct engagement routes and related cards; individual People profile routes; retained plain light/dark hero and caption, footer email CTAs, cookie choices/theme persistence, homepage static 4D overview and labelled expertise accordion panels, Enter/Space operation, all-closed/one-open states, no-JS fallback and legacy capability anchors, Our approach philosophy anchor, practitioner portraits/disclosures/motion, legacy case cards and collective experience, contact field validation and configured/unavailable form state checks passed; submission and retry flows are tested separately" };
   fs.writeFileSync(path.join(reportDir, "browser-check.json"), JSON.stringify(report, null, 2));
   console.log(JSON.stringify({ pages: pages.length, jsErrors: errors.length, accessibility: accessibility.length, overflow: overflow.length, brokenLinks: brokenLinks.length }));
   assert.equal(errors.length, 0, "Browser JS errors");

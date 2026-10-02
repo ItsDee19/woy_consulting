@@ -6,6 +6,15 @@ const { matchHas, prepareDestination } = require("next/dist/shared/lib/router/ut
 const { getPathMatch } = require("next/dist/shared/lib/router/utils/path-match");
 
 const environmentKeys = ["NODE_ENV", "SITE_URL", "NEXT_PUBLIC_SITE_URL", "VERCEL_PROJECT_PRODUCTION_URL", "VERCEL_URL"];
+const workSlugs = [
+  "education-transformation", "insurance-leadership", "consultative-selling",
+  "automotive-alignment", "entrepreneurial-mindset", "medical-technology-leadership",
+];
+const legacyCaseSlugs = [
+  "education-institution-transformation", "insurance-senior-sales-leadership", "it-ites-consultative-selling",
+  "automotive-leadership-assimilation", "financial-services-entrepreneurial-mindset", "medical-technology-strategic-thinking",
+];
+
 let importNumber = 0;
 
 async function redirectRules(environment = {}) {
@@ -130,7 +139,7 @@ test("recreated top-level pages are served directly in every environment", async
 
 test("recreated pages still upgrade configured public HTTP requests", async () => {
   const rules = await redirectRules({ SITE_URL: "https://example.com" });
-  for (const pathname of ["/expertise", "/work", "/people", "/approach", "/people/vipin-tuteja", "/people/sandeep-bidani", "/people/kannan-swaminathan"]) {
+  for (const pathname of ["/expertise", "/work", "/people", "/approach", "/people/vipin-tuteja", "/people/sandeep-bidani", "/people/kannan-swaminathan", ...workSlugs.map(slug => `/work/${slug}`)]) {
     const first = redirect(rules, { host: "example.com", pathname });
     assert.equal(first.parsedDestination.protocol, "https:");
     assert.equal(first.parsedDestination.hostname, "example.com");
@@ -139,25 +148,23 @@ test("recreated pages still upgrade configured public HTTP requests", async () =
   }
 });
 
-test("source case links retain published case destinations and query parameters", async () => {
-  const destinations = [
-    ["education-transformation", "education-institution-transformation"],
-    ["insurance-leadership", "insurance-senior-sales-leadership"],
-    ["consultative-selling", "it-ites-consultative-selling"],
-    ["automotive-alignment", "automotive-leadership-assimilation"],
-    ["entrepreneurial-mindset", "financial-services-entrepreneurial-mindset"],
-    ["medical-technology-leadership", "medical-technology-strategic-thinking"],
-  ];
-  for (const NODE_ENV of ["development", "production"]) {
-    const rules = await redirectRules({ NODE_ENV });
-    for (const [source, destination] of destinations) {
-      const result = redirect(rules, { host: "localhost:5173", pathname: `/work/${source}`, query: { source: "expertise" } });
-      assert.ok(result);
-      assert.equal(result.permanent, true);
-      assert.equal(result.parsedDestination.pathname, `/case-studies/${destination}`);
-      assert.deepEqual(result.parsedDestination.query, { source: "expertise" });
+test("engagement stories are served directly while legacy case-study URLs remain available", async () => {
+  for (const environment of [
+    { NODE_ENV: "development" },
+    { NODE_ENV: "production" },
+    { NODE_ENV: "production", SITE_URL: "https://example.com" },
+  ]) {
+    const rules = await redirectRules(environment);
+    const host = environment.SITE_URL ? "example.com" : "localhost:5173";
+    const paths = [
+      ...workSlugs.map(slug => `/work/${slug}`),
+      ...legacyCaseSlugs.map(slug => `/case-studies/${slug}`),
+      "/case-studies", "/work/unknown-case",
+    ];
+    for (const pathname of paths) {
+      assert.equal(redirect(rules, { host, protocol: "https", pathname, query: { source: "expertise" } }), null,
+        `${pathname} must not redirect to a different case, listing or fragment`);
     }
-    assert.equal(redirect(rules, { host: "localhost:5173", pathname: "/work/unknown-case" }), null, "Unknown source paths are not sent to an unrelated case");
   }
 });
 
@@ -171,11 +178,16 @@ test("individual profile routes and unknown slugs are not redirected to practiti
   }
 });
 
-test("HTTPS upgrade precedes a source compatibility redirect", async () => {
+test("HTTPS upgrades engagement links once and retain path and query parameters", async () => {
   const rules = await redirectRules({ SITE_URL: "https://example.com" });
-  const first = redirect(rules, { host: "example.com", pathname: "/work/education-transformation" });
-  assert.equal(first.parsedDestination.protocol, "https:");
-  assert.equal(first.parsedDestination.pathname, "/work/education-transformation");
-  const second = redirect(rules, { host: "example.com", protocol: "https", pathname: first.parsedDestination.pathname });
-  assert.equal(second.parsedDestination.pathname, "/case-studies/education-institution-transformation");
+  for (const slug of workSlugs) {
+    const pathname = `/work/${slug}`;
+    const query = { source: "expertise", campaign: "engagement" };
+    const first = redirect(rules, { host: "example.com", pathname, query });
+    assert.equal(first.parsedDestination.protocol, "https:");
+    assert.equal(first.parsedDestination.pathname, pathname);
+    assert.deepEqual(first.parsedDestination.query, query);
+    assert.equal(redirect(rules, { host: "example.com", protocol: "https", pathname, query }), null,
+      "The HTTPS request renders the engagement without a legacy case redirect");
+  }
 });
