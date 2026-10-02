@@ -27,7 +27,7 @@ const experience: Record<string, { label: string; detail: string; background: st
   "kannan-swaminathan": {
     label: "Executive coaching",
     detail: "Coaching for CXOs and senior leaders",
-    background: "ICF Professional Certified Coach · EMCC Senior Practitioner",
+    background: "EMCC Senior Practitioner",
   },
 };
 
@@ -75,7 +75,7 @@ export default function PractitionersPage() {
                     height={284}
                     sizes="(max-width: 359px) 84vw, 284px"
                     loading={i === 0 ? "eager" : "lazy"}
-                    className={`${styles.portrait} ${i === 0 ? styles.founderPortrait : ""}`}
+                    className={`${styles.portrait} ${i === 0 ? styles.founderPortrait : p.slug === "kannan-swaminathan" ? styles.kannanPortrait : ""}`}
                   />}
                 </div>
                 <div className={styles.identity}>

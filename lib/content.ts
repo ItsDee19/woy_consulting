@@ -600,7 +600,7 @@ export const practitioners: Practitioner[] = [
     bio: [
       "Kannan is a senior business leader from the banking and financial services industry, with corporate experience across The Royal Bank of Scotland Group, Tata Consultancy Services, ABN AMRO Bank, Standard Chartered Bank, ICICI Bank and ANZ Grindlays Bank.",
       "His leadership roles in business process services have spanned transitions, operations, business development, change management, customer management and strategy.",
-      "He is a Professional Certified Coach with the International Coaching Federation and credentialled as a Senior Practitioner by the European Mentoring and Coaching Council, coaching executives and senior leaders across India and globally.",
+      "He is credentialled as a Senior Practitioner by the European Mentoring and Coaching Council, coaching executives and senior leaders across India and globally.",
     ],
     expertise: [
       "Executive coaching across CXO and senior leadership",
@@ -609,7 +609,7 @@ export const practitioners: Practitioner[] = [
       "Human potential assessment and applied neuroscience",
     ],
     linkedin: null,
-    photo: "/practitioners/kannan-swaminathan.webp",
+    photo: "/assets/kannan-swaminathan-portrait.jpg",
   },
 ];
 

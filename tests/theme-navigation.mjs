@@ -122,7 +122,7 @@ try {
       await page.locator(".work-library .case-card").first().focus();
       await page.keyboard.press("Enter");
       await page.waitForURL(base + "/work/education-transformation");
-      await verify();
+      await verifyTop("Selected work engagement");
       await page.goBack();
       await page.waitForURL(base + "/work");
       await verify();
@@ -131,7 +131,7 @@ try {
       await verifyTop("Home from selected work");
       await page.locator("#selected-work .case-card").nth(1).click();
       await page.waitForURL(base + "/work/insurance-leadership");
-      await verify();
+      await verifyTop("Homepage selected engagement");
       await navigate("Leadership & Partners");
       await page.waitForURL(base + "/people");
       await page.locator(".person-card").first().click();

@@ -124,12 +124,14 @@
 :where(.recreation) .people-intro{display:flex;justify-content:space-between;gap:70px;border-top:1px solid var(--border);padding-block:30px 45px}
 :where(.recreation) .people-intro>p:last-child{max-width:580px}
 :where(.recreation) .people-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:34px}
-:where(.recreation) .portrait{overflow:hidden;background:#d6dae0}
-:where(.recreation) .portrait img{width:100%;aspect-ratio:.84;object-fit:cover;filter:grayscale(1);transition:filter .35s,transform .35s}
-:where(.recreation) .person-card:hover img{filter:grayscale(.15);transform:scale(1.025)}
-:where(.recreation) .portrait-vipin-tuteja img{object-position:50% 26%}
-:where(.recreation) .portrait-sandeep-bidani img{object-position:52% 15%}
-:where(.recreation) .portrait-kannan-swaminathan img{object-position:48% 8%}
+/* Keep each original photo at its native ratio; match headroom and scale inside equal frames. */
+:where(.recreation) .person-card .portrait{position:relative;aspect-ratio:.84;overflow:hidden;background:#d6dae0}
+:where(.recreation) .person-card .portrait img{position:absolute;top:0;left:50%;width:var(--portrait-width,100%);max-width:none;height:auto;transform:translate(-50%,var(--portrait-shift,0%));transform-origin:50% 0%;filter:grayscale(1);transition:filter .35s,transform .35s}
+:where(.recreation) .person-card:is(:hover,:focus-visible) .portrait img{filter:grayscale(.15);transform:translate(-50%,var(--portrait-shift,0%)) scale(1.025)}
+:where(.recreation) .portrait-vipin-tuteja{--portrait-width:120%}
+:where(.recreation) .portrait-sandeep-bidani{--portrait-width:169%;--portrait-shift:-4.2%}
+:where(.recreation) .portrait-kannan-swaminathan{--portrait-shift:-8.4%}
+@media(prefers-reduced-motion:reduce){:where(.recreation) .person-card:is(:hover,:focus-visible) .portrait img{transform:translate(-50%,var(--portrait-shift,0%))}}
 :where(.recreation) .person-card-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:23px}
 :where(.recreation) .person-card-title h3{font-size:1.9rem}
 :where(.recreation) .person-card-title svg{color:var(--primary);flex:none}
@@ -202,7 +204,7 @@
 :where(.recreation) .people-intro{display:block;padding-block:23px 30px}
 :where(.recreation) .people-intro>p:last-child{margin-top:18px}
 :where(.recreation) .people-grid{grid-template-columns:1fr;gap:42px}
-:where(.recreation) .portrait img{aspect-ratio:1.04;max-height:480px}
+:where(.recreation) .person-card .portrait{aspect-ratio:1.04;max-height:480px}
 :where(.recreation) .person-card-title h3{font-size:2rem}
 :where(.recreation) .people-principle{grid-template-columns:1fr;gap:25px}
 :where(.recreation) .people-section{padding-bottom:45px}

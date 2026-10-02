@@ -24,6 +24,7 @@
   .portrait { filter: none; }
 }
 .founderPortrait { object-position: 50% 0; }
+.kannanPortrait { object-position: 50% 20%; }
 .identity { padding: 1.6rem 0 1.4rem; }
 .role { min-height: 2.8em; max-width: 29ch; font-size: .76rem; line-height: 1.4; font-weight: 500; color: var(--c-red); }
 .identity h2 { margin: .55rem 0 .9rem; font-size: clamp(1.5rem, 2.1vw, 1.95rem); line-height: 1.12; letter-spacing: -.035em; }

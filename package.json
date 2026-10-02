@@ -14,6 +14,7 @@
     "test:performance": "node tests/performance.mjs",
     "test:contact-browser": "node tests/contact-browser.mjs",
     "test:theme-navigation": "node tests/theme-navigation.mjs",
+    "test:selected-work-navigation": "node tests/selected-work-navigation.mjs",
     "security:check": "node scripts/security-check.mjs",
     "security:source": "node scripts/security-check.mjs --source-only",
     "test:security-browser": "node tests/security-browser.mjs",

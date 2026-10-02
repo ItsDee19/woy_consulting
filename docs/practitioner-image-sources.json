@@ -41,21 +41,20 @@
     },
     {
       "person": "Kannan Swaminathan",
-      "sourcePage": 14,
-      "sourceImage": "Im12.jpg",
+      "source": "Owner-supplied photograph, replacing the earlier PDF portrait",
+      "sourceImage": "codex-clipboard-ad3ce373-a94d-41f8-8cf0-c470779af971.jpg",
       "sourceDimensions": [
-        284,
-        284
+        1064,
+        1600
       ],
-      "sourceHasSoftMask": false,
-      "output": "/practitioners/kannan-swaminathan.webp",
+      "output": "/assets/kannan-swaminathan-portrait.jpg",
       "outputDimensions": [
-        284,
-        284
+        1064,
+        1600
       ],
-      "bytes": 17358,
-      "processing": "Extracted embedded image; any PDF transparency preserved by pypdf; encoded as WebP at quality 90 without enlargement or retouching.",
-      "sha256": "5df739e85756bd72ce78d179ff7b49eb3d6b56dc924604d808877952c163b49b"
+      "bytes": 382019,
+      "processing": "Copied the supplied JPEG unchanged. Shared by the leadership listing, individual profile and legacy practitioners page.",
+      "sha256": "852d0618b9d98a0681c1914d582d101554bf70fc8974d91e16aa7ace91fe8880"
     }
   ]
 }

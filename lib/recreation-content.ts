@@ -30,7 +30,7 @@ const peopleListingDetails: Record<string, { category: string; image: string; fo
   },
   "kannan-swaminathan": {
     category: "leadership",
-    image: "kannan-swaminathan.jpg",
+    image: "kannan-swaminathan-portrait.jpg",
     focus: "Leadership, transitions & financial services",
   },
 };
