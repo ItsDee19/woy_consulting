@@ -65,8 +65,8 @@
 .circle { background-position: -56px -344px; }
 .star { background-position: -56px -514px; }
 .compass { background-position: -56px -687px; }
-/* Remove the sprite paper on navy while retaining its original red ink. */
-:global([data-theme="dark"]) .symbol { filter: invert(1) hue-rotate(180deg) saturate(20) brightness(.8); mix-blend-mode: screen; }
+/* Share the original-artwork filter with Approach; theme surfaces must not tint the ink. */
+:global([data-theme="dark"]) .symbol { filter: url("#woy-philosophy-ink"); mix-blend-mode: normal; }
 .symbolName { min-width: 0; margin: 0; color: var(--philosophy-red); font-size: 13px; font-weight: 400; letter-spacing: .13em; text-transform: uppercase; }
 .principle h3 { max-width: 22ch; margin: 0 0 16px; color: var(--philosophy-ink); font-family: var(--font-editorial); font-size: 28px; font-weight: 400; line-height: 1.2; letter-spacing: -.04em; }
 .body { margin: 0; color: var(--philosophy-muted); font-size: 16px; line-height: 1.75; text-align: left; }

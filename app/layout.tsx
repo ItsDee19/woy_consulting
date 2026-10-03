@@ -6,6 +6,7 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { CookieConsent } from "@/components/CookieConsent";
 import { ScrollProgress } from "@/components/ScrollProgress";
+import { BrandArtworkFilters } from "@/components/BrandArtworkFilters";
 import { site } from "@/lib/content";
 import { isIndexable, siteUrl } from "@/lib/site-url";
 import { pageMetadata } from "@/lib/metadata";
@@ -73,6 +74,7 @@ export default async function RootLayout({
           Skip to content
         </a>
 
+        <BrandArtworkFilters />
         <ScrollProgress />
         <Nav />
         <main id="main">{children}</main>

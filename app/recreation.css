@@ -426,14 +426,20 @@
   background: var(--card);
 }
 
-/* These original raster exports have white paper behind their red artwork.
- * Screen blending removes that paper after inversion; the hue rotation keeps
- * WOY's mark red and makes the original dark CONSULTING caption legible. */
-[data-theme="dark"] :where(.recreation) .logo-window img,
-[data-theme="dark"] :where(.recreation) .philosophy-mark img,
-[data-theme="dark"] :where(.recreation) .logo-symbol {
+/* The navbar's caption retains its existing treatment; its mark is masked below. */
+[data-theme="dark"] :where(.recreation) .logo-window img {
   filter: invert(1) hue-rotate(180deg) saturate(2);
   mix-blend-mode: screen;
+}
+
+/* Source pixels supply the silhouettes; paint the fixed brand red without blending. */
+[data-theme="dark"] :where(.recreation) .philosophy-mark img {
+  filter: url("#woy-emblem-ink");
+  mix-blend-mode: normal;
+}
+[data-theme="dark"] :where(.recreation) .logo-symbol {
+  filter: url("#woy-philosophy-ink");
+  mix-blend-mode: normal;
 }
 
 /* Use the original transparent artwork as an alpha mask for the dark navbar.
