@@ -53,7 +53,7 @@ export const peopleProfiles: PersonProfile[] = [
       "Kannan brings 29 years of corporate experience in banking and financial services, including 15 years in leadership roles.",
       "His experience spans transitions, operations, business development, relationship management and strategy, with organisations including the Royal Bank of Scotland Group, Tata Consultancy Services, ABN AMRO, Standard Chartered, ICICI Bank and ANZ Grindlays.",
       "He brings this operating perspective to leadership and executive coaching, helping leaders examine their context, strengthen their effectiveness and navigate change.",
-      "He has been credentialed as a Senior Practitioner by the European Mentoring and Coaching Council. He has over 2000+ hours of coaching experience and has worked with leadership across CXO, Business Function Heads, Vice Presidents, Directors, and Senior Managers in the Banking, Information Technology, Healthcare, Logistics, and Consulting industries across India and globally.",
+      "He is a Professional Certified Coach from the International Coaching Federation. He has over 2000+ hours of coaching experience and has worked with leadership across CXO, Business Function Heads, Vice Presidents, Directors, and Senior Managers in the Banking, Information Technology, Healthcare, Logistics, and Consulting industries across India and globally.",
     ],
     experience: ["RBS", "TCS", "ABN AMRO", "Standard Chartered", "ICICI Bank", "ANZ Grindlays"],
   },

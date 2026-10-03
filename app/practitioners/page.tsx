@@ -27,7 +27,7 @@ const experience: Record<string, { label: string; detail: string; background: st
   "kannan-swaminathan": {
     label: "Executive coaching",
     detail: "Coaching for CXOs and senior leaders",
-    background: "EMCC Senior Practitioner",
+    background: "ICF Professional Certified Coach",
   },
 };
 
