@@ -39,7 +39,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@tailwindcss/postcss": "^4.0.0",
-    "@types/node": "^22.10.7",
+    "@types/node": "^26.6.2",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "eslint": "^9.39.5",
