@@ -1,5 +1,6 @@
 import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
 import { defineArrayMember, defineField, defineType } from "sanity";
+import { IMAGE_FORMATS } from "./documentAttachment";
 
 const older = "older";
 
@@ -24,7 +25,7 @@ export const person = defineType({
       options: { list: [{ title: "Our Leadership", value: "leadership" }, { title: "Our Partners", value: "partner" }], layout: "radio" },
       initialValue: "leadership", validation: (rule) => rule.required(),
     }),
-    defineField({ name: "portrait", title: "Portrait", type: "image", description: "Click the crop icon and drag the focal point onto the face; profile pages frame the photo around it.", options: { hotspot: true }, validation: (rule) => rule.required() }),
+    defineField({ name: "portrait", title: "Portrait", type: "image", description: "Click the crop icon and drag the focal point onto the face; profile pages frame the photo around it.", options: { hotspot: true, accept: IMAGE_FORMATS }, validation: (rule) => rule.required() }),
     defineField({ name: "introduction", title: "Introduction", type: "text", rows: 3, validation: (rule) => [rule.required(), rule.max(200).warning()] }),
     defineField({ name: "biography", title: "Biography", type: "array", description: "One entry per paragraph.", of: [defineArrayMember({ type: "text", rows: 4 })], validation: (rule) => rule.required().min(1) }),
     defineField({ name: "experience", title: "Previous organisations", type: "array", of: [defineArrayMember({ type: "string" })] }),
@@ -35,7 +36,7 @@ export const person = defineType({
     defineField({ name: "lede", title: "Short introduction", type: "text", rows: 2, fieldset: older }),
     defineField({ name: "olderBio", title: "Biography", type: "array", of: [defineArrayMember({ type: "text", rows: 4 })], fieldset: older }),
     defineField({ name: "expertise", title: "Areas of focus", type: "array", of: [defineArrayMember({ type: "string" })], fieldset: older }),
-    defineField({ name: "olderPhoto", title: "Photo", type: "image", options: { hotspot: true }, fieldset: older }),
+    defineField({ name: "olderPhoto", title: "Photo", type: "image", options: { hotspot: true, accept: IMAGE_FORMATS }, fieldset: older }),
     defineField({ name: "highlightLabel", title: "Highlight: label", type: "string", fieldset: older }),
     defineField({ name: "highlightDetail", title: "Highlight: detail", type: "string", fieldset: older }),
     defineField({ name: "highlightBackground", title: "Highlight: background line", type: "string", fieldset: older }),
