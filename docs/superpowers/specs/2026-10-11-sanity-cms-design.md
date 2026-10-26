@@ -76,19 +76,18 @@ Editors ──► Studio (woy-consulting.sanity.studio; source in studio/)
 |---|---|---|
 | `studio/` | A standalone Sanity Studio with its own `package.json`. Holds the schemas, desk structure and import script, and is deployed with `sanity deploy`. It is outside the Next.js build, lint and typecheck. | Sanity |
 | `lib/sanity/client.ts` | Server-only client config: project ID, dataset, pinned `apiVersion`, `useCdn: false` and the `published` perspective. | env |
-| `lib/sanity/fetch.ts` | `sanityFetch(query, params, tags)`. It calls the client with `next: { revalidate: 300, tags }`. | client |
-| `lib/cms/queries.ts` | All GROQ queries. Used by the getters and by the snapshot script. | — |
-| `lib/cms/*.ts` | One getter per content type, for example `getCaseStudies()` and `getSiteSettings()`. Each is wrapped in React `cache()` and maps Sanity documents to the shapes the components consume today. | fetch, snapshot |
+| `lib/cms/source.ts` | `loadQuery(name)`. Wraps the client call in `unstable_cache` (tag `sanity`, 300 s) and serves the snapshot when `shouldUseSnapshot` says Sanity is unreachable. | client, fallback, snapshot |
+| `lib/cms/queries.mjs` | All GROQ queries. Used by the loader and by the snapshot script. | — |
+| `lib/cms/*.ts` | One getter per content type, for example `getEngagements()` and `getResources()`. Each is wrapped in React `cache()` and maps Sanity documents to the shapes the components consume today. | source |
 | `lib/cms/fallback.ts` | Decides whether an error should fall back to the snapshot (`shouldUseSnapshot`) and serves the matching snapshot section. | snapshot |
 | `scripts/cms-snapshot.mjs` | Runs on `prebuild` and `predev`. It fetches every query and writes `lib/cms/snapshot.generated.json`, which is git-ignored. **It exits non-zero on any failure**, so the build fails and the current production deployment stays live. | queries |
 | `app/api/revalidate/route.ts` | The webhook receiver. It verifies the Sanity signature, then revalidates tags. | secret |
 
-**Caching.** Published content is fetched from Sanity's live API (`useCdn: false`), so a fetch that happens straight after a publish is never served stale by Sanity's CDN. Results are held in the Next.js data cache under these tags:
+**Caching.** Published content is fetched from Sanity's live API (`useCdn: false`), so a fetch that happens straight after a publish is never served stale by Sanity's CDN. Results are held in the Next.js data cache through `unstable_cache`, under one tag:
 
 - `sanity`, for everything
-- `sanity:<type>`, for each content type
 
-Visitors are served from that cache. The webhook revalidates the tag for the published document's `_type`, and a 300-second time-based refresh acts as a backstop. Sanity API usage therefore scales with the number of edits, not with traffic.
+Visitors are served from that cache. The webhook expires the `sanity` tag (`revalidateTag("sanity", { expire: 0 })`) on any publish, and a 300-second time-based refresh acts as a backstop. With a handful of entries, one tag is simpler than a tag per content type and costs one extra read per publish. Sanity API usage therefore scales with the number of edits, not with traffic.
 
 > To verify while planning: the exact `revalidateTag` signature and fetch-cache behaviour inside `force-dynamic` routes in the installed Next.js 16. Read `node_modules/next/dist/docs` before writing code.
 
@@ -147,6 +146,7 @@ The **"Older case-study page"** group is collapsed and drives `/case-studies` an
 The main fields drive `/people` and `/people/[slug]`:
 
 - `name`, `slug`, `role`
+- `group`: "Our Leadership" or "Our Partners", which sets the section on `/people`
 - `portrait`, an image whose focal point is required
 - `introduction`, `biography[]` (paragraphs), `experience[]` (company names)
 - `focus`, the one-line summary used in listings
@@ -163,6 +163,7 @@ The **"Older practitioners page"** group is collapsed and drives `/practitioners
 | `olderBio[]` | `biography[]` |
 | `expertise[]` | empty, so the list is hidden |
 | `olderPhoto` | `portrait` |
+| `highlightLabel`, `highlightDetail`, `highlightBackground` | empty, so the highlight box is hidden unless all three are filled |
 
 The initials are derived from the name. The homepage leadership feature stays in code.
 
@@ -273,16 +274,15 @@ The CTA link (`ctaHref`) stays in code.
 | A query or mapping error (a bug) | Throw. Never fall back. |
 | The snapshot can't be generated at build | The build fails, and the previous deployment stays live |
 
-The connection-versus-bug decision lives in one function, `shouldUseSnapshot(error)`. It covers network errors, timeouts, HTTP 5xx and 429. The repository owner writes it during implementation, with its tradeoffs explained first.
+The connection-versus-bug decision lives in one function, `shouldUseSnapshot(error)`. It covers network errors, timeouts, HTTP 5xx, 429 and 402. Sanity's free plan answers 402 once a monthly quota is used up, which would otherwise stop all content loading. The simulated outage (`CMS_TEST_UNREACHABLE=1`) must use a port that `fetch` does not block, or it fails with "bad port" instead of a connection error. The repository owner writes it during implementation, with its tradeoffs explained first.
 
 The snapshot file is generated, never edited by hand and git-ignored. Every script that needs it (`dev`, `build`, `typecheck`) generates it first.
 
 ## 8. Security
 
 - **The CSP is unchanged.**
-  - Every Sanity image is rendered through `next/image` or `getImageProps`, so browsers load it from `/_next/image` on the site's own origin. `next.config.mjs` `images.remotePatterns` allows only `https://cdn.sanity.io/images/<projectId>/production/**`.
-  - Raw `cdn.sanity.io` URLs are never placed in `<img>`. Today `components/recreation/CollectiveExperience.tsx` uses a plain `<img>`, so it moves to `getImageProps`.
-  - Document downloads are ordinary links (navigations) to `cdn.sanity.io/files/...`.
+  - `next/image` uses absolute Sanity URLs, so browsers load them from `/_next/image` on the site's own origin. `next.config.mjs` `images.remotePatterns` allows only `https://cdn.sanity.io/images/<projectId>/production/**`.
+  - Raw `<img>` elements and document downloads use the same-origin `/cms-assets/images/*` and `/cms-assets/files/*` rewrite in `next.config.mjs`. It reaches only this project and dataset, and only known-safe extensions (images: png, jpg, webp, avif, gif; documents: pdf, doc(x), ppt(x), xls(x)), so an uploaded `.html` or `.svg` can never be served from the site's own origin. Browsers therefore never contact `cdn.sanity.io` directly, and `CollectiveExperience` may keep its plain `<img>`.
 - **The webhook accepts POST only.**
   - It verifies the HMAC signature with `SANITY_REVALIDATE_SECRET`. A missing or invalid signature returns 401, and nothing from the request body is echoed back.
   - The existing strict CSP header on `/api/*` stays.
@@ -300,7 +300,7 @@ The snapshot file is generated, never edited by hand and git-ignored. Every scri
 - **Sources.** It reads the current TypeScript content modules and the files under `/public`, and uploads every image and file it needs.
 - **Focal points.** A portrait's `imagePosition: "50% 26%"` becomes the hotspot `{x: 0.5, y: 0.26}`.
 - **Crops.** A pixel crop `[x, y, w, h]` on a `W×H` image becomes `{left: x/W, top: y/H, right: 1-(x+w)/W, bottom: 1-(y+h)/H}`.
-- **Fixed IDs** such as `caseStudy.education-transformation`, `person.vipin-tuteja` and `clientLogo.airtel` are written with `createOrReplace`. The import is idempotent and safe to re-run.
+- **Fixed IDs** such as `caseStudy-education-transformation`, `person-vipin-tuteja` and `clientLogo-airtel` are written with `createOrReplace`. The import is idempotent and safe to re-run. IDs use hyphens, never dots: a dotted ID is treated as private and is hidden from public reads.
 - **Order of work.** Batch 1 imports case studies and people. Batch 2 imports everything else.
 - **Parity tests.** Before any page is switched over, a test maps every imported document back through the `lib/cms` mappers and deep-compares the result with the current TypeScript data. The old files are deleted only after that test passes.
 
