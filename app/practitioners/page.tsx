@@ -22,7 +22,7 @@ export default function PractitionersPage() {
           type: "CollectionPage",
           mainEntity: practitioners.map((practitioner) => ({ "@id": schemaId("/practitioners", practitioner.slug) })),
         }),
-        ...practitionerGraph(),
+        ...practitionerGraph(practitioners),
       ]} />
 
       <section className={styles.hero}>

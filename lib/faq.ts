@@ -1,4 +1,5 @@
-import { approach, caseStudies, practitioners, site } from "@/lib/content";
+import { approach, site } from "@/lib/content";
+import type { CaseStudyBrief, Practitioner } from "@/lib/cms/types";
 
 export type FAQItem = {
   id: string;
@@ -13,7 +14,8 @@ const list = (items: string[]) => new Intl.ListFormat("en", { style: "long", typ
  * Visitor-facing answers grounded in content.ts and the About, Approach,
  * Case Studies and Contact pages. Shared by the visible FAQ and its structured data.
  */
-export const faqItems: FAQItem[] = [
+export function buildFaqItems({ practitioners, caseStudies }: { practitioners: Practitioner[]; caseStudies: CaseStudyBrief[] }): FAQItem[] {
+  return [
   {
     id: "what-woy-means",
     question: "What does WOY stand for?",
@@ -62,4 +64,5 @@ export const faqItems: FAQItem[] = [
     answer: `Email ${site.email} or use the contact form to share your full name, mobile number and email address. A WOY partner can then discuss what you are working on and whether the advisory team is the right fit. You do not need a fully defined brief to begin; understanding the challenge is part of Discover.`,
     links: [{ label: "What happens after an enquiry", href: "/contact" }],
   },
-];
+  ];
+}

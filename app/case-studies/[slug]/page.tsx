@@ -5,26 +5,27 @@ import { pageMetadata } from "@/lib/metadata";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/dist/ssr";
-import { caseStudies, caseStudyBySlug } from "@/lib/content";
+import { getCaseStudyBriefs } from "@/lib/cms/content";
 import styles from "../case-studies.module.css";
 
-export function generateStaticParams() {
-  return caseStudies.map((c) => ({ slug: c.slug }));
+async function findStudy(slug: string) {
+  const caseStudies = await getCaseStudyBriefs();
+  const index = caseStudies.findIndex((c) => c.slug === slug);
+  if (index < 0) notFound();
+  return { study: caseStudies[index], next: caseStudies[(index + 1) % caseStudies.length] };
+}
+
+export async function generateStaticParams() {
+  return (await getCaseStudyBriefs()).map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
-  const study = caseStudyBySlug(slug);
-  if (!study) notFound();
+  const { study } = await findStudy((await params).slug);
   return pageMetadata(study.title, `${study.industry} case study: ${study.headline}`, `/case-studies/${study.slug}`);
 }
 
 export default async function CaseStudyPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const study = caseStudyBySlug(slug);
-  if (!study) notFound();
-  const index = caseStudies.findIndex((c) => c.slug === slug);
-  const next = caseStudies[(index + 1) % caseStudies.length];
+  const { study, next } = await findStudy((await params).slug);
 
   return (
     <>

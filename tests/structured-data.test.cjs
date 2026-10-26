@@ -54,7 +54,7 @@ test("schema IDs and breadcrumbs stay on the canonical origin", () => {
   ]);
 });
 
-test("visible services and practitioners share the site entity without invented details", () => {
+test("visible services share the site entity without invented details", () => {
   const [organization, website] = schema.siteEntityGraph();
   assert.equal(website.publisher["@id"], organization["@id"]);
   assert.equal(organization.email, "hello@woyconsulting.com");
@@ -73,17 +73,6 @@ test("visible services and practitioners share the site entity without invented 
     assert.equal(service["@id"], service.url);
     assert.equal(service.mainEntityOfPage["@id"], "https://www.woy.test/#webpage");
   }
-  const people = schema.practitionerGraph();
-  assert.equal(people.length, content.practitioners.length);
-  for (const person of people) {
-    const practitioner = content.practitioners.find((item) => person.url.endsWith(`#${item.slug}`));
-    assert.ok(practitioner);
-    assert.equal(person.name, practitioner.name);
-    assert.equal(person.affiliation["@id"], organization["@id"]);
-    if (!practitioner.linkedin) assert.ok(!("sameAs" in person));
-    if (!practitioner.photo) assert.ok(!("image" in person));
-    assert.ok(!("hasCredential" in person));
-  }
 });
 
 test("homepage expertise preserves every previous capability anchor exactly once", () => {
@@ -96,9 +85,31 @@ test("homepage expertise preserves every previous capability anchor exactly once
   assert.ok(currentAnchors.every((slug) => !aliases.includes(slug)));
 });
 
+const practitionerFixture = [
+  { slug: "a-person", name: "A Person", initials: "AP", role: "Partner", lede: "Lede.", bio: ["Bio."], expertise: ["Strategy"], linkedin: null, photo: null },
+  { slug: "b-person", name: "B Person", initials: "BP", role: "Coach", lede: "Lede.", bio: ["Bio."], expertise: [], linkedin: "https://www.linkedin.com/in/b", photo: "https://cdn.sanity.io/images/abc123xy/production/b-1x1.jpg" },
+];
+const caseFixture = [
+  { slug: "one", industry: "Insurance", title: "One", headline: "Headline one", context: "Context one", edge: [], framework: [], outcomes: ["Changed."] },
+  { slug: "two", industry: "Education", title: "Two", headline: "Headline two", context: "Context two", edge: [], framework: [], outcomes: ["Changed."] },
+];
+
+test("practitioners share the site entity without invented details", () => {
+  const [organization] = schema.siteEntityGraph();
+  const people = schema.practitionerGraph(practitionerFixture);
+  assert.equal(people.length, 2);
+  assert.equal(people[0].url, "https://www.woy.test/practitioners#a-person");
+  assert.equal(people[0].affiliation["@id"], organization["@id"]);
+  assert.ok(!("sameAs" in people[0]) && !("image" in people[0]));
+  assert.deepEqual(plain(people[1].sameAs), ["https://www.linkedin.com/in/b"]);
+  assert.equal(people[1].image, "https://cdn.sanity.io/images/abc123xy/production/b-1x1.jpg");
+  for (const person of people) assert.ok(!("hasCredential" in person));
+});
+
 test("case-study listing and detail graphs identify the same published works without naming confidential clients", () => {
-  const list = schema.caseStudyListSchema();
-  for (const [index, study] of content.caseStudies.entries()) {
+  const list = schema.caseStudyListSchema(caseFixture);
+  assert.equal(list.numberOfItems, 2);
+  for (const [index, study] of caseFixture.entries()) {
     const work = schema.caseStudySchema(study);
     const listed = list.itemListElement[index].item;
     assert.equal(listed["@id"], work["@id"]);

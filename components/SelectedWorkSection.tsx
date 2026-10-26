@@ -1,10 +1,14 @@
 import { CaseCard, TextLink } from "@/components/recreation/Site";
-import { cases } from "@/lib/recreation-content";
+import { getEngagements } from "@/lib/cms/content";
+import { selectFeatured } from "@/lib/cms/map-case-studies";
 import styles from "./SelectedWorkSection.module.css";
 
-const selectedCases = cases.filter((item) => item.featured).slice(0, 4);
+const numberWords = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
 
-export function SelectedWorkSection() {
+export async function SelectedWorkSection() {
+  const engagements = await getEngagements();
+  const selectedCases = selectFeatured(engagements);
+  const industryCount = new Set(engagements.map((item) => item.industry)).size;
   return (
     <section
       id="selected-work"
@@ -31,7 +35,7 @@ export function SelectedWorkSection() {
           ))}
         </div>
         <div className={styles.footer}>
-          <p>Explore engagements across six industries.</p>
+          <p>{`Explore engagements across ${numberWords[industryCount] ?? industryCount} ${industryCount === 1 ? "industry" : "industries"}.`}</p>
           <TextLink href="/work">View all selected work</TextLink>
         </div>
       </div>
