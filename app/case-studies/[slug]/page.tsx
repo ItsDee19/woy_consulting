@@ -5,6 +5,7 @@ import { pageMetadata } from "@/lib/metadata";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/dist/ssr";
+import { DownloadButton } from "@/components/DownloadButton";
 import { getCaseStudyBriefs } from "@/lib/cms/content";
 import styles from "../case-studies.module.css";
 
@@ -93,6 +94,7 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
           <div><p className={styles.eyebrow}>Next engagement · {next.industry}</p><h2 id="next-case-title">{next.title}</h2></div>
           <ArrowRight size={30} aria-hidden="true" />
         </Link>
+        {study.download && <DownloadButton download={study.download} className={styles.backLink} />}
         <p className={styles.confidentiality}>Client identity is withheld under confidentiality agreements.</p>
       </section>
     </>

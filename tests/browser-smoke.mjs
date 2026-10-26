@@ -384,6 +384,7 @@ try {
       ["Selected work", "/work"],
       ["Leadership & Partners", "/people"],
       ["Our approach", "/approach"],
+      ["Resources", "/resources"],
     ], "Explore links use the current page destinations");
     assert.equal(await footer.locator('a[href="/terms-and-conditions"]').count(), 0, "Footer omits Terms and Conditions");
     assert.equal(await footer.getByRole("button", { name: "Cookie Policy", exact: true }).count(), 1);

@@ -1,6 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { CaseCard, TextLink } from "@/components/recreation/Site";
+import { DownloadButton } from "@/components/DownloadButton";
 import type { Engagement } from "@/lib/cms/types";
 import styles from "./EngagementPage.module.css";
 
@@ -73,6 +74,7 @@ export function EngagementPage({ engagement, related }: { engagement: Engagement
           <Link className={styles.contact} href="/contact">
             Discuss a similar challenge<ArrowUpRight size={18} aria-hidden="true" />
           </Link>
+          {engagement.download && <DownloadButton download={engagement.download} className={styles.contact} />}
         </div>
       </section>
 

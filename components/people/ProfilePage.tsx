@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { DownloadButton } from "@/components/DownloadButton";
 import type { PersonProfile } from "@/lib/cms/types";
 import styles from "./ProfilePage.module.css";
 
@@ -40,6 +41,7 @@ export function ProfilePage({ profile }: { profile: PersonProfile }) {
               </ul>
             </section>
 
+            {profile.download && <DownloadButton download={profile.download} className={styles.contact} />}
             <Link href="/contact" className={styles.contact}>
               Start a conversation <ArrowUpRight size={18} aria-hidden="true" />
             </Link>

@@ -1,0 +1,11 @@
+.library { padding-bottom: 90px; }
+.list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
+.item { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px; padding-block: 36px; border-bottom: 1px solid var(--border); }
+.withCover { grid-template-columns: minmax(0, 240px) minmax(0, 1fr); }
+.cover { width: 100%; height: auto; }
+.body { display: grid; gap: 14px; justify-items: start; }
+.title { font-size: clamp(1.75rem, 2.6vw, 2.25rem); }
+.empty { padding-block: 36px; border-top: 1px solid var(--border); }
+.empty a { border-bottom: 1px solid currentColor; }
+.empty a:hover { color: var(--primary); }
+@media (max-width: 700px) { .withCover { grid-template-columns: minmax(0, 1fr); gap: 20px; } }
