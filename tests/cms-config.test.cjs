@@ -18,5 +18,5 @@ test("site and Studio point at the same public Sanity project and dataset", () =
 });
 
 test("the outage simulation can only target a closed loopback port", () => {
-  assert.match(read("lib/sanity/project.mjs"), /CMS_TEST_UNREACHABLE === "1" \? "http:\/\/127\.0\.0\.1:9" : undefined/);
+  assert.match(read("lib/sanity/project.mjs"), /CMS_TEST_UNREACHABLE === "1" \? "http:\/\/127\.0\.0\.1:47123" : undefined/);
 });
