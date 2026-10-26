@@ -1,9 +1,10 @@
 import { pageMetadata } from "@/lib/metadata";
 import {PageIntro,PersonCard,TextLink} from '@/components/recreation/Site';
-import {people} from '@/lib/recreation-content';
+import { getPeopleListings } from "@/lib/cms/content";
 export const metadata = pageMetadata('Leadership & Partners', 'Meet WOY Consulting’s leadership and partners, supported by a consortium of over 10 consultants and over 25 coaches.', "/people");
 
-export default function People(){
+export default async function People(){
+  const people=await getPeopleListings();
   const leadership=people.filter(person=>person.category==='leadership');
   const partners=people.filter(person=>person.category==='partner');
   return <div className="recreation">

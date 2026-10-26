@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import type { PersonProfile } from "@/lib/people-profiles";
+import type { PersonProfile } from "@/lib/cms/types";
 import styles from "./ProfilePage.module.css";
 
 export function ProfilePage({ profile }: { profile: PersonProfile }) {

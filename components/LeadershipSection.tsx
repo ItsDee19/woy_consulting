@@ -1,10 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
-import { practitioners } from "@/lib/content";
 import styles from "./LeadershipSection.module.css";
-
-const founder = practitioners.find((person) => person.slug === "vipin-tuteja")!;
 
 export function LeadershipSection() {
   return (
@@ -22,7 +19,7 @@ export function LeadershipSection() {
           <div className={styles.portraitFrame}>
             <Image
               src="/practitioners/vipin-tuteja-homepage.webp"
-              alt={`${founder.name}, founder and managing director of WOY Consulting`}
+              alt="Vipin Tuteja, founder and managing director of WOY Consulting"
               width={575}
               height={710}
               sizes="(min-width: 1900px) 575px, (min-width: 901px) 31vw, (min-width: 650px) 575px, 91vw"
@@ -31,7 +28,7 @@ export function LeadershipSection() {
             />
           </div>
           <figcaption className={styles.identity}>
-            <span className={styles.name}>{founder.name}</span>
+            <span className={styles.name}>Vipin Tuteja</span>
             <span className={styles.role}>Founder &amp; Managing Director</span>
           </figcaption>
         </figure>

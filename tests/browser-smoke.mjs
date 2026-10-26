@@ -698,7 +698,8 @@ try {
     const portrait = article.locator("img");
     await portrait.scrollIntoViewIfNeeded();
     await portrait.evaluate(image => image.decode());
-    assert.match(await portrait.getAttribute("src"), new RegExp(slug));
+    assert.match(await portrait.getAttribute("src"), /^\/_next\/image\?url=https%3A%2F%2Fcdn\.sanity\.io%2Fimages%2F/, "Practitioner portrait comes from Sanity via next/image");
+    assert.ok((await portrait.getAttribute("alt")).startsWith(name), `Portrait alt text names ${name}`);
     assert.ok(await portrait.evaluate(image => image.naturalWidth > 0));
     const summary = article.locator("summary");
     await summary.focus();
