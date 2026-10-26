@@ -613,6 +613,25 @@ export const practitioners: Practitioner[] = [
   },
 ];
 
+/** The highlight box on /practitioners. Migrated to Sanity in batch 1, then removed from this file. */
+export const practitionerHighlights: Record<string, { label: string; detail: string; background: string }> = {
+  "vipin-tuteja": {
+    label: "Business leadership",
+    detail: "Strategy, execution and P&L ownership",
+    background: "Xerox · American Express · Ricoh · Samsung",
+  },
+  "sandeep-bidani": {
+    label: "HR & culture",
+    detail: "Organisation change across global teams",
+    background: "KPMG · American Express · IBM",
+  },
+  "kannan-swaminathan": {
+    label: "Executive coaching",
+    detail: "Coaching for CXOs and senior leaders",
+    background: "ICF Professional Certified Coach",
+  },
+};
+
 /* ------------------------------------------------------------ why partner with */
 export const differentiators = [
   {

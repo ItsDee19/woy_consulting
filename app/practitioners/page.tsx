@@ -4,7 +4,7 @@ import { ArrowUpRight, Plus, LinkedinLogo } from "@phosphor-icons/react/dist/ssr
 import { StructuredData } from "@/components/StructuredData";
 import { contentPageGraph, practitionerGraph, schemaId } from "@/lib/structured-data";
 import { pageMetadata } from "@/lib/metadata";
-import { practitioners } from "@/lib/content";
+import { practitioners, practitionerHighlights } from "@/lib/content";
 import styles from "./practitioners.module.css";
 
 export const metadata = pageMetadata(
@@ -12,24 +12,6 @@ export const metadata = pageMetadata(
   "Meet Vipin Tuteja, Sandeep Bidani and Kannan Swaminathan, WOY practitioners in leadership, culture, strategy and executive coaching.",
   "/practitioners"
 );
-
-const experience: Record<string, { label: string; detail: string; background: string }> = {
-  "vipin-tuteja": {
-    label: "Business leadership",
-    detail: "Strategy, execution and P&L ownership",
-    background: "Xerox · American Express · Ricoh · Samsung",
-  },
-  "sandeep-bidani": {
-    label: "HR & culture",
-    detail: "Organisation change across global teams",
-    background: "KPMG · American Express · IBM",
-  },
-  "kannan-swaminathan": {
-    label: "Executive coaching",
-    detail: "Coaching for CXOs and senior leaders",
-    background: "ICF Professional Certified Coach",
-  },
-};
 
 export default function PractitionersPage() {
   return (
@@ -63,7 +45,7 @@ export default function PractitionersPage() {
       <section id="meet-the-practitioners" className={styles.profiles} aria-label="Practitioner profiles">
         <div className={`shell ${styles.profileGrid}`}>
           {practitioners.map((p, i) => {
-            const proof = experience[p.slug];
+            const proof = practitionerHighlights[p.slug];
             return (
               <article id={p.slug} key={p.slug} className={styles.profile}>
                 <div className={styles.portraitField}>
