@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/cms-snapshot.mjs --allow-offline",
     "dev": "next dev -p 5173",
+    "prebuild": "node scripts/cms-snapshot.mjs",
+    "cms:snapshot": "node scripts/cms-snapshot.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -27,6 +30,8 @@
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",
+    "@sanity/client": "^8.11.0",
+    "@sanity/webhook": "^4.0.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.47.0",

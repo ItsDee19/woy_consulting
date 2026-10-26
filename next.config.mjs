@@ -1,4 +1,5 @@
 import { configuredSiteOrigins, isLocalHost } from "./lib/site-origin.mjs";
+import { SANITY_DATASET, SANITY_PROJECT_ID } from "./lib/sanity/project.mjs";
 
 const isProduction = process.env.NODE_ENV === "production";
 /** @type {import('next').NextConfig} */
@@ -7,7 +8,23 @@ const nextConfig = {
   devIndicators: false,
   agentRules: false,
   poweredByHeader: false,
-  images: { formats: ["image/webp"], remotePatterns: [] },
+  images: {
+    formats: ["image/webp"],
+    remotePatterns: [{ protocol: "https", hostname: "cdn.sanity.io", pathname: `/images/${SANITY_PROJECT_ID}/${SANITY_DATASET}/**` }],
+  },
+  // The build-time CMS snapshot is read with fs at runtime; ship it with every server function.
+  outputFileTracingIncludes: { "/**": ["./lib/cms/snapshot.generated.json"] },
+  // Same-origin, single-segment proxy to THIS project's assets only. Keeps CSP img-src 'self' and
+  // lets downloads use the `download` attribute. Only known-safe extensions are proxied, so an
+  // uploaded .html or .svg can never be served from the site's own origin (stored-XSS guard).
+  // Verified: a header set here for /cms-assets is overridden by Sanity's own response headers
+  // (script-src 'none', nosniff), so the extension allowlist is the control, not a headers() rule.
+  async rewrites() {
+    return [
+      { source: "/cms-assets/images/:file([A-Za-z0-9_-]+\\.(?:png|jpe?g|webp|avif|gif))", destination: `https://cdn.sanity.io/images/${SANITY_PROJECT_ID}/${SANITY_DATASET}/:file` },
+      { source: "/cms-assets/files/:file([A-Za-z0-9_-]+\\.(?:pdf|docx?|pptx?|xlsx?))", destination: `https://cdn.sanity.io/files/${SANITY_PROJECT_ID}/${SANITY_DATASET}/:file` },
+    ];
+  },
   async headers() {
     return [
       {
@@ -25,7 +42,7 @@ const nextConfig = {
         headers: [{ key: "Content-Security-Policy", value: "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'" }],
       },
       {
-        source: "/:folder(logos|images)/:path*",
+        source: "/:folder(logos|images|cms-assets)/:path*",
         headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
       },
     ];
