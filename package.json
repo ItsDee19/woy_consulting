@@ -7,6 +7,8 @@
     "dev": "next dev -p 5173",
     "prebuild": "node scripts/cms-snapshot.mjs",
     "cms:snapshot": "node scripts/cms-snapshot.mjs",
+    "cms:secret": "node scripts/cms-create-secret.mjs",
+    "cms:revalidate": "node --env-file-if-exists=.env.local scripts/cms-revalidate.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
