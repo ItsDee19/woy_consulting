@@ -183,3 +183,7 @@
 @media (forced-colors: active) {
   .contact { border: 1px solid ButtonText; }
 }
+
+/* A download button next to the contact button needs a gap; a lone contact button is unchanged. */
+.takeaway .contact + .contact { margin-left: 12px; }
+@media (max-width: 700px) { .takeaway .contact + .contact { margin-left: 0; margin-top: 12px; } }

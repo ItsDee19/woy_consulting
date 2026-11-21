@@ -159,9 +159,9 @@ const workPages = [
 page.on("pageerror", error => errors.push({ url: page.url(), message: error.message }));
 // Cover request-rendered pages too; nonce CSP deliberately disables static HTML.
 const appPaths = JSON.parse(fs.readFileSync(".next/server/app-paths-manifest.json", "utf8"));
-const content = fs.readFileSync("lib/content.ts", "utf8");
-const caseBlock = content.split("export const caseStudies: CaseStudy[] = [")[1].split("export ")[0];
-const caseRoutes = [...caseBlock.matchAll(/slug: "([^"]+)"/g)].map(match => `/case-studies/${match[1]}`);
+const sitemapXml = await (await fetch(`${base}/sitemap.xml`)).text();
+const caseRoutes = [...sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => new URL(match[1]).pathname).filter(route => route.startsWith("/case-studies/"));
+assert.equal(caseRoutes.length, 6, "Six older case-study routes are listed in the sitemap");
 const routes = [...new Set([...Object.keys(appPaths)
   .filter(route => route.endsWith("/page") && !route.startsWith("/_") && !route.includes("["))
   .map(route => route.replace(/\/page$/, "") || "/"), ...caseRoutes, ...profilePages.map(profile => `/people/${profile.slug}`), ...workPages.map(item => `/work/${item.slug}`)])];
@@ -384,6 +384,7 @@ try {
       ["Selected work", "/work"],
       ["Leadership & Partners", "/people"],
       ["Our approach", "/approach"],
+      ["Resources", "/resources"],
     ], "Explore links use the current page destinations");
     assert.equal(await footer.locator('a[href="/terms-and-conditions"]').count(), 0, "Footer omits Terms and Conditions");
     assert.equal(await footer.getByRole("button", { name: "Cookie Policy", exact: true }).count(), 1);
@@ -698,7 +699,8 @@ try {
     const portrait = article.locator("img");
     await portrait.scrollIntoViewIfNeeded();
     await portrait.evaluate(image => image.decode());
-    assert.match(await portrait.getAttribute("src"), new RegExp(slug));
+    assert.match(await portrait.getAttribute("src"), /^\/_next\/image\?url=https%3A%2F%2Fcdn\.sanity\.io%2Fimages%2F/, "Practitioner portrait comes from Sanity via next/image");
+    assert.ok((await portrait.getAttribute("alt")).startsWith(name), `Portrait alt text names ${name}`);
     assert.ok(await portrait.evaluate(image => image.naturalWidth > 0));
     const summary = article.locator("summary");
     await summary.focus();

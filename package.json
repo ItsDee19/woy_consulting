@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/cms-snapshot.mjs --allow-offline",
     "dev": "next dev -p 5173",
+    "prebuild": "node scripts/cms-snapshot.mjs",
+    "cms:snapshot": "node scripts/cms-snapshot.mjs",
+    "cms:secret": "node scripts/cms-create-secret.mjs",
+    "cms:revalidate": "node --env-file-if-exists=.env.local scripts/cms-revalidate.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -18,13 +23,17 @@
     "security:check": "node scripts/security-check.mjs",
     "security:source": "node scripts/security-check.mjs --source-only",
     "test:security-browser": "node tests/security-browser.mjs",
-    "test:contact-security-browser": "node tests/contact-security-browser.mjs"
+    "test:contact-security-browser": "node tests/contact-security-browser.mjs",
+    "test:visual:capture": "node tests/visual-capture.mjs",
+    "test:visual:compare": "node tests/visual-compare.mjs"
   },
   "engines": {
     "node": ">=22.19.0"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",
+    "@sanity/client": "^8.11.0",
+    "@sanity/webhook": "^4.0.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.47.0",
@@ -45,7 +54,9 @@
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.3.6",
     "lighthouse": "^13.5.0",
+    "pixelmatch": "^7.2.0",
     "playwright": "^1.63.0",
+    "pngjs": "^7.0.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.3"
   }

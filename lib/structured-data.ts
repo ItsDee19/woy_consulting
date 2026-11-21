@@ -1,4 +1,5 @@
-import { caseStudies, expertiseAreas, practitioners, site, type CaseStudy } from "@/lib/content";
+import { expertiseAreas, site } from "@/lib/content";
+import type { CaseStudyBrief, Practitioner } from "@/lib/cms/types";
 import { siteUrl } from "@/lib/site-url";
 
 export type SchemaNode = Record<string, unknown>;
@@ -111,7 +112,7 @@ export function serviceGraph(): SchemaNode[] {
   }));
 }
 
-export function practitionerGraph(): SchemaNode[] {
+export function practitionerGraph(practitioners: Practitioner[]): SchemaNode[] {
   return practitioners.map((practitioner) => ({
     "@type": "Person",
     "@id": schemaId("/practitioners", practitioner.slug),
@@ -126,7 +127,7 @@ export function practitionerGraph(): SchemaNode[] {
   }));
 }
 
-export function caseStudyListSchema(): SchemaNode {
+export function caseStudyListSchema(caseStudies: CaseStudyBrief[]): SchemaNode {
   return {
     "@type": "ItemList",
     "@id": schemaId("/case-studies", "case-studies"),
@@ -144,7 +145,7 @@ export function caseStudyListSchema(): SchemaNode {
   };
 }
 
-export function caseStudySchema(study: CaseStudy): SchemaNode {
+export function caseStudySchema(study: CaseStudyBrief): SchemaNode {
   const path = `/case-studies/${study.slug}`;
   return {
     "@type": "CreativeWork",

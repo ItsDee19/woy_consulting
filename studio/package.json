@@ -1,0 +1,28 @@
+{
+  "name": "woy-studio",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Sanity Studio for the WOY Consulting website",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "typecheck": "tsc --noEmit",
+    "import:dry": "sanity exec scripts/import-current-content.ts --with-user-token -- --dry-run",
+    "import": "sanity exec scripts/import-current-content.ts --with-user-token"
+  },
+  "dependencies": {
+    "@sanity/orderable-document-list": "^2.0.28",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "sanity": "^6.19.0",
+    "styled-components": "^6.6.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "typescript": "^5.9.3"
+  }
+}

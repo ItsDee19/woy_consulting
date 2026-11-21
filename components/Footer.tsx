@@ -12,6 +12,7 @@ const explore = [
   { label: "Selected work", href: "/work" },
   { label: "Leadership & Partners", href: "/people" },
   { label: "Our approach", href: "/approach" },
+  { label: "Resources", href: "/resources" },
 ];
 
 export function Footer() {

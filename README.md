@@ -1,6 +1,6 @@
 # WOY Consulting - website
 
-A multi-page Next.js site (App Router, TypeScript, Tailwind v4). Core marketing copy is maintained in `lib/content.ts`; policy text lives in the two legal page files.
+A multi-page Next.js site (App Router, TypeScript, Tailwind v4). Case studies, people and documents are edited in Sanity (see `docs/editing-guide.md`); remaining copy lives in `lib/content.ts`; policy text lives in the two legal page files.
 
 ```
 app/
@@ -12,7 +12,9 @@ app/
     page.tsx            index
     [slug]/page.tsx     six generated detail pages
 components/             Nav, Footer, LogoFormation, Mark, ClientLogos, ...
-lib/content.ts          all site copy and data
+lib/content.ts          site copy and data not managed in Sanity
+lib/cms/                reads Sanity (cached, with a build-time snapshot fallback)
+studio/                 the Sanity Studio (separate package)
 lib/site-url.ts         canonical origin for metadata, sitemap and robots
 public/logos/           47 client logos extracted from the WOY deck
 _legacy/                the earlier single-page static build, kept for reference
@@ -67,16 +69,31 @@ through a private channel rather than committing them.
 | `/expertise` | Permanent redirect to the homepage’s `#expertise` section |
 | `/approach` | Interactive 4D journey, connected architectural planes and the ownership built into delivery |
 | `/case-studies` | Featured engagement and outcome-led portfolio of six cases |
-| `/case-studies/[slug]` | Six detail pages, generated from `lib/content.ts` |
+| `/case-studies/[slug]` | Detail pages, generated from the case studies in Sanity |
 | `/practitioners` | Authentic portraits with monochrome/colour hover, experience highlights and expandable biographies |
 | `/contact` | Direct email to hello@woyconsulting.com, plus the name, email, optional organisation and message form with required consent |
 | `/faq` | Answers about WOY, its services, approach and enquiries |
+| `/resources` | Brochures and reports uploaded in Sanity, newest first, each with a Download link. A short message shows until the first one is published |
 | `/privacy-policy` | Information handling and cookie choices |
 | `/terms-and-conditions` | Website terms and enquiries |
 
-Adding a seventh case study means adding one object to `caseStudies` in
-`lib/content.ts`. The portfolio entry, the detail page, the route and its metadata
+Adding a case study: create it in the Studio and publish. The portfolio entry, the detail page, the route and its metadata
 all follow automatically.
+
+---
+
+## Content management (Sanity)
+
+Case studies, people and downloadable documents live in Sanity (project `hoks8t5u`, dataset `production`, public). WOY staff edit them in the hosted Studio, as described in [docs/editing-guide.md](docs/editing-guide.md). The site reads published content only.
+
+- **Studio:** `studio/` is a separate npm package. Run it locally with `cd studio && npm install && npm run dev` (http://localhost:3333) and publish it with `npx sanity deploy`.
+- **Snapshot:** `npm run cms:snapshot` saves every query result to `lib/cms/snapshot.generated.json` (git-ignored). `npm run dev` and `npm run build` run it first. A **build fails if Sanity is unreachable while the snapshot is taken**, so a deploy never ships without content and the current deployment stays live. At runtime, if Sanity is unreachable and nothing is cached, the site serves this snapshot (and logs `[cms] Sanity unreachable…`).
+- **Instant refresh:** publishing in Sanity calls a signed webhook, `POST https://<domain>/api/revalidate`. In Sanity (Manage → API → Webhooks) trigger it on Create, Update and Delete for `_type in ["caseStudy","person","resource"]`, dataset `production`, and give it the secret from `.env.local`. Create that secret with `npm run cms:secret` (written to `.env.local`, never printed) and paste the same value into the Sanity webhook and the Vercel project as `SANITY_REVALIDATE_SECRET`. `npm run cms:revalidate` sends a signed test request to a local server. Without the webhook the site still refreshes within 5 minutes.
+- **Environment:** `SANITY_PROJECT_ID` and `SANITY_DATASET` are optional overrides (the defaults are in `lib/sanity/project.mjs`). `SANITY_REVALIDATE_SECRET` is required in production and must be at least 32 characters.
+- **Uploads are public.** The dataset is public, so an uploaded file can be downloaded before it is published. Only upload material meant for the public.
+- **Images and files** are served from this site's own origin under `/cms-assets/*`, a rewrite limited to this Sanity project and to safe file types, which keeps the Content-Security-Policy unchanged.
+- **Testing an outage:** build normally, then start with `CMS_TEST_UNREACHABLE=1 npm start`. The site should render identically from the snapshot.
+- **Visual checks:** `npm run test:visual:capture -- --label <name>` and `npm run test:visual:compare -- baseline <name>` compare screenshots of every route. Some pixel noise is normal on a busy machine, so re-capture once before treating a difference as real.
 
 ---
 
@@ -183,12 +200,12 @@ The following details require WOY’s production information.
 
 1. **Contact delivery.** Configure Resend, the verified sender and recipient mailboxes, the signing secret, Redis and Turnstile from `.env.example`. Follow [the current setup instructions](docs/security-deployment.md); no separate contact-delivery handler is required. Add the privacy email when provided.
 
-2. **LinkedIn URLs.** `linkedin` is `null` for all three practitioners in
-   `lib/content.ts`, and the card shows a placeholder line. These were not
-   guessed, because a wrong guess points at the wrong person.
+2. **LinkedIn URLs.** The optional **LinkedIn profile** field is empty for all
+   three people in the Studio. These were not guessed, because a wrong guess
+   points at the wrong person.
 
-3. **Headshots.** Set `photo` in `lib/content.ts` to an image path and the
-   initials tile is replaced automatically. Stock faces were not substituted
+3. **Headshots.** Each person's portrait is the image uploaded in the Studio,
+   with the focal point set on the face. Stock faces were not substituted
    under real people's names.
 
 4. **Section photography.** Existing decorative stock photos are optimized locally in `public/images/`. Replace them with WOY-owned photography when available and update meaningful alternatives.

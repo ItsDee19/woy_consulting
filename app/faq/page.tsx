@@ -3,7 +3,8 @@ import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { PageHero } from "@/components/PageHero";
 import { Reveal } from "@/components/Reveal";
 import { StructuredData } from "@/components/StructuredData";
-import { faqItems } from "@/lib/faq";
+import { buildFaqItems } from "@/lib/faq";
+import { getCaseStudyBriefs, getPractitioners } from "@/lib/cms/content";
 import { pageMetadata } from "@/lib/metadata";
 import { contentPageGraph, schemaId, schemaUrl } from "@/lib/structured-data";
 
@@ -15,7 +16,8 @@ export const metadata = pageMetadata(
   "/faq",
 );
 
-export default function FAQPage() {
+export default async function FAQPage() {
+  const faqItems = buildFaqItems({ practitioners: await getPractitioners(), caseStudies: await getCaseStudyBriefs() });
   const structuredData = {
     "@type": "FAQPage",
     "@id": schemaId("/faq", "questions"),

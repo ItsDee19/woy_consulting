@@ -1,12 +1,12 @@
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { CaseCard, TextLink } from "@/components/recreation/Site";
-import { cases, type CaseStudy } from "@/lib/recreation-content";
+import { DownloadButton } from "@/components/DownloadButton";
+import type { Engagement } from "@/lib/cms/types";
 import styles from "./EngagementPage.module.css";
 
 /** The listing and detail pages share the same engagement records and cards. */
-export function EngagementPage({ engagement }: { engagement: CaseStudy }) {
-  const related = cases.filter(item => item.slug !== engagement.slug).slice(0, 2);
+export function EngagementPage({ engagement, related }: { engagement: Engagement; related: Engagement[] }) {
 
   return (
     <div className={`recreation ${styles.page}`} data-engagement-detail={engagement.slug}>
@@ -74,6 +74,7 @@ export function EngagementPage({ engagement }: { engagement: CaseStudy }) {
           <Link className={styles.contact} href="/contact">
             Discuss a similar challenge<ArrowUpRight size={18} aria-hidden="true" />
           </Link>
+          {engagement.download && <DownloadButton download={engagement.download} className={styles.contact} />}
         </div>
       </section>
 

@@ -1,11 +1,10 @@
 import type { MetadataRoute } from "next";
-import { caseStudies } from "@/lib/content";
-import { cases } from "@/lib/recreation-content";
-import { peopleProfiles } from "@/lib/people-profiles";
+import { getCaseStudyBriefs, getEngagements, getProfiles } from "@/lib/cms/content";
 import { siteUrl } from "@/lib/site-url";
 
 /** Keep public routes, individual profiles, and published cases discoverable. */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [cases, caseStudies, peopleProfiles] = await Promise.all([getEngagements(), getCaseStudyBriefs(), getProfiles()]);
   const pages = [
     { path: "", priority: 1 },
     { path: "/about", priority: 0.8 },
@@ -17,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/practitioners", priority: 0.7 },
     { path: "/contact", priority: 0.6 },
     { path: "/faq", priority: 0.6 },
+    { path: "/resources", priority: 0.6 },
     { path: "/privacy-policy", priority: 0.3 },
     { path: "/terms-and-conditions", priority: 0.3 },
   ];

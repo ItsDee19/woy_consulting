@@ -1,6 +1,7 @@
 import { StructuredData } from "@/components/StructuredData";
 import { PageIntro, TextLink } from "@/components/recreation/Site";
-import { expertise, cases } from "@/lib/recreation-content";
+import { expertise } from "@/lib/recreation-content";
+import { getEngagements } from "@/lib/cms/content";
 import { pageMetadata } from "@/lib/metadata";
 import { contentPageGraph } from "@/lib/structured-data";
 
@@ -10,7 +11,8 @@ export const metadata = pageMetadata(
   "/expertise",
 );
 
-export default function ExpertisePage() {
+export default async function ExpertisePage() {
+  const cases = await getEngagements();
   return (
     <div className="recreation">
       <StructuredData id="expertise-structured-data" nodes={contentPageGraph({

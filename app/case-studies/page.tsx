@@ -3,7 +3,7 @@ import { caseStudyListSchema, contentPageGraph, schemaId } from "@/lib/structure
 import { pageMetadata } from "@/lib/metadata";
 import Link from "next/link";
 import { ArrowDown, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
-import { caseStudies } from "@/lib/content";
+import { getCaseStudyBriefs } from "@/lib/cms/content";
 import { CollectiveExperience } from "@/components/CollectiveExperience";
 import styles from "./case-study-index.module.css";
 
@@ -13,7 +13,8 @@ export const metadata = pageMetadata(
   "/case-studies"
 );
 
-export default function CaseStudiesPage() {
+export default async function CaseStudiesPage() {
+  const caseStudies = await getCaseStudyBriefs();
   return (
     <>
       <StructuredData id="case-studies-structured-data" nodes={[
@@ -21,7 +22,7 @@ export default function CaseStudiesPage() {
           path: "/case-studies", name: "Case Studies", description: metadata.description ?? "",
           type: "CollectionPage", mainEntity: { "@id": schemaId("/case-studies", "case-studies") },
         }),
-        caseStudyListSchema(),
+        caseStudyListSchema(caseStudies),
       ]} />
 
       <header className={`shell ${styles.hero}`}>
@@ -57,7 +58,7 @@ export default function CaseStudiesPage() {
                     </div>
                     <div className={styles.result}>
                       <dt>What changed</dt>
-                      <dd>{study.outcomes[0]}.</dd>
+                      <dd>{study.outcomes[0] ?? study.headline}.</dd>
                     </div>
                   </dl>
                   <span className={styles.readCase}>Read the case study <span className={styles.caseArrow}><ArrowUpRight size={20} aria-hidden="true" /></span></span>

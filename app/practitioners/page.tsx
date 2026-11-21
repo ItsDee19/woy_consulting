@@ -4,7 +4,7 @@ import { ArrowUpRight, Plus, LinkedinLogo } from "@phosphor-icons/react/dist/ssr
 import { StructuredData } from "@/components/StructuredData";
 import { contentPageGraph, practitionerGraph, schemaId } from "@/lib/structured-data";
 import { pageMetadata } from "@/lib/metadata";
-import { practitioners } from "@/lib/content";
+import { getPractitioners } from "@/lib/cms/content";
 import styles from "./practitioners.module.css";
 
 export const metadata = pageMetadata(
@@ -13,25 +13,8 @@ export const metadata = pageMetadata(
   "/practitioners"
 );
 
-const experience: Record<string, { label: string; detail: string; background: string }> = {
-  "vipin-tuteja": {
-    label: "Business leadership",
-    detail: "Strategy, execution and P&L ownership",
-    background: "Xerox · American Express · Ricoh · Samsung",
-  },
-  "sandeep-bidani": {
-    label: "HR & culture",
-    detail: "Organisation change across global teams",
-    background: "KPMG · American Express · IBM",
-  },
-  "kannan-swaminathan": {
-    label: "Executive coaching",
-    detail: "Coaching for CXOs and senior leaders",
-    background: "ICF Professional Certified Coach",
-  },
-};
-
-export default function PractitionersPage() {
+export default async function PractitionersPage() {
+  const practitioners = await getPractitioners();
   return (
     <>
       <StructuredData id="practitioners-structured-data" nodes={[
@@ -40,7 +23,7 @@ export default function PractitionersPage() {
           type: "CollectionPage",
           mainEntity: practitioners.map((practitioner) => ({ "@id": schemaId("/practitioners", practitioner.slug) })),
         }),
-        ...practitionerGraph(),
+        ...practitionerGraph(practitioners),
       ]} />
 
       <section className={styles.hero}>
@@ -63,7 +46,7 @@ export default function PractitionersPage() {
       <section id="meet-the-practitioners" className={styles.profiles} aria-label="Practitioner profiles">
         <div className={`shell ${styles.profileGrid}`}>
           {practitioners.map((p, i) => {
-            const proof = experience[p.slug];
+            const proof = p.highlight;
             return (
               <article id={p.slug} key={p.slug} className={styles.profile}>
                 <div className={styles.portraitField}>
@@ -83,16 +66,15 @@ export default function PractitionersPage() {
                   <h2>{p.name}</h2>
                   <p className={styles.lede}>{p.lede}</p>
                 </div>
-                <div className={styles.experience}>
+                {proof && <div className={styles.experience}>
                   <p><strong>{proof.label}</strong><span>{proof.detail}</span></p>
                   <p className={styles.background}>{proof.background}</p>
-                </div>
+                </div>}
                 <details className={styles.biography}>
                   <summary>Explore {p.name.split(" ")[0]}’s experience <Plus size={19} aria-hidden /></summary>
                   <div className={styles.bioBody}>
                     {p.bio.map(para => <p key={para.slice(0, 32)}>{para}</p>)}
-                    <h3>Areas of focus</h3>
-                    <ul>{p.expertise.map(item => <li key={item}>{item}</li>)}</ul>
+                    {p.expertise.length > 0 && <><h3>Areas of focus</h3><ul>{p.expertise.map(item => <li key={item}>{item}</li>)}</ul></>}
                     {p.linkedin && <a href={p.linkedin} target="_blank" rel="noopener noreferrer" className={styles.textLink} aria-label={`${p.name} on LinkedIn`}><LinkedinLogo size={19} aria-hidden /> LinkedIn</a>}
                   </div>
                 </details>
